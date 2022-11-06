@@ -1,5 +1,6 @@
 // Services
-import productsService from "./products.service";
-import categoryService from "./category.service";
+import * as productsService from "./products.service";
+import * as categoryService from "./category.service";
+import * as brandService from "./brand.service";
 
-export { productsService, categoryService };
+export { productsService, categoryService, brandService };

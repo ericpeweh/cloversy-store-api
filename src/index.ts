@@ -22,6 +22,7 @@ app.get("/", (req, res) => {
 
 app.use("/products", router.productsRouter);
 app.use("/category", router.categoryRouter);
+app.use("/brands", router.brandRouter);
 
 app.listen(port, () => {
 	console.log(`Server is running at http://localhost:${port}`);

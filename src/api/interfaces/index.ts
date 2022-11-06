@@ -1,4 +1,2 @@
 // Types & Interfaces
-import { ProductType } from "./product.interface";
-
-export { ProductType };
+export { ProductType, UpdateProductDataArgs } from "./product.interface";

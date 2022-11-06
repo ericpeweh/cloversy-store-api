@@ -1,14 +1,6 @@
 // Data
-import { getAllProducts, createProduct } from "./products.data";
-import { getAllCategories, createCategory, updateCategory, deleteCategory } from "./category.data";
+import * as productRepo from "./products.data";
+import * as categoryRepo from "./category.data";
+import * as brandRepo from "./brand.data";
 
-export default {
-	// Products
-	getAllProducts,
-	createProduct,
-	// Category
-	getAllCategories,
-	createCategory,
-	updateCategory,
-	deleteCategory
-};
+export { productRepo, categoryRepo, brandRepo };

@@ -17,5 +17,6 @@ pool.on("error", err => {
 });
 
 export default {
-	query: (text: string, params: Array<any> = []) => pool.query(text, params)
+	query: (text: string, params: Array<any> = []) => pool.query(text, params),
+	pool
 };

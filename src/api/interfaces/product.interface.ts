@@ -1,4 +1,4 @@
-interface ProductType {
+export interface ProductType {
 	id?: number;
 	title: string;
 	sku?: string;
@@ -10,4 +10,11 @@ interface ProductType {
 	slug: string;
 }
 
-export { ProductType };
+export interface UpdateProductDataArgs {
+	updatedProductData: Array<any>;
+	productId: string;
+	tags: string[];
+	sizes: string[];
+	deleteTagsId: string[];
+	deleteSizesId: string[];
+}

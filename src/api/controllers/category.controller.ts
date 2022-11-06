@@ -2,7 +2,7 @@
 import { Request, Response } from "express";
 
 // Services
-import categoryService from "../services/category.service";
+import { categoryService } from "../services";
 
 // Types
 

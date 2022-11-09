@@ -5,7 +5,6 @@ import { Request, Response } from "express";
 import { productsService } from "../services";
 
 // Types
-import { ProductType } from "../interfaces";
 
 export const getAllProducts = async (req: Request, res: Response) => {
 	try {

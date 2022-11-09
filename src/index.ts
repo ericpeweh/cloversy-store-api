@@ -7,7 +7,7 @@ import axios from "axios";
 // Configs
 
 // Middlewares
-import { isAuth } from "./api/middlewares";
+import { isAuth, checkUser, isAdmin } from "./api/middlewares";
 
 // Routes
 import router from "./api/routes";
@@ -22,14 +22,13 @@ app.use(express.json());
 app.use(cors());
 
 // Authentication
-app.use(isAuth);
 
 // Routing
 app.get("/", (req, res) => {
 	res.send("<h1>Hello world</h1>");
 });
 
-app.get("/profile", async (req, res) => {
+app.get("/profile", isAuth, checkUser, isAdmin, async (req, res) => {
 	const accessToken = req.headers.authorization?.split(" ")[1];
 	const response = await axios.get("https://dev-yinr7e34g2h7igf4.us.auth0.com/userinfo", {
 		headers: {

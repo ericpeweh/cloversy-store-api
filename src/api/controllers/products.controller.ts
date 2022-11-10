@@ -4,6 +4,9 @@ import { Request, Response } from "express";
 // Services
 import { productsService } from "../services";
 
+// Utils
+import { ErrorObj } from "../utils";
+
 // Types
 
 export const getAllProducts = async (req: Request, res: Response) => {
@@ -28,7 +31,7 @@ export const getSingleProduct = async (req: Request, res: Response) => {
 		const { productSlug } = req.params;
 
 		if (typeof productId !== "string") {
-			throw new Error("Query param 'id' has to be of type string");
+			throw new ErrorObj.ClientError("Query param 'id' has to be of type string");
 		}
 
 		const result = await productsService.getSingleProduct(productId, productSlug);
@@ -38,7 +41,7 @@ export const getSingleProduct = async (req: Request, res: Response) => {
 			data: { product: result }
 		});
 	} catch (error: any) {
-		res.status(400).json({
+		res.status(error.statusCode || 500).json({
 			status: "error",
 			message: error.message
 		});

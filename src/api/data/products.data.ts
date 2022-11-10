@@ -49,12 +49,12 @@ export const createProduct = async (productData: Array<any>, tags: string[], siz
 		const productId = productResult.rows[0].id;
 
 		const tagResult: string[] = [];
-		tags.forEach(async tag => {
-			const productTagQuery = `INSERT INTO product_tag(
-        product_id,
-        tag
-      ) VALUES ($1, $2) RETURNING tag`;
+		const productTagQuery = `INSERT INTO product_tag(
+      product_id,
+      tag
+    ) VALUES ($1, $2) RETURNING tag`;
 
+		tags.forEach(async tag => {
 			const addedTag = await client.query(productTagQuery, [productId, tag]);
 
 			tagResult.push(addedTag.rows[0].tag);

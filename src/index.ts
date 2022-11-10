@@ -2,12 +2,10 @@
 import express, { Express } from "express";
 import dotenv from "dotenv";
 import cors from "cors";
-import axios from "axios";
 
 // Configs
 
 // Middlewares
-import { isAuth, checkUser, isAdmin } from "./api/middlewares";
 import { isAuth, checkUser, isAdmin, errorHandler } from "./api/middlewares";
 
 // Routes
@@ -22,27 +20,18 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cors());
 
-// Authentication
-
 // Routing
 app.get("/", (req, res) => {
 	res.send("<h1>Hello world</h1>");
 });
 
-app.get("/profile", isAuth, checkUser, isAdmin, async (req, res) => {
-	const accessToken = req.headers.authorization?.split(" ")[1];
-	const response = await axios.get("https://dev-yinr7e34g2h7igf4.us.auth0.com/userinfo", {
-		headers: {
-			Authorization: `Bearer ${accessToken}`
-		}
-	});
-	const userData = response.data;
-	res.json(userData);
-});
-
+app.use(isAuth, checkUser);
 app.use("/products", router.productsRouter);
-app.use("/category", router.categoryRouter);
-app.use("/brands", router.brandRouter);
+app.use("/category", isAdmin, router.categoryRouter);
+app.use("/brands", isAdmin, router.brandRouter);
+app.use("/customers", isAdmin, router.userRouter);
+app.use("/vouchers", isAdmin, router.voucherRouter);
+
 // Error handling middleware
 app.use(errorHandler);
 

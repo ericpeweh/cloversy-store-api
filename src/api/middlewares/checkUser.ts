@@ -16,7 +16,7 @@ const checkUser = async (req: Request, _: Response, next: NextFunction) => {
 			}
 		});
 		const auth0UserData = response.data;
-		let userData = await userService.getUserData(auth0UserData.email);
+		let userData = await userService.getUserDataByEmail(auth0UserData.email);
 
 		if (userData === undefined) {
 			userData = await userService.createNewUser([

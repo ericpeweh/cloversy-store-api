@@ -8,6 +8,7 @@ import axios from "axios";
 
 // Middlewares
 import { isAuth, checkUser, isAdmin } from "./api/middlewares";
+import { isAuth, checkUser, isAdmin, errorHandler } from "./api/middlewares";
 
 // Routes
 import router from "./api/routes";
@@ -42,6 +43,8 @@ app.get("/profile", isAuth, checkUser, isAdmin, async (req, res) => {
 app.use("/products", router.productsRouter);
 app.use("/category", router.categoryRouter);
 app.use("/brands", router.brandRouter);
+// Error handling middleware
+app.use(errorHandler);
 
 app.listen(port, () => {
 	console.log(`Server is running at http://localhost:${port}`);

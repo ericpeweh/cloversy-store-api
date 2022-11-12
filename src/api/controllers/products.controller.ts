@@ -31,7 +31,7 @@ export const getSingleProduct = async (req: Request, res: Response) => {
 		const { productSlug } = req.params;
 
 		if (typeof productId !== "string") {
-			throw new ErrorObj.ClientError("Query param 'id' has to be of type string");
+			throw new ErrorObj.ClientError("Query param 'id' has to be type of string");
 		}
 
 		const result = await productsService.getSingleProduct(productId, productSlug);

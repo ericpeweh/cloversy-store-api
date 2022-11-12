@@ -12,11 +12,11 @@ import { ErrorObj } from "../utils";
 export const getAllCustomers = async (req: Request, res: Response) => {
 	const { q: searchQuery = "", status: statusQuery = "" } = req.query;
 
-	if (typeof searchQuery !== "string" || typeof statusQuery !== "string") {
-		throw new ErrorObj.ClientError("Query param 'q' and 'status' has to be of type string");
-	}
-
 	try {
+		if (typeof searchQuery !== "string" || typeof statusQuery !== "string") {
+			throw new ErrorObj.ClientError("Query param 'q' and 'status' has to be type of string");
+		}
+
 		const result = await userService.getAllCustomers(searchQuery, statusQuery);
 
 		res.status(200).json({

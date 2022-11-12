@@ -4,6 +4,9 @@ import db from "../../config/connectDB";
 // Types
 import { UpdateProductDataArgs } from "../interfaces";
 
+// Utils
+import { ErrorObj } from "../utils";
+
 export const getAllProducts = async () => {
 	const query = "SELECT * FROM product";
 	const products = await db.query(query);
@@ -16,7 +19,7 @@ export const getSingleProduct = async (productId: string, productSlug: string) =
 	const productResult = await db.query(productQuery, [productId, productSlug]);
 
 	if (productResult.rows.length === 0) {
-		throw new Error("Product not found!");
+		throw new ErrorObj.ClientError("Product not found!", 404);
 	}
 
 	const tags = await db.query("SELECT tag FROM product_tag WHERE product_id = $1", [productId]);

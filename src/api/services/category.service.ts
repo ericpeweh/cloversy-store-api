@@ -1,10 +1,10 @@
 // Data
 import { categoryRepo } from "../data";
 
-export const getAllCategories = async () => {
-	const categories = await categoryRepo.getAllCategories();
+export const getAllCategories = async (page: string, q: string, sortBy: string) => {
+	const result = await categoryRepo.getAllCategories(page, q, sortBy);
 
-	return categories;
+	return result;
 };
 
 export const createCategory = async (categoryData: any[]) => {

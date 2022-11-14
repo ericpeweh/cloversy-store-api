@@ -4,15 +4,35 @@ import { Request, Response } from "express";
 // Services
 import { categoryService } from "../services";
 
+// Utils
+import { ErrorObj } from "../utils";
+
 // Types
 
 export const getAllCategories = async (req: Request, res: Response) => {
+	const { page = "1", q = "", sortBy = "" } = req.query;
+
 	try {
-		const result = await categoryService.getAllCategories();
+		if (typeof sortBy !== "string" || typeof q !== "string" || typeof page !== "string") {
+			throw new ErrorObj.ClientError(
+				"Query param 'page', 'q', and 'sortBy' has to be type of string"
+			);
+		}
+
+		if (!["product_amount", "a-z", "z-a", ""].includes(sortBy)) {
+			throw new ErrorObj.ClientError("Query param 'sortBy' is not supported");
+		}
+
+		const { categories, ...paginationData } = await categoryService.getAllCategories(
+			page,
+			q,
+			sortBy
+		);
 
 		res.status(200).json({
 			status: "success",
-			data: { categories: result.rows }
+			...paginationData,
+			data: { categories: categories.rows }
 		});
 	} catch (error: any) {
 		res.status(400).json({

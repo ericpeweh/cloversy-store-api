@@ -1,13 +1,11 @@
 // Dependencies
-import { Response, NextFunction, Request } from "express";
+import { Response, Request } from "express";
 import axios from "axios";
-
-// Interfaces
 
 // Services
 import { userService } from "../services";
 
-const checkUser = async (req: Request, _: Response, next: NextFunction) => {
+export const authUser = async (req: Request, res: Response) => {
 	try {
 		const accessToken = req.headers.authorization?.split(" ")[1];
 		const response = await axios.get("https://dev-yinr7e34g2h7igf4.us.auth0.com/userinfo", {
@@ -22,15 +20,17 @@ const checkUser = async (req: Request, _: Response, next: NextFunction) => {
 			userData = await userService.createNewUser([
 				auth0UserData.name,
 				auth0UserData.email,
-				auth0UserData.picture
+				auth0UserData.picture,
+				auth0UserData.sub
 			]);
 		}
-		req.user = userData;
-	} catch (error) {
-		console.error(error);
-	} finally {
-		next();
+		res.status(200).json({
+			status: "success"
+		});
+	} catch (error: any) {
+		res.status(error.statusCode || 500).json({
+			status: "error",
+			message: error.message
+		});
 	}
 };
-
-export default checkUser;

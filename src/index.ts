@@ -6,7 +6,7 @@ import cors from "cors";
 // Configs
 
 // Middlewares
-import { isAuth, checkUser, isAdmin, errorHandler } from "./api/middlewares";
+import { isAuth, isAdmin, errorHandler } from "./api/middlewares";
 
 // Routes
 import router from "./api/routes";
@@ -25,7 +25,9 @@ app.get("/", (req, res) => {
 	res.send("<h1>Hello world</h1>");
 });
 
-app.use(isAuth, checkUser);
+app.use(isAuth);
+
+app.use("/auth", router.authRouter);
 app.use("/products", router.productsRouter);
 app.use("/category", isAdmin, router.categoryRouter);
 app.use("/brands", isAdmin, router.brandRouter);

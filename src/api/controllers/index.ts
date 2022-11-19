@@ -4,11 +4,13 @@ import * as categoryController from "./category.controller";
 import * as brandController from "./brand.controller";
 import * as userController from "./user.controller";
 import * as voucherController from "./voucher.controller";
+import * as authController from "./auth.controller";
 
 export {
 	productsController,
 	categoryController,
 	brandController,
 	userController,
-	voucherController
+	voucherController,
+	authController
 };

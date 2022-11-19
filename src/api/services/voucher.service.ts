@@ -2,23 +2,35 @@
 import { voucherRepo } from "../data";
 
 export const getAllVouchers = async (voucherStatus: string, sortBy: string) => {
-	const vouchers = await voucherRepo.getAllVouchers(voucherStatus, sortBy);
+	try {
+		const vouchers = await voucherRepo.getAllVouchers(voucherStatus, sortBy);
 
-	return vouchers;
+		return vouchers;
+	} catch (error) {
+		throw error;
+	}
 };
 
 export const getSingleVoucher = async (voucherCode: string) => {
-	const { voucherResult, selectedUsers } = await voucherRepo.getSingleVoucher(voucherCode);
+	try {
+		const { voucherResult, selectedUsers } = await voucherRepo.getSingleVoucher(voucherCode);
 
-	return selectedUsers.length > 0
-		? { ...voucherResult.rows[0], selectedUsers }
-		: voucherResult.rows[0];
+		return selectedUsers.length > 0
+			? { ...voucherResult.rows[0], selectedUsers }
+			: voucherResult.rows[0];
+	} catch (error) {
+		throw error;
+	}
 };
 
 export const createVoucher = async (voucherData: any[], selectedUserIds: string[] | number[]) => {
-	const newVoucher = await voucherRepo.createVoucher(voucherData, selectedUserIds);
+	try {
+		const newVoucher = await voucherRepo.createVoucher(voucherData, selectedUserIds);
 
-	return newVoucher;
+		return newVoucher;
+	} catch (error) {
+		throw error;
+	}
 };
 
 export const updateVoucher = async (
@@ -27,12 +39,16 @@ export const updateVoucher = async (
 	removedUserIds: string[] | number[],
 	code: string
 ) => {
-	const updatedVoucher = await voucherRepo.updateVoucher(
-		updatedVoucherData,
-		selectedUserIds,
-		removedUserIds,
-		code
-	);
+	try {
+		const updatedVoucher = await voucherRepo.updateVoucher(
+			updatedVoucherData,
+			selectedUserIds,
+			removedUserIds,
+			code
+		);
 
-	return updatedVoucher;
+		return updatedVoucher;
+	} catch (error) {
+		throw error;
+	}
 };

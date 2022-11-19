@@ -85,6 +85,8 @@ export const createProduct = async (productData: Array<any>, tags: string[], siz
 	}
 };
 
+import generateUpdateQuery from "../utils/generateUpdateQuery";
+
 export const updateProduct = async (updateProductData: UpdateProductDataArgs) => {
 	const client = await db.pool.connect();
 	const { updatedProductData, productId, tags, sizes, deleteTagsId, deleteSizesId } =
@@ -93,25 +95,21 @@ export const updateProduct = async (updateProductData: UpdateProductDataArgs) =>
 	try {
 		await client.query("BEGIN");
 
-		const productQuery = `UPDATE product SET 
-    title = $1,  
-    sku = $2,
-    price = $3,
-    status = $4,
-    category_id = $5,
-    brand_id = $6,
-    description = $7,
-    slug = $8
-    WHERE id = $9 RETURNING * `;
+		const { query: productQuery, params: productParams } = generateUpdateQuery(
+			"product",
+			updatedProductData,
+			{ id: productId },
+			` RETURNING *`
+		);
 
-		const productResult = await db.query(productQuery, [...updatedProductData, productId]);
+		const productResult = await db.query(productQuery, productParams);
 
 		const tagResult: string[] = [];
 		tags.forEach(async tag => {
 			const productTagQuery = `INSERT INTO product_tag(
-        product_id,
-        tag
-      ) VALUES ($1, $2) RETURNING tag`;
+	      product_id,
+	      tag
+	    ) VALUES ($1, $2) RETURNING tag`;
 
 			const addedTag = await client.query(productTagQuery, [productId, tag]);
 
@@ -121,9 +119,9 @@ export const updateProduct = async (updateProductData: UpdateProductDataArgs) =>
 		const sizeResult: string[] = [];
 		sizes.forEach(async size => {
 			const productSizeQuery = `INSERT INTO product_size(
-        product_id,
-        size
-      ) VALUES ($1, $2) RETURNING size`;
+	      product_id,
+	      size
+	    ) VALUES ($1, $2) RETURNING size`;
 
 			const addedSize = await client.query(productSizeQuery, [productId, size]);
 

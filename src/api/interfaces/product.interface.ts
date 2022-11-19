@@ -11,7 +11,7 @@ export interface ProductType {
 }
 
 export interface UpdateProductDataArgs {
-	updatedProductData: Array<any>;
+	updatedProductData: Object;
 	productId: string;
 	tags: string[];
 	sizes: string[];

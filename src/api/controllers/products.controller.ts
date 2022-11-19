@@ -97,7 +97,7 @@ export const updateProduct = async (req: Request, res: Response) => {
 			deleteSizesId = []
 		} = req.body;
 
-		const updatedProductData = [
+		const updatedProductData = {
 			title,
 			sku,
 			price,
@@ -106,7 +106,7 @@ export const updateProduct = async (req: Request, res: Response) => {
 			brand_id,
 			description,
 			slug
-		];
+		};
 
 		const result = await productsService.updateProduct({
 			updatedProductData,
@@ -122,8 +122,6 @@ export const updateProduct = async (req: Request, res: Response) => {
 			data: { updatedProduct: result }
 		});
 	} catch (error: any) {
-		console.log(error);
-
 		res.status(400).json({
 			status: "error",
 			message: error.message

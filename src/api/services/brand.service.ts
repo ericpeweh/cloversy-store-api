@@ -1,8 +1,8 @@
 // Data
 import { brandRepo } from "../data";
 
-export const getAllBrands = async () => {
-	const brands = await brandRepo.getAllBrands();
+export const getAllBrands = async (page: string, q: string, sortBy: string) => {
+	const brands = await brandRepo.getAllBrands(page, q, sortBy);
 
 	return brands;
 };

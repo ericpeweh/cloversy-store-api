@@ -10,7 +10,7 @@ import { ErrorObj } from "../utils";
 // Types
 
 export const getAllCategories = async (req: Request, res: Response) => {
-	const { page = "1", q = "", sortBy = "" } = req.query;
+	const { page = "1", q = "", sortBy = "id" } = req.query;
 
 	try {
 		if (typeof sortBy !== "string" || typeof q !== "string" || typeof page !== "string") {
@@ -19,7 +19,7 @@ export const getAllCategories = async (req: Request, res: Response) => {
 			);
 		}
 
-		if (!["product_amount", "a-z", "z-a", ""].includes(sortBy)) {
+		if (!["product_amount", "a-z", "z-a", "id", ""].includes(sortBy)) {
 			throw new ErrorObj.ClientError("Query param 'sortBy' is not supported");
 		}
 

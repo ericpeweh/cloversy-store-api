@@ -4,7 +4,7 @@ import db from "../../config/connectDB";
 export const getAllCategories = async (page: string, searchQuery: string, sortBy: string) => {
 	let paramsIndex = 0;
 	const params = [];
-	const limit = 20;
+	const limit = 10;
 	const offset = parseInt(page) * limit - limit;
 
 	let query = `SELECT *,
@@ -13,9 +13,11 @@ export const getAllCategories = async (page: string, searchQuery: string, sortBy
       WHERE p.category_id = c.id
     ) AS product_amount 
     FROM category c`;
+	let totalQuery = `SELECT COUNT(id) FROM category`;
 
 	if (searchQuery) {
 		query += ` WHERE name iLIKE $${paramsIndex + 1}`;
+		totalQuery += ` WHERE name iLIKE $1`;
 		paramsIndex += 1;
 		params.push(`%${searchQuery}%`);
 	}
@@ -26,13 +28,10 @@ export const getAllCategories = async (page: string, searchQuery: string, sortBy
 
 		query += ` ORDER BY ${sorter} ${sortType}`;
 	}
-
 	query += ` LIMIT ${limit} OFFSET ${offset}`;
 
 	const categories = await db.query(query, params);
-
-	const totalQuery = `SELECT COUNT(id) FROM category`;
-	const totalResult = await db.query(totalQuery);
+	const totalResult = await db.query(totalQuery, params);
 	const totalCategory = totalResult.rows[0].count;
 
 	return {

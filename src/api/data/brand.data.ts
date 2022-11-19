@@ -1,11 +1,46 @@
 // Config
 import db from "../../config/connectDB";
 
-export const getAllBrands = async () => {
-	const query = "SELECT * FROM brand";
-	const brands = await db.query(query);
+export const getAllBrands = async (page: string, searchQuery: string, sortBy: string) => {
+	let paramsIndex = 0;
+	const params = [];
+	const limit = 10;
+	const offset = parseInt(page) * limit - limit;
 
-	return brands;
+	let query = `SELECT *,
+    (SELECT 
+      COUNT(*) FROM product p
+      WHERE p.brand_id = b.id
+    ) AS product_amount  
+    FROM brand b`;
+	let totalQuery = `SELECT COUNT(id) FROM brand`;
+
+	if (searchQuery) {
+		query += ` WHERE name iLIKE $${paramsIndex + 1}`;
+		totalQuery += ` WHERE name iLIKE $1`;
+		paramsIndex += 1;
+		params.push(`%${searchQuery}%`);
+	}
+
+	if (sortBy) {
+		const sorter = sortBy === "a-z" || sortBy === "z-a" ? "name" : sortBy;
+		const sortType = sortBy === "a-z" ? "ASC" : "DESC";
+
+		query += ` ORDER BY ${sorter} ${sortType}`;
+	}
+	query += ` LIMIT ${limit} OFFSET ${offset}`;
+
+	const brands = await db.query(query, params);
+	const totalResult = await db.query(totalQuery, params);
+	const totalBrands = totalResult.rows[0].count;
+
+	return {
+		brands,
+		page: parseInt(page),
+		pageSize: limit,
+		totalCount: parseInt(totalBrands),
+		totalPages: Math.ceil(totalBrands / limit)
+	};
 };
 
 export const createBrand = async (brandData: Array<any>) => {

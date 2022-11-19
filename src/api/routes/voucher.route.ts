@@ -10,6 +10,6 @@ const router = Router();
 router.get("/", voucherController.getAllVouchers);
 router.get("/:voucherCode", voucherController.getSingleVoucher);
 router.post("/", voucherController.createVoucher);
-router.put("/", voucherController.updateVoucher);
+router.put("/:voucherCode", voucherController.updateVoucher);
 
 export default router;

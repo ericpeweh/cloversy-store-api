@@ -15,11 +15,11 @@ export const getAllVouchers = async (voucherStatus: string, sortBy: string) => {
 		paramsIndex += 1;
 	}
 
-	if (sortBy && sortBy !== "latest") {
+	if (sortBy && sortBy !== "id") {
 		voucherQuery += ` ORDER BY ${sortBy} ASC`;
 	}
 
-	if (sortBy === "latest") {
+	if (sortBy === "id") {
 		voucherQuery += ` ORDER BY created_at DESC`;
 	}
 
@@ -69,8 +69,9 @@ export const createVoucher = async (
       discount,
       discount_type,
       status,
-      voucher_scope
-    ) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`;
+      voucher_scope,
+      description
+    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *`;
 
 		const voucherResult = await client.query(voucherQuery, voucherData);
 		const newVoucherCode = voucherResult.rows[0].code;
@@ -113,8 +114,9 @@ export const updateVoucher = async (
       discount = $3,
       discount_type = $4,
       status = $5,
-      voucher_scope = $6
-      WHERE code = $7 RETURNING *`;
+      voucher_scope = $6,
+      description = $7
+      WHERE code = $8 RETURNING *`;
 
 		const voucherResult = await client.query(voucherQuery, [...updatedVoucherData, code]);
 		const isVoucherGlobalScoped = voucherResult.rows[0].voucher_scope === "global";

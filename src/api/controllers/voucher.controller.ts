@@ -15,7 +15,7 @@ export const getAllVouchers = async (req: Request, res: Response) => {
 			throw new ErrorObj.ClientError("Query param 'status' and 'sortBy' has to be type of string");
 		}
 
-		if (!["current_usage", "latest", "expiry_date", ""].includes(sortBy)) {
+		if (!["current_usage", "latest", "expiry_date", "id", ""].includes(sortBy)) {
 			throw new ErrorObj.ClientError("Query param 'sortBy' is not supported");
 		}
 
@@ -60,22 +60,24 @@ export const createVoucher = async (req: Request, res: Response) => {
 		const {
 			code,
 			title,
-			expiryDate = null,
+			expiry_date = null,
 			status,
 			discount,
-			discountType,
-			voucherScope,
+			discount_type,
+			voucher_scope,
+			description,
 			selectedUserIds = []
 		} = req.body;
 
 		const voucherQueryData = [
 			code,
 			title,
-			expiryDate,
+			expiry_date,
 			discount,
-			discountType,
+			discount_type,
 			status,
-			voucherScope
+			voucher_scope,
+			description
 		];
 
 		const result = await voucherService.createVoucher(voucherQueryData, selectedUserIds);
@@ -93,26 +95,36 @@ export const createVoucher = async (req: Request, res: Response) => {
 };
 
 export const updateVoucher = async (req: Request, res: Response) => {
+	const { voucherCode } = req.params;
+
 	try {
 		const {
-			code,
 			title,
 			status,
-			expiryDate,
+			expiry_date,
 			discount,
-			discountType,
-			voucherScope,
+			discount_type,
+			voucher_scope,
+			description,
 			selectedUserIds = [],
 			removedUserIds = []
 		} = req.body;
 
-		const voucherQueryData = [title, expiryDate, discount, discountType, status, voucherScope];
+		const voucherQueryData = [
+			title,
+			expiry_date,
+			discount,
+			discount_type,
+			status,
+			voucher_scope,
+			description
+		];
 
 		const result = await voucherService.updateVoucher(
 			voucherQueryData,
 			selectedUserIds,
 			removedUserIds,
-			code
+			voucherCode
 		);
 
 		res.status(200).json({
@@ -120,8 +132,6 @@ export const updateVoucher = async (req: Request, res: Response) => {
 			data: { updatedVoucher: result.rows[0] }
 		});
 	} catch (error: any) {
-		console.log(error);
-
 		res.status(400).json({
 			status: "error",
 			message: error.message

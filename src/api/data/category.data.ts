@@ -28,7 +28,10 @@ export const getAllCategories = async (page: string, searchQuery: string, sortBy
 
 		query += ` ORDER BY ${sorter} ${sortType}`;
 	}
-	query += ` LIMIT ${limit} OFFSET ${offset}`;
+
+	if (page) {
+		query += ` LIMIT ${limit} OFFSET ${offset}`;
+	}
 
 	const categories = await db.query(query, params);
 	const totalResult = await db.query(totalQuery, params);
@@ -36,8 +39,8 @@ export const getAllCategories = async (page: string, searchQuery: string, sortBy
 
 	return {
 		categories,
-		page: parseInt(page),
-		pageSize: limit,
+		page: parseInt(page) || "all",
+		pageSize: categories.rowCount,
 		totalCount: parseInt(totalCategory),
 		totalPages: Math.ceil(totalCategory / limit)
 	};

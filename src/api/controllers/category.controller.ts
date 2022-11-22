@@ -10,7 +10,7 @@ import { ErrorObj } from "../utils";
 // Types
 
 export const getAllCategories = async (req: Request, res: Response) => {
-	const { page = "1", q = "", sortBy = "id" } = req.query;
+	const { page = "", q = "", sortBy = "id" } = req.query;
 
 	try {
 		if (typeof sortBy !== "string" || typeof q !== "string" || typeof page !== "string") {

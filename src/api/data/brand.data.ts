@@ -28,7 +28,10 @@ export const getAllBrands = async (page: string, searchQuery: string, sortBy: st
 
 		query += ` ORDER BY ${sorter} ${sortType}`;
 	}
-	query += ` LIMIT ${limit} OFFSET ${offset}`;
+
+	if (page) {
+		query += ` LIMIT ${limit} OFFSET ${offset}`;
+	}
 
 	const brands = await db.query(query, params);
 	const totalResult = await db.query(totalQuery, params);
@@ -36,8 +39,8 @@ export const getAllBrands = async (page: string, searchQuery: string, sortBy: st
 
 	return {
 		brands,
-		page: parseInt(page),
-		pageSize: limit,
+		page: parseInt(page) || "all",
+		pageSize: brands.rowCount,
 		totalCount: parseInt(totalBrands),
 		totalPages: Math.ceil(totalBrands / limit)
 	};

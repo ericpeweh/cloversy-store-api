@@ -3,20 +3,90 @@ import db from "../../config/connectDB";
 
 // Types
 import { UpdateProductDataArgs } from "../interfaces";
+import { UploadResponse } from "@google-cloud/storage";
 
 // Utils
 import { ErrorObj } from "../utils";
+import generateUpdateQuery from "../utils/generateUpdateQuery";
 
-export const getAllProducts = async () => {
-	const query = "SELECT * FROM product";
-	const products = await db.query(query);
+export const getAllProducts = async (
+	page: string,
+	searchQuery: string,
+	sortBy: string,
+	productStatus: string,
+	brandFilter: string
+) => {
+	let paramsIndex = 0;
+	const params = [];
+	const limit = 12;
+	const offset = parseInt(page) * limit - limit;
 
-	return products;
+	let query = `SELECT p.*, b.name AS brand, 
+    (SELECT url FROM product_image pi 
+      WHERE pi.product_id = p.id 
+      LIMIT 1
+    ) AS image 
+    FROM product p JOIN brand b
+    ON p.brand_id = b.id`;
+
+	let totalQuery = "SELECT COUNT(id) FROM product";
+
+	if (productStatus) {
+		query += ` WHERE status = $${paramsIndex + 1}`;
+		totalQuery += ` WHERE status = $${paramsIndex + 1}`;
+		params.push(productStatus);
+		paramsIndex += 1;
+	}
+
+	if (brandFilter) {
+		const filter = ` ${paramsIndex === 0 ? "WHERE" : "AND"} brand_id = $${paramsIndex + 1}`;
+		query += filter;
+		totalQuery += filter;
+		params.push(brandFilter);
+		paramsIndex += 1;
+	}
+
+	if (searchQuery) {
+		const search = ` ${paramsIndex === 0 ? "WHERE" : "AND"} title iLIKE $${paramsIndex + 1}`;
+		query += search;
+		totalQuery += search;
+		params.push(`%${searchQuery}%`);
+		paramsIndex += 1;
+	}
+
+	if (sortBy) {
+		const sorter = sortBy === "low-to-high" || sortBy === "high-to-low" ? "price" : sortBy;
+		const sortType = sortBy === "low-to-high" ? "ASC" : "DESC";
+
+		query += ` ORDER BY ${sorter} ${sortType}`;
+	}
+
+	if (page) {
+		query += ` LIMIT ${limit} OFFSET ${offset}`;
+	}
+
+	const totalResult = await db.query(totalQuery, params);
+	const totalCustomers = totalResult.rows[0].count;
+
+	const products = await db.query(query, params);
+
+	return {
+		products,
+		page: parseInt(page),
+		pageSize: limit,
+		totalCount: parseInt(totalCustomers),
+		totalPages: Math.ceil(totalCustomers / limit)
+	};
 };
 
-export const getSingleProduct = async (productId: string, productSlug: string) => {
-	const productQuery = "SELECT * FROM product WHERE id = $1 AND slug = $2";
-	const productResult = await db.query(productQuery, [productId, productSlug]);
+export const getSingleProductById = async (productId: string) => {
+	const productQuery = `SELECT p.*, ROUND(p.price) AS price , b.name AS brand, c.name AS category 
+    FROM product p
+    JOIN brand b ON p.brand_id = b.id 
+    JOIN category c ON p.category_id = c.id 
+    WHERE p.id = $1 
+  `;
+	const productResult = await db.query(productQuery, [productId]);
 
 	if (productResult.rows.length === 0) {
 		throw new ErrorObj.ClientError("Product not found!", 404);
@@ -28,7 +98,10 @@ export const getSingleProduct = async (productId: string, productSlug: string) =
 	const sizes = await db.query("SELECT size FROM product_size WHERE product_id = $1", [productId]);
 	const filteredSizes = sizes.rows.map(item => item.size);
 
-	return { productResult, filteredTags, filteredSizes };
+	const images = await db.query("SELECT url FROM product_image WHERE product_id = $1", [productId]);
+	const filteredImages = images.rows.map(item => item.url);
+
+	return { productResult, filteredTags, filteredSizes, filteredImages };
 };
 
 export const createProduct = async (productData: Array<any>, tags: string[], sizes: string[]) => {
@@ -85,11 +158,48 @@ export const createProduct = async (productData: Array<any>, tags: string[], siz
 	}
 };
 
-import generateUpdateQuery from "../utils/generateUpdateQuery";
+export const getProductImages = async (productId: string) => {
+	const imageQuery = `SELECT url FROM product_image WHERE product_id = $1`;
+
+	const imagesResult = await db.query(imageQuery, [productId]);
+
+	return imagesResult;
+};
+
+export const addProductImages = async (productId: string, images: UploadResponse[]) => {
+	const imagesResult: string[] = [];
+
+	const imageQuery = `INSERT INTO product_image(
+      product_id, 
+      url
+    ) VALUES ($1, $2) RETURNING url`;
+
+	for (const imageResponse of images) {
+		const result = await db.query(imageQuery, [
+			productId,
+			`https://storage.googleapis.com/cloversy-store/${imageResponse[1].name}`
+		]);
+
+		imagesResult.push(result.rows[0].url);
+	}
+
+	return imagesResult;
+};
+
+export const removeProductImagesWithUrl = async (
+	productId: string,
+	imagesUrlToDelete: string[]
+) => {
+	const imageQuery = `DELETE FROM product_image WHERE product_id = $1 AND url = ANY ($2)`;
+
+	const result = await db.query(imageQuery, [productId, imagesUrlToDelete]);
+
+	return result;
+};
 
 export const updateProduct = async (updateProductData: UpdateProductDataArgs) => {
 	const client = await db.pool.connect();
-	const { updatedProductData, productId, tags, sizes, deleteTagsId, deleteSizesId } =
+	const { updatedProductData, productId, tags, sizes, removedTags, removedSizes } =
 		updateProductData;
 
 	try {
@@ -128,14 +238,14 @@ export const updateProduct = async (updateProductData: UpdateProductDataArgs) =>
 			sizeResult.push(addedSize.rows[0].size);
 		});
 
-		deleteTagsId.forEach(async tagId => {
-			const tagQuery = `DELETE FROM product_tag WHERE id = $1 AND product_id = $2`;
-			await client.query(tagQuery, [tagId, productId]);
+		removedTags.forEach(async tag => {
+			const tagQuery = `DELETE FROM product_tag WHERE tag = $1 AND product_id = $2`;
+			await client.query(tagQuery, [tag, productId]);
 		});
 
-		deleteSizesId.forEach(async sizeId => {
-			const sizeQuery = `DELETE FROM product_size WHERE id = $1 AND product_id = $2`;
-			await client.query(sizeQuery, [sizeId, productId]);
+		removedSizes.forEach(async size => {
+			const sizeQuery = `DELETE FROM product_size WHERE size = $1 AND product_id = $2`;
+			await client.query(sizeQuery, [size, productId]);
 		});
 
 		const updatedTags = await client.query("SELECT tag FROM product_tag WHERE product_id = $1", [

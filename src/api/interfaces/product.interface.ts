@@ -15,6 +15,7 @@ export interface UpdateProductDataArgs {
 	productId: string;
 	tags: string[];
 	sizes: string[];
-	deleteTagsId: string[];
-	deleteSizesId: string[];
+	removedTags: string[];
+	removedSizes: string[];
+	removedImages: string[];
 }

@@ -1,3 +1,5 @@
 node_modules
 .env
 list.todo
+google-cloud.json
+uploads

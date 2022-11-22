@@ -10,12 +10,43 @@ import { ErrorObj } from "../utils";
 // Types
 
 export const getAllProducts = async (req: Request, res: Response) => {
+	const {
+		status: productStatus = "",
+		brand: brandFilter = "",
+		sortBy = "id",
+		page = "",
+		q = ""
+	} = req.query;
+
 	try {
-		const result = await productsService.getAllProducts();
+		if (
+			typeof sortBy !== "string" ||
+			typeof q !== "string" ||
+			typeof page !== "string" ||
+			typeof productStatus !== "string" ||
+			typeof brandFilter !== "string"
+		) {
+			throw new ErrorObj.ClientError(
+				"Query param 'page', 'q', 'status', and 'sortBy' has to be type of string"
+			);
+		}
+
+		if (!["low-to-high", "high-to-low", "rating", "popularity", "id", ""].includes(sortBy)) {
+			throw new ErrorObj.ClientError("Query param 'sortBy' is not supported");
+		}
+
+		const { products, ...paginationData } = await productsService.getAllProducts(
+			page,
+			q,
+			sortBy,
+			productStatus,
+			brandFilter
+		);
 
 		res.status(200).json({
 			status: "success",
-			data: { products: result.rows }
+			...paginationData,
+			data: { products: products.rows }
 		});
 	} catch (error: any) {
 		res.status(400).json({
@@ -25,16 +56,15 @@ export const getAllProducts = async (req: Request, res: Response) => {
 	}
 };
 
-export const getSingleProduct = async (req: Request, res: Response) => {
+export const getSingleProductById = async (req: Request, res: Response) => {
 	try {
-		const { id: productId } = req.query;
-		const { productSlug } = req.params;
+		const { productId } = req.params;
 
 		if (typeof productId !== "string") {
 			throw new ErrorObj.ClientError("Query param 'id' has to be type of string");
 		}
 
-		const result = await productsService.getSingleProduct(productId, productSlug);
+		const result = await productsService.getSingleProduct(productId);
 
 		res.status(200).json({
 			status: "success",
@@ -62,10 +92,16 @@ export const createProduct = async (req: Request, res: Response) => {
 			tags = [],
 			sizes = []
 		} = req.body;
+		const images = req.files as Express.Multer.File[];
 
 		const postQueryData = [title, sku, price, status, category_id, brand_id, description, slug];
 
-		const result = await productsService.createProduct(postQueryData, tags, sizes);
+		const result = await productsService.createProduct(
+			postQueryData,
+			tags.split(","),
+			sizes.split(","),
+			images
+		);
 
 		res.status(200).json({
 			status: "success",
@@ -91,11 +127,13 @@ export const updateProduct = async (req: Request, res: Response) => {
 			brand_id,
 			description,
 			slug,
-			tags = [],
-			sizes = [],
-			deleteTagsId = [],
-			deleteSizesId = []
+			tags = "",
+			sizes = "",
+			removedTags = "",
+			removedSizes = "",
+			removedImages = ""
 		} = req.body;
+		const images = req.files as Express.Multer.File[];
 
 		const updatedProductData = {
 			title,
@@ -108,14 +146,18 @@ export const updateProduct = async (req: Request, res: Response) => {
 			slug
 		};
 
-		const result = await productsService.updateProduct({
-			updatedProductData,
-			productId,
-			tags,
-			sizes,
-			deleteTagsId,
-			deleteSizesId
-		});
+		const result = await productsService.updateProduct(
+			{
+				updatedProductData,
+				productId,
+				tags: tags.length > 0 ? tags.split(",") : [],
+				sizes: sizes.length > 0 ? sizes.split(",") : [],
+				removedTags: removedTags.length > 0 ? removedTags.split(",") : [],
+				removedSizes: removedSizes.length > 0 ? removedSizes.split(",") : [],
+				removedImages: removedImages.length > 0 ? removedImages.split(",") : []
+			},
+			images
+		);
 
 		res.status(200).json({
 			status: "success",

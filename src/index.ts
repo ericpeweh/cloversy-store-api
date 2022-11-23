@@ -25,14 +25,18 @@ app.get("/", (req, res) => {
 	res.send("<h1>Hello world</h1>");
 });
 
+app.use("/auth", router.authRouter);
+
+// Client routes
 app.use(isAuth);
 
-app.use("/auth", router.authRouter);
-app.use("/products", router.productsRouter);
-app.use("/category", isAdmin, router.categoryRouter);
-app.use("/brands", isAdmin, router.brandRouter);
-app.use("/customers", isAdmin, router.userRouter);
-app.use("/vouchers", isAdmin, router.voucherRouter);
+// Admin routes
+app.use(isAuth);
+app.use("/admin/products", isAdmin, router.productRouter);
+app.use("/admin/category", isAdmin, router.categoryRouter);
+app.use("/admin/brands", isAdmin, router.brandRouter);
+app.use("/admin/customers", isAdmin, router.userRouter);
+app.use("/admin/vouchers", isAdmin, router.voucherRouter);
 
 // Error handling middleware
 app.use(errorHandler);

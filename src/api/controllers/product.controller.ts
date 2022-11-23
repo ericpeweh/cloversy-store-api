@@ -2,7 +2,7 @@
 import { Request, Response } from "express";
 
 // Services
-import { productsService } from "../services";
+import { productService } from "../services";
 
 // Utils
 import { ErrorObj } from "../utils";
@@ -35,7 +35,7 @@ export const getAllProducts = async (req: Request, res: Response) => {
 			throw new ErrorObj.ClientError("Query param 'sortBy' is not supported");
 		}
 
-		const { products, ...paginationData } = await productsService.getAllProducts(
+		const { products, ...paginationData } = await productService.getAllProducts(
 			page,
 			q,
 			sortBy,
@@ -64,7 +64,7 @@ export const getSingleProductById = async (req: Request, res: Response) => {
 			throw new ErrorObj.ClientError("Query param 'id' has to be type of string");
 		}
 
-		const result = await productsService.getSingleProduct(productId);
+		const result = await productService.getSingleProduct(productId);
 
 		res.status(200).json({
 			status: "success",
@@ -96,7 +96,7 @@ export const createProduct = async (req: Request, res: Response) => {
 
 		const postQueryData = [title, sku, price, status, category_id, brand_id, description, slug];
 
-		const result = await productsService.createProduct(
+		const result = await productService.createProduct(
 			postQueryData,
 			tags.split(","),
 			sizes.split(","),
@@ -146,7 +146,7 @@ export const updateProduct = async (req: Request, res: Response) => {
 			slug
 		};
 
-		const result = await productsService.updateProduct(
+		const result = await productService.updateProduct(
 			{
 				updatedProductData,
 				productId,
@@ -175,7 +175,7 @@ export const deleteProduct = async (req: Request, res: Response) => {
 	try {
 		const { productId } = req.params;
 
-		const result = await productsService.deleteProduct(productId);
+		const result = await productService.deleteProduct(productId);
 
 		res.status(200).json({
 			status: "success",

@@ -10,6 +10,7 @@ import { isAuth, isAdmin, errorHandler } from "./api/middlewares";
 
 // Routes
 import router from "./api/routes";
+import clientRouter from "./api/routes/client";
 
 // Setup
 dotenv.config();
@@ -28,6 +29,9 @@ app.get("/", (req, res) => {
 app.use("/auth", router.authRouter);
 
 // Client routes
+app.use("/products", clientRouter.productRouter);
+app.use("/category", clientRouter.categoryRouter);
+app.use("/brands", clientRouter.brandRouter);
 app.use(isAuth);
 
 // Admin routes

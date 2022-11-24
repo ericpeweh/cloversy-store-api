@@ -11,12 +11,12 @@ import { ErrorObj } from "../../utils";
 
 export const getAllProducts = async (req: Request, res: Response) => {
 	const {
-		status: productStatus = "",
 		brand: brandFilter = "",
 		sortBy = "id",
 		page = "",
 		q = "",
-		count = ""
+		count = "",
+		price: priceFilter = ""
 	} = req.query;
 
 	try {
@@ -24,12 +24,12 @@ export const getAllProducts = async (req: Request, res: Response) => {
 			typeof sortBy !== "string" ||
 			typeof q !== "string" ||
 			typeof page !== "string" ||
-			typeof productStatus !== "string" ||
 			typeof brandFilter !== "string" ||
-			typeof count !== "string"
+			typeof count !== "string" ||
+			typeof priceFilter !== "string"
 		) {
 			throw new ErrorObj.ClientError(
-				"Query param 'page', 'q', 'status', 'brand', 'count', and 'sortBy' has to be type of string"
+				"Query param 'page', 'q', 'brand', 'count', 'price', and 'sortBy' has to be type of string"
 			);
 		}
 
@@ -37,19 +37,23 @@ export const getAllProducts = async (req: Request, res: Response) => {
 			throw new ErrorObj.ClientError("Query param 'sortBy' is not supported");
 		}
 
-		const { products, ...paginationData } = await productService.getAllProducts(
+		const { products, priceRange } = await productService.getAllProducts(
 			page,
 			q,
 			sortBy,
-			productStatus,
 			brandFilter,
-			count
+			count,
+			priceFilter
 		);
+		const { products: productsData, ...paginationData } = products;
+
+		const minPrice = +priceRange.rows[0].min_price;
+		const maxPrice = +priceRange.rows[0].max_price;
 
 		res.status(200).json({
 			status: "success",
 			...paginationData,
-			data: { products: products.rows }
+			data: { products: productsData.rows, priceRange: [minPrice, maxPrice] }
 		});
 	} catch (error: any) {
 		res.status(400).json({
@@ -59,19 +63,21 @@ export const getAllProducts = async (req: Request, res: Response) => {
 	}
 };
 
-export const getSingleProductById = async (req: Request, res: Response) => {
+export const getSingleProductBySlug = async (req: Request, res: Response) => {
 	try {
-		const { productId } = req.params;
+		const { productSlug } = req.params;
 
-		if (typeof productId !== "string") {
+		if (typeof productSlug !== "string") {
 			throw new ErrorObj.ClientError("Query param 'id' has to be type of string");
 		}
 
-		const result = await productService.getSingleProduct(productId);
+		const { productResult, recommendationsResult } = await productService.getSingleProductBySlug(
+			productSlug
+		);
 
 		res.status(200).json({
 			status: "success",
-			data: { product: result }
+			data: { product: { ...productResult.rows[0], recommendations: recommendationsResult.rows } }
 		});
 	} catch (error: any) {
 		res.status(error.statusCode || 500).json({

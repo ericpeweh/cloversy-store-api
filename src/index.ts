@@ -6,7 +6,7 @@ import cors from "cors";
 // Configs
 
 // Middlewares
-import { isAuth, isAdmin, errorHandler } from "./api/middlewares";
+import { isAuth, isAdmin, errorHandler, getUserData } from "./api/middlewares";
 
 // Routes
 import router from "./api/routes";
@@ -32,7 +32,10 @@ app.use("/auth", router.authRouter);
 app.use("/products", clientRouter.productRouter);
 app.use("/category", clientRouter.categoryRouter);
 app.use("/brands", clientRouter.brandRouter);
+
 app.use(isAuth);
+app.use("/vouchers", getUserData, clientRouter.voucherRouter);
+app.use("/data", clientRouter.dataRouter);
 
 // Admin routes
 app.use(isAuth);

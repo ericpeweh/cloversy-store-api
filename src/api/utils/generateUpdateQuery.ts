@@ -25,10 +25,10 @@ const generateUpdateQuery = (
 	if (identifier) {
 		query += ` WHERE`;
 		const identifierPairs = Object.entries(identifier);
-		identifierPairs.forEach(([key, value]) => {
+		identifierPairs.forEach(([key, value], index) => {
 			if (value !== undefined) {
 				queryParams.push(value);
-				query += ` ${key} = $${queryIndex}`;
+				query += ` ${index > 0 ? "AND" : ""} ${key} = $${queryIndex}`;
 				queryIndex += 1;
 			}
 		});
@@ -38,6 +38,8 @@ const generateUpdateQuery = (
 	if (extra) {
 		query += extra;
 	}
+
+	console.log(query);
 
 	return { query, params: queryParams, index: queryIndex };
 };

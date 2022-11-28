@@ -9,5 +9,6 @@ const router = Router();
 // Routing
 router.get("/province", dataController.getAllProvinces);
 router.get("/city", dataController.getCitiesByProvinceId);
+router.get("/subdistrict", dataController.getSubdistrictByCityId);
 
 export default router;

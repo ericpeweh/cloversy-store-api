@@ -31,12 +31,36 @@ export const getCitiesByProvinceId = async (req: Request, res: Response) => {
 			throw new ErrorObj.ClientError("Invalid province id");
 		}
 
-		const provinces = await dataService.getCitiesByProvinceId(provinceId);
+		const cities = await dataService.getCitiesByProvinceId(provinceId);
 
 		res.status(200).json({
 			status: "success",
 			data: {
-				provinces
+				cities
+			}
+		});
+	} catch (error: any) {
+		res.status(error.statusCode || 500).json({
+			status: "error",
+			message: error.message
+		});
+	}
+};
+
+export const getSubdistrictByCityId = async (req: Request, res: Response) => {
+	const { city: cityId } = req.query;
+
+	try {
+		if (typeof cityId !== "string") {
+			throw new ErrorObj.ClientError("Invalid city id");
+		}
+
+		const subdistricts = await dataService.getSubdistrictByCityId(cityId);
+
+		res.status(200).json({
+			status: "success",
+			data: {
+				subdistricts
 			}
 		});
 	} catch (error: any) {

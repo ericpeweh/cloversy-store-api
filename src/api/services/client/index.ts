@@ -5,4 +5,10 @@ import * as brandService from "./brand.service";
 import * as voucherService from "./voucher.service";
 import * as dataService from "./data.service";
 
-export { productService, categoryService, brandService, voucherService, dataService };
+export {
+	productService,
+	categoryService,
+	brandService,
+	voucherService,
+	dataService,
+};

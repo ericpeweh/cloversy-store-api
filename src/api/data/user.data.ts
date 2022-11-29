@@ -97,7 +97,7 @@ export const createNewUser = async (userData: CreateUserData) => {
 	const userQuery = `INSERT INTO users(
     full_name,
     email,
-    profile_image,
+    profile_picture,
     sub
   ) VALUES ($1, $2, $3, $4) RETURNING *`;
 

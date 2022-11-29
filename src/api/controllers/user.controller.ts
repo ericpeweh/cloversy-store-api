@@ -70,13 +70,13 @@ export const getSingleCustomer = async (req: Request, res: Response) => {
 
 export const updateUserData = async (req: Request, res: Response) => {
 	const { userId } = req.params;
-	const { full_name, contact, profile_image, user_status, credits, prev_status } = req.body;
+	const { full_name, contact, profile_picture, user_status, credits, prev_status } = req.body;
 
 	try {
 		const updatedUserData = {
 			full_name,
 			contact,
-			profile_image,
+			profile_picture,
 			user_status,
 			credits
 		};

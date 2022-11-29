@@ -4,5 +4,6 @@ import * as categoryRepo from "./category.data";
 import * as brandRepo from "./brand.data";
 import * as voucherRepo from "./voucher.data";
 import * as addressRepo from "./address.data";
+import * as userRepo from "./user.data";
 
-export { productRepo, categoryRepo, brandRepo, voucherRepo, addressRepo };
+export { productRepo, categoryRepo, brandRepo, voucherRepo, addressRepo, userRepo };

@@ -2,18 +2,16 @@
 import { Response, Request } from "express";
 import axios from "axios";
 
+// Utils
+import { ErrorObj } from "../utils";
+
 // Services
-import { userService } from "../services";
+import { userService, authService } from "../services";
 
 export const authUser = async (req: Request, res: Response) => {
 	try {
 		const accessToken = req.headers.authorization?.split(" ")[1];
-		const response = await axios.get("https://dev-yinr7e34g2h7igf4.us.auth0.com/userinfo", {
-			headers: {
-				Authorization: `Bearer ${accessToken}`
-			}
-		});
-		const auth0UserData = response.data;
+		const auth0UserData = await authService.getUserInfoAuth0(accessToken!);
 		let userData = await userService.getUserDataByEmail(auth0UserData.email);
 
 		if (userData === undefined) {
@@ -25,7 +23,30 @@ export const authUser = async (req: Request, res: Response) => {
 			]);
 		}
 		res.status(200).json({
-			status: "success"
+			status: "success",
+			data: { user: userData }
+		});
+	} catch (error: any) {
+		res.status(error.statusCode || 500).json({
+			status: "error",
+			message: error.message
+		});
+	}
+};
+
+export const resetPassword = async (req: Request, res: Response) => {
+	const userEmail = req.user?.email;
+
+	try {
+		if (userEmail === undefined) {
+			throw new ErrorObj.ServerError("Failed to check user authority, please try again.");
+		}
+
+		const result = await authService.resetPasswordAuth0(userEmail);
+
+		res.status(200).json({
+			status: "success",
+			data: { result }
 		});
 	} catch (error: any) {
 		res.status(error.statusCode || 500).json({

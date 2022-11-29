@@ -39,8 +39,6 @@ const generateUpdateQuery = (
 		query += extra;
 	}
 
-	console.log(query);
-
 	return { query, params: queryParams, index: queryIndex };
 };
 

@@ -41,7 +41,7 @@ export const getSingleVoucher = async (voucherCode: string) => {
 	let voucherDistResult = [];
 	if (isVoucherUserScoped) {
 		const voucherDistQuery = `SELECT u.id AS user_id, u.email AS email, 
-      u.full_name AS full_name, u.profile_image AS profile_image
+      u.full_name AS full_name, u.profile_picture AS profile_picture
       FROM voucher_dist v
       JOIN users u
       ON v.user_id = u.id

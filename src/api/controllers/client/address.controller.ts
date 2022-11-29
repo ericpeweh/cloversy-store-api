@@ -149,7 +149,7 @@ export const updateAddress = async (req: Request, res: Response) => {
 	}
 };
 
-export const deleteCategory = async (req: Request, res: Response) => {
+export const deleteAddress = async (req: Request, res: Response) => {
 	const userId = req.user?.id;
 
 	try {

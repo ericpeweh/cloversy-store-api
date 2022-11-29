@@ -5,7 +5,7 @@ export interface User {
 	full_name: string;
 	email: string;
 	contact: string | null;
-	profile_image: string | null;
+	profile_picture: string | null;
 	user_status: UserStatus;
 	credits: string;
 	user_role: string;

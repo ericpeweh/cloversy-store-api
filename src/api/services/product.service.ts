@@ -24,17 +24,9 @@ export const getAllProducts = async (
 };
 
 export const getSingleProduct = async (productId: string) => {
-	const { productResult, filteredTags, filteredSizes, filteredImages } =
-		await productRepo.getSingleProductById(productId);
+	const productResult = await productRepo.getSingleProductById(productId);
 
-	const product = {
-		...productResult.rows[0],
-		tags: filteredTags,
-		sizes: filteredSizes,
-		images: filteredImages
-	};
-
-	return product;
+	return productResult;
 };
 
 export const createProduct = async (

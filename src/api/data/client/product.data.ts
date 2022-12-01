@@ -160,3 +160,11 @@ export const getProductsPriceRange = async () => {
 
 	return priceRangeResult;
 };
+
+export const checkProductExistById = async (productId: string) => {
+	const productQuery = `SELECT id FROM product WHERE id = $1`;
+
+	const productResult = await db.query(productQuery, [productId]);
+
+	return productResult.rows.length !== 0;
+};

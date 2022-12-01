@@ -80,28 +80,31 @@ export const getAllProducts = async (
 };
 
 export const getSingleProductById = async (productId: string) => {
-	const productQuery = `SELECT p.*, ROUND(p.price) AS price , b.name AS brand, c.name AS category 
-    FROM product p
-    JOIN brand b ON p.brand_id = b.id 
-    JOIN category c ON p.category_id = c.id 
-    WHERE p.id = $1 
-  `;
+	const productQuery = `SELECT p.*, ROUND(p.price) AS price , b.name AS brand, c.name AS category,
+  (SELECT array_agg("url") AS images 
+    FROM product_image pi 
+    WHERE pi.product_id = p.id
+  ),
+  (SELECT array_agg("size" ORDER BY size ASC) AS sizes
+    FROM product_size ps
+    WHERE ps.product_id = p.id
+  ),
+  (SELECT array_agg("tag") AS tags
+    FROM product_tag pt
+    WHERE pt.product_id = p.id
+  )
+  FROM product p
+  JOIN brand b ON p.brand_id = b.id 
+  JOIN category c ON p.category_id = c.id 
+  WHERE p.id = $1 
+`;
 	const productResult = await db.query(productQuery, [productId]);
 
 	if (productResult.rows.length === 0) {
 		throw new ErrorObj.ClientError("Product not found!", 404);
 	}
 
-	const tags = await db.query("SELECT tag FROM product_tag WHERE product_id = $1", [productId]);
-	const filteredTags = tags.rows.map(item => item.tag);
-
-	const sizes = await db.query("SELECT size FROM product_size WHERE product_id = $1", [productId]);
-	const filteredSizes = sizes.rows.map(item => item.size);
-
-	const images = await db.query("SELECT url FROM product_image WHERE product_id = $1", [productId]);
-	const filteredImages = images.rows.map(item => item.url);
-
-	return { productResult, filteredTags, filteredSizes, filteredImages };
+	return productResult;
 };
 
 export const createProduct = async (productData: Array<any>, tags: string[], sizes: string[]) => {

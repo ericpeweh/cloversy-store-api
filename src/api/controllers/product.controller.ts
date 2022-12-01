@@ -68,7 +68,7 @@ export const getSingleProductById = async (req: Request, res: Response) => {
 
 		res.status(200).json({
 			status: "success",
-			data: { product: result }
+			data: { product: result.rows[0] }
 		});
 	} catch (error: any) {
 		res.status(error.statusCode || 500).json({

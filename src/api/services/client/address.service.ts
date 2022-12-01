@@ -8,13 +8,9 @@ import { UpdateAddressDataArgs } from "../../interfaces";
 import { ErrorObj } from "../../utils";
 
 export const getAllUserAddress = async (userId: string) => {
-	try {
-		const address = await addressRepo.getAllUserAddress(userId);
+	const address = await addressRepo.getAllUserAddress(userId);
 
-		return address;
-	} catch (error) {
-		throw error;
-	}
+	return address;
 };
 
 export const createAddress = async (addressData: any[], isDefault: boolean, userId: string) => {

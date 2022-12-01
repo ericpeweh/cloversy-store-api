@@ -6,6 +6,7 @@ import * as voucherService from "./voucher.service";
 import * as dataService from "./data.service";
 import * as addressService from "./address.service";
 import * as userService from "./user.service";
+import * as wishlistService from "./wishlist.service";
 
 export {
 	productService,
@@ -14,5 +15,6 @@ export {
 	voucherService,
 	dataService,
 	addressService,
-	userService
+	userService,
+	wishlistService
 };

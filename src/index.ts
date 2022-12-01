@@ -26,7 +26,7 @@ app.get("/", (req, res) => {
 	res.send("<h1>Hello world</h1>");
 });
 
-app.use("/auth", isAuth, router.authRouter);
+app.use("/auth", isAuth, getUserData, router.authRouter);
 
 // Client routes
 app.use("/products", clientRouter.productRouter);

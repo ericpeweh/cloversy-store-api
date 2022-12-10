@@ -2,11 +2,21 @@
 import express, { Express } from "express";
 import dotenv from "dotenv";
 import cors from "cors";
+import session from "express-session";
+import sessionStore from "connect-pg-simple";
 
 // Configs
+import db from "./config/connectDB";
 
 // Middlewares
-import { isAuth, isAdmin, errorHandler, getUserData } from "./api/middlewares";
+import {
+	isAuth,
+	isAdmin,
+	errorHandler,
+	getUserData,
+	passAuth,
+	getUserDataOptional
+} from "./api/middlewares";
 
 // Routes
 import router from "./api/routes";
@@ -19,7 +29,32 @@ const port = process.env.PORT;
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-app.use(cors());
+app.use(
+	cors({
+		origin: "http://localhost:3000",
+		methods: ["GET", "POST", "PUT", "PATCH", "OPTIONS", "HEAD", "DELETE"],
+		credentials: true
+	})
+);
+// app.set("trust proxy", 1);
+
+app.use(
+	session({
+		secret: process.env.SESSION_SECRET!,
+		cookie: {
+			maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
+			sameSite: "lax",
+			secure: false
+			// secure: process.env.NODE_ENV === "production"
+		},
+		store: new (sessionStore(session))({
+			pool: db.pool,
+			tableName: "cart_session"
+		}),
+		resave: true,
+		saveUninitialized: true
+	})
+);
 
 // Routing
 app.get("/", (req, res) => {
@@ -37,6 +72,7 @@ app.use(isAuth);
 app.use("/vouchers", getUserData, clientRouter.voucherRouter);
 app.use("/account", getUserData, clientRouter.accountRouter);
 app.use("/data", clientRouter.dataRouter);
+app.use("/cart", passAuth, getUserDataOptional, clientRouter.cartRouter);
 
 // Admin routes
 app.use(isAuth);

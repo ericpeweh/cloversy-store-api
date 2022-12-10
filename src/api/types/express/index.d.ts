@@ -1,4 +1,4 @@
-export type UserStatus = "active" | "banned";
+import express from "express";
 
 export interface User {
 	id: string;
@@ -13,4 +13,9 @@ export interface User {
 	created_at: string;
 }
 
-export type CreateUserData = string[];
+declare module "express" {
+	export interface Request {
+		user?: User;
+		auth?: any;
+	}
+}

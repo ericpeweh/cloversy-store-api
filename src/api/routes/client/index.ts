@@ -5,6 +5,7 @@ import brandRouter from "./brand.route";
 import voucherRouter from "./voucher.route";
 import dataRouter from "./data.route";
 import accountRouter from "./account.route";
+import cartRouter from "./cart.route";
 
 export default {
 	productRouter,
@@ -12,5 +13,6 @@ export default {
 	brandRouter,
 	voucherRouter,
 	dataRouter,
-	accountRouter
+	accountRouter,
+	cartRouter
 };

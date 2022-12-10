@@ -6,5 +6,15 @@ import * as voucherRepo from "./voucher.data";
 import * as addressRepo from "./address.data";
 import * as userRepo from "./user.data";
 import * as wishlistRepo from "./wishlist.data";
+import * as cartRepo from "./cart.data";
 
-export { productRepo, categoryRepo, brandRepo, voucherRepo, addressRepo, userRepo, wishlistRepo };
+export {
+	productRepo,
+	categoryRepo,
+	brandRepo,
+	voucherRepo,
+	addressRepo,
+	userRepo,
+	wishlistRepo,
+	cartRepo
+};

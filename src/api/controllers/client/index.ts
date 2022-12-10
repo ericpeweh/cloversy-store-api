@@ -7,6 +7,7 @@ import * as dataController from "./data.controller";
 import * as addressController from "./address.controller";
 import * as userController from "./user.controller";
 import * as wishlistController from "./wishlist.controller";
+import * as cartController from "./cart.controller";
 
 export {
 	productController,
@@ -16,5 +17,6 @@ export {
 	dataController,
 	addressController,
 	userController,
-	wishlistController
+	wishlistController,
+	cartController
 };

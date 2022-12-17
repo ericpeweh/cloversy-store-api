@@ -1,6 +1,10 @@
 // Config
 import db from "../../../config/connectDB";
 
+// Types
+import { Voucher } from "../../interfaces";
+import { QueryResult } from "pg";
+
 // Utils
 import { ErrorObj } from "../../utils";
 
@@ -10,6 +14,7 @@ export const getUserVouchers = async (userId: string) => {
     JOIN voucher v
     ON v.code = vd.voucher_code
   WHERE user_id = $1
+  AND status = 'active'
   ORDER BY created_at DESC
   `;
 
@@ -20,7 +25,7 @@ export const getUserVouchers = async (userId: string) => {
 export const getSingleVoucher = async (voucherCode: string) => {
 	const voucherQuery = `SELECT * FROM voucher WHERE code = $1`;
 
-	const voucherResult = await db.query(voucherQuery, [voucherCode]);
+	const voucherResult: QueryResult<Voucher> = await db.query(voucherQuery, [voucherCode]);
 
 	if (voucherResult.rows.length === 0) {
 		throw new ErrorObj.ClientError("Voucher not found!", 404);

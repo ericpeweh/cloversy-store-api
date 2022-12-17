@@ -8,6 +8,6 @@ const router = Router();
 
 // Routing
 router.get("/", voucherController.getUserVouchers);
-router.get("/:voucherCode", voucherController.getSingleVoucher);
+router.post("/:voucherCode", voucherController.getSingleVoucher);
 
 export default router;

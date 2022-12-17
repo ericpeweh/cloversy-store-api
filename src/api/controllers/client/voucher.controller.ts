@@ -3,6 +3,9 @@ import { Request, Response } from "express";
 
 // Services
 import { voucherService } from "../../services/client";
+
+// Utils
+import isDateSurpassToday from "../../utils/isDateSurpassToday";
 import { ErrorObj } from "../../utils";
 
 // Types
@@ -30,6 +33,7 @@ export const getUserVouchers = async (req: Request, res: Response) => {
 };
 
 export const getSingleVoucher = async (req: Request, res: Response) => {
+	const userId = req.user?.id;
 	const { voucherCode } = req.params;
 
 	try {
@@ -37,7 +41,13 @@ export const getSingleVoucher = async (req: Request, res: Response) => {
 			throw new ErrorObj.ClientError("Query param 'voucherCode' has to be type of string");
 		}
 
-		const result = await voucherService.getSingleVoucher(voucherCode);
+		if (voucherCode?.length !== 10) throw new ErrorObj.ClientError("Invalid voucher code!");
+
+		if (!userId) {
+			throw new ErrorObj.ClientError("Failed to identity user!");
+		}
+
+		const result = await voucherService.getSingleVoucher(voucherCode, userId);
 
 		res.status(200).json({
 			status: "success",

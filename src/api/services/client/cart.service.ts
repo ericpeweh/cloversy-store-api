@@ -1,11 +1,8 @@
-// Dependencies
-import { v4 as uuid } from "uuid";
-
 // Data
 import { cartRepo, productRepo } from "../../data/client";
 
 // Types
-import { CartItem, UpdateAddressDataArgs } from "../../interfaces";
+import { CartItem } from "../../interfaces";
 
 // Utils
 import { ErrorObj } from "../../utils";
@@ -38,7 +35,7 @@ export const addProductToSessionCart = (
 			return item.product_id === product_id
 				? {
 						...item,
-						quantity: item.quantity + quantity
+						quantity: item.quantity || 0 + quantity
 				  }
 				: item;
 		});
@@ -55,7 +52,7 @@ export const addProductToDBCart = async (
 ) => {
 	const { product_id } = newCartItem;
 
-	const isProductExist = await productRepo.checkProductExistById(product_id);
+	const isProductExist = await productRepo.checkProductExistById(product_id + "");
 
 	if (!isProductExist) {
 		throw new ErrorObj.ClientError("Product not found!", 404);

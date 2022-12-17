@@ -1,5 +1,6 @@
 export interface Address {
 	id: number;
+	user_id: number;
 	recipient_name: string;
 	contact: string;
 	address: string;

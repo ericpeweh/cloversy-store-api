@@ -4,3 +4,6 @@ export * from "./user.interface";
 export * from "./address.interface";
 export * from "./wishlist.interface";
 export * from "./cart.interface";
+export * from "./voucher.interface";
+export * from "./data.interface";
+export * from "./transaction.interface";

@@ -10,5 +10,6 @@ const router = Router();
 router.get("/province", dataController.getAllProvinces);
 router.get("/city", dataController.getCitiesByProvinceId);
 router.get("/subdistrict", dataController.getSubdistrictByCityId);
+router.post("/cost", dataController.getShippingCostBySubdistrict);
 
 export default router;

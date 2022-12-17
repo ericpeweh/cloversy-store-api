@@ -1,6 +1,9 @@
 // Config
+import { QueryResult } from "pg";
 import db from "../../../config/connectDB";
-import { CartItem, UpdateAddressDataArgs } from "../../interfaces";
+
+// Types
+import { CartItem, CartItemDetails } from "../../interfaces";
 
 // Utils
 import generateUpdateQuery from "../../utils/generateUpdateQuery";
@@ -32,7 +35,7 @@ export const getSessionCartItemsDetails = async (productIds: string[]) => {
 };
 
 export const getDBCartItemsDetails = async (userId: string) => {
-	const cartItemsQuery = `SELECT p.*, b.name AS brand, c.id AS id, c.quantity AS quantity, c.size AS size,
+	const cartItemsQuery = `SELECT p.*, p.id as product_id, b.name AS brand, c.id AS id, c.quantity AS quantity, c.size AS size,
     (SELECT array_agg("url") AS images 
       FROM product_image pi 
       WHERE pi.product_id = p.id
@@ -53,7 +56,7 @@ export const getDBCartItemsDetails = async (userId: string) => {
     ORDER BY c.id DESC
   `;
 
-	const cartItemsResult = await db.query(cartItemsQuery, [userId]);
+	const cartItemsResult: QueryResult<CartItemDetails> = await db.query(cartItemsQuery, [userId]);
 	return cartItemsResult;
 };
 

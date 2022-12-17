@@ -7,6 +7,7 @@ import * as addressRepo from "./address.data";
 import * as userRepo from "./user.data";
 import * as wishlistRepo from "./wishlist.data";
 import * as cartRepo from "./cart.data";
+import * as transactionRepo from "./transaction.data";
 
 export {
 	productRepo,
@@ -16,5 +17,6 @@ export {
 	addressRepo,
 	userRepo,
 	wishlistRepo,
-	cartRepo
+	cartRepo,
+	transactionRepo
 };

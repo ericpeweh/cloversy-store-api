@@ -71,8 +71,9 @@ app.use("/brands", clientRouter.brandRouter);
 app.use(isAuth);
 app.use("/vouchers", getUserData, clientRouter.voucherRouter);
 app.use("/account", getUserData, clientRouter.accountRouter);
-app.use("/data", clientRouter.dataRouter);
+app.use("/data", getUserData, clientRouter.dataRouter);
 app.use("/cart", passAuth, getUserDataOptional, clientRouter.cartRouter);
+app.use("/transactions", getUserData, clientRouter.transactionRouter);
 
 // Admin routes
 app.use(isAuth);

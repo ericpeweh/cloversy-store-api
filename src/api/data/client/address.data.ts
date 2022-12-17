@@ -1,6 +1,9 @@
 // Config
 import db from "../../../config/connectDB";
-import { UpdateAddressDataArgs } from "../../interfaces";
+
+// Types
+import { QueryResult } from "pg";
+import { Address, UpdateAddressDataArgs } from "../../interfaces";
 
 // Utils
 import generateUpdateQuery from "../../utils/generateUpdateQuery";
@@ -12,6 +15,16 @@ export const getAllUserAddress = async (userId: string) => {
   `;
 
 	const addressResult = await db.query(addressQuery, [userId]);
+	return addressResult;
+};
+
+export const getSingleUserAddress = async (addressId: string) => {
+	const addressQuery = `SELECT * FROM address
+    WHERE id = $1
+    ORDER BY is_default DESC, id ASC
+  `;
+
+	const addressResult: QueryResult<Address> = await db.query(addressQuery, [addressId]);
 	return addressResult;
 };
 

@@ -2,7 +2,7 @@
 import { Response, Request } from "express";
 
 // Services
-import { dataService } from "../../services/client";
+import { dataService, addressService } from "../../services/client";
 import { ErrorObj } from "../../utils";
 
 export const getAllProvinces = async (req: Request, res: Response) => {
@@ -61,6 +61,42 @@ export const getSubdistrictByCityId = async (req: Request, res: Response) => {
 			status: "success",
 			data: {
 				subdistricts
+			}
+		});
+	} catch (error: any) {
+		res.status(error.statusCode || 500).json({
+			status: "error",
+			message: error.message
+		});
+	}
+};
+
+export const getShippingCostBySubdistrict = async (req: Request, res: Response) => {
+	const userId = req.user?.id;
+	const { addressId } = req.body;
+
+	try {
+		if (isNaN(+addressId)) {
+			throw new ErrorObj.ClientError("Invalid address id");
+		}
+
+		if (!userId) {
+			throw new ErrorObj.ClientError("Failed to identity user!");
+		}
+
+		const subdistrictId = (await addressService.getSingleUserAddress(userId, addressId))
+			.subdistrict_id;
+
+		if (!subdistrictId) {
+			throw new ErrorObj.ClientError("Address not found", 404);
+		}
+
+		const result = await dataService.getShippingCostBySubdistrict(subdistrictId);
+
+		res.status(200).json({
+			status: "success",
+			data: {
+				costs: result
 			}
 		});
 	} catch (error: any) {

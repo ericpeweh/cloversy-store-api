@@ -1,6 +1,6 @@
 // Dependencies
 import { Request, Response } from "express";
-import { v4 as uuid } from "uuid";
+import { nanoid } from "nanoid";
 
 // Types
 import { CartItem, CartItemDetails } from "../../interfaces";
@@ -122,7 +122,7 @@ export const addProductToCart = async (req: Request, res: Response) => {
 	const { product_id, quantity, size }: CartItem = req.body;
 
 	const newCartItem = {
-		id: uuid(),
+		id: nanoid(),
 		product_id,
 		size,
 		quantity

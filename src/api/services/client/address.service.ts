@@ -13,6 +13,16 @@ export const getAllUserAddress = async (userId: string) => {
 	return address;
 };
 
+export const getSingleUserAddress = async (userId: string, addressId: string) => {
+	const result = await addressRepo.getSingleUserAddress(addressId);
+
+	if (result.rows.length === 0 || result.rows[0].user_id !== +userId) {
+		throw new ErrorObj.ClientError("Address not found!", 404);
+	}
+
+	return result.rows[0];
+};
+
 export const createAddress = async (addressData: any[], isDefault: boolean, userId: string) => {
 	const newAddress = await addressRepo.createAddress(addressData, isDefault, userId);
 

@@ -3,7 +3,12 @@ import axios, { AxiosResponse } from "axios";
 import dotenv from "dotenv";
 
 // Types
-import { RajaOngkirCostResponse, CostItem, ShippingService } from "../../interfaces";
+import {
+	RajaOngkirCostResponse,
+	CostItem,
+	ShippingService,
+	RajaOngkirWaybillResponse
+} from "../../interfaces";
 
 dotenv.config();
 
@@ -110,6 +115,27 @@ export const getShippingCostBySubdistrict = async (subdistrictId: number) => {
 
 		// Remove Cargo shipping from SiCepat
 		return result.filter(cost => cost.service !== "GOKIL");
+	} catch (error: any) {
+		throw error;
+	}
+};
+
+export const getShippingWaybill = async (trackingCode: string, courierName: string) => {
+	try {
+		const response = await axios.post<RajaOngkirWaybillResponse>(
+			`${RAJA_ONGKIR_BASE_URL}/waybill`,
+			{
+				waybill: trackingCode,
+				courier: courierName === "J&T" ? "jnt" : courierName
+			},
+			{
+				headers: {
+					key: process.env.RAJA_ONGKIR_API_KEY
+				}
+			}
+		);
+
+		return response.data.rajaongkir.result.manifest;
 	} catch (error: any) {
 		throw error;
 	}

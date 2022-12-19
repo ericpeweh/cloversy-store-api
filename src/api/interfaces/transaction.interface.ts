@@ -139,7 +139,7 @@ export interface TransactionDetailsType {
 	discount: number;
 	total: number;
 	subtotal: number;
-	order_note: string;
+	customer_note: string;
 	gift_note: string;
 	user: User;
 	userCartItems: CartItemDetails[];
@@ -171,8 +171,9 @@ export interface Transaction {
 	user_id: string;
 	order_status: TransactionStatus;
 	order_status_modified: string;
-	order_note: string;
 	gift_note: string;
+	order_note: string;
+	customer_note: string;
 	voucher_code: string;
 	discount_total: string;
 	subtotal: string;

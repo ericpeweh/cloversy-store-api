@@ -17,7 +17,9 @@ import {
 import getLocalTime from "../../utils/getLocalTime";
 import { ErrorObj } from "../../utils";
 
-export const createTransaction = async (transactionDetails: TransactionDetailsType) => {
+export const createTransaction = async (
+	transactionDetails: Omit<TransactionDetailsType, "order_note">
+) => {
 	const client = await db.pool.connect();
 
 	const {
@@ -27,7 +29,7 @@ export const createTransaction = async (transactionDetails: TransactionDetailsTy
 		total,
 		subtotal,
 		user,
-		order_note,
+		customer_note,
 		gift_note,
 		userCartItems,
 		selectedAddress,
@@ -41,7 +43,7 @@ export const createTransaction = async (transactionDetails: TransactionDetailsTy
 
 		// Create transaction record
 		const transactionQuery = `INSERT INTO transactions(
-      id, user_id, order_status, order_note, gift_note, voucher_code, discount_total, subtotal, total
+      id, user_id, order_status, customer_note, gift_note, voucher_code, discount_total, subtotal, total
     ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id
     `;
 
@@ -49,7 +51,7 @@ export const createTransaction = async (transactionDetails: TransactionDetailsTy
 			chargeResponse.order_id,
 			user.id,
 			"pending",
-			order_note,
+			customer_note,
 			gift_note,
 			selectedVoucher?.code || null,
 			discount,
@@ -136,6 +138,10 @@ export const createTransaction = async (transactionDetails: TransactionDetailsTy
 				{
 					timeline_date: getLocalTime(),
 					description: "Pesanan telah dibuat"
+				},
+				{
+					timeline_date: getLocalTime(),
+					description: "Menunggu pembayaran"
 				}
 			])
 		]);
@@ -171,7 +177,10 @@ export const createTransaction = async (transactionDetails: TransactionDetailsTy
 };
 
 export const getSingleTransaction = async (userId: string, transactionId: string) => {
-	const transactionQuery = `SELECT t.*, 
+	const transactionQuery = `SELECT 
+    t.id as id, t.user_id as user_id, t.order_status as order_status, 
+    t.gift_note as gift_note, t.voucher_code as voucher_code, 
+    t.customer_note as customer_note, t.created_at as created_at,
     ROUND(t.subtotal) AS subtotal, 
     ROUND(t.discount_total) AS discount_total,
     ROUND(t.total) AS total,
@@ -223,4 +232,48 @@ export const getSingleTransaction = async (userId: string, transactionId: string
 		payment: transactionPaymentResult.rows[0],
 		items: transactionItemsResult.rows
 	};
+};
+
+export const getUserTransactions = async (userId: string) => {
+	const transactionsQuery = `
+    SELECT 
+    t.id as id, t.user_id as user_id, t.order_status as order_status, 
+    t.created_at as created_at, ROUND(t.total) AS total, 
+    (
+      SELECT json_agg(json_build_object(
+          'product_id', ti.product_id,
+          'quantity', ti.quantity,
+          'price', ROUND(ti.price),
+          'product_size', ti.product_size,
+          'title', products.title,
+          'slug', products.slug,
+          'images', products.images		
+      ))
+      FROM transactions_item ti
+      JOIN (
+        SELECT p.id as product_id, p.title as title, p.slug as slug,
+          (
+            SELECT array_agg("url") AS images 
+            FROM product_image pi 
+            WHERE pi.product_id = p.id
+          )
+          FROM product p
+      ) AS products 
+      ON products.product_id = ti.product_id
+      WHERE products.product_id = ti.product_id
+      AND ti.transaction_id = t.id
+    ) as item_details
+    FROM transactions t
+    WHERE t.user_id = $1
+    ORDER BY t.created_at DESC
+  `;
+
+	const transactionResult: QueryResult<
+		Transaction & {
+			shipping_details: TransactionShipping & Address;
+			timeline: TransactionTimelineItem[];
+		}
+	> = await db.query(transactionsQuery, [userId]);
+
+	return transactionResult.rows;
 };

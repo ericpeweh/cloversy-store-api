@@ -98,19 +98,23 @@ export const chargeTransaction = async (
 			// }),
 			item_details: [
 				...userCartItems.map(cartItem => ({
-					id: +cartItem.product_id,
+					id: `${+cartItem.product_id} ${cartItem.size}`,
 					price: +cartItem.price,
 					quantity: +cartItem.quantity,
 					name: `${cartItem.title} - EU ${cartItem.size}`,
 					brand: cartItem.brand_id + "",
 					category: cartItem.category_id + ""
 				})),
-				selectedVoucher && {
-					name: "Discount",
-					price: -discount,
-					quantity: 1,
-					id: "D01"
-				},
+				...(selectedVoucher
+					? [
+							{
+								name: "Discount",
+								price: -discount,
+								quantity: 1,
+								id: "D01"
+							}
+					  ]
+					: []),
 				{
 					name: "Shipping",
 					price: shippingCost,
@@ -141,10 +145,18 @@ export const chargeTransaction = async (
 	}
 };
 
-export const createTransaction = async (transactionDetails: TransactionDetailsType) => {
+export const createTransaction = async (
+	transactionDetails: Omit<TransactionDetailsType, "order_note">
+) => {
 	const newTransactionId = await transactionRepo.createTransaction(transactionDetails);
 
 	return newTransactionId;
+};
+
+export const getUserTransactions = async (userId: string) => {
+	const transactions = await transactionRepo.getUserTransactions(userId);
+
+	return transactions;
 };
 
 export const getSingleTransaction = async (userId: string, transactionId: string) => {

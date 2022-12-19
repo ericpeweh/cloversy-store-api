@@ -1,6 +1,8 @@
 // Dependencies
 import { Response, Request } from "express";
-import { BankTransferChargeResponse, ChargeResponse } from "../../interfaces";
+
+// Types
+import { ShippingManifestItem, TransactionTimelineItem } from "../../interfaces";
 
 // Services
 import {
@@ -10,6 +12,8 @@ import {
 	voucherService,
 	dataService
 } from "../../services/client";
+
+// Utils
 import { ErrorObj } from "../../utils";
 
 export const getUserTransactions = async (req: Request, res: Response) => {
@@ -18,9 +22,11 @@ export const getUserTransactions = async (req: Request, res: Response) => {
 	try {
 		if (!userId) throw new ErrorObj.ClientError("Failed to identify user!");
 
+		const transactions = await transactionService.getUserTransactions(userId);
+
 		res.status(200).json({
 			status: "success",
-			data: { ok: "OK" }
+			data: { transactions }
 		});
 	} catch (error: any) {
 		res.status(error.statusCode || 500).json({
@@ -40,11 +46,41 @@ export const getSingleTransaction = async (req: Request, res: Response) => {
 
 		if (!userId) throw new ErrorObj.ClientError("Failed to identify user!");
 
-		const transaction = await transactionService.getSingleTransaction(userId, transactionId);
+		const transactionData = await transactionService.getSingleTransaction(userId, transactionId);
+		const { timeline: timelineData, ...transaction } = transactionData;
+
+		const timeline = timelineData.reverse();
+
+		// Add waybill tracking if tracking code is provided
+		const trackingCode = transaction.shipping_details.shipping_tracking_code;
+		if (trackingCode) {
+			const waybillManifest = await dataService.getShippingWaybill(
+				trackingCode,
+				transaction.shipping_details.shipping_courier
+			);
+
+			timeline.unshift(
+				...waybillManifest
+					.map((item: ShippingManifestItem) => ({
+						timeline_date: `${item.manifest_date}${
+							item.manifest_time.length === 5
+								? `T${item.manifest_time}:00`
+								: `T${item.manifest_time}`
+						}`,
+						description: `${item.city_name ? item.city_name + " - " : ""}${
+							item.manifest_description
+						}`
+					}))
+					// Sort manifest by date (DESCENDING)
+					.sort((a, b) =>
+						a.timeline_date > b.timeline_date ? -1 : a.timeline_date < b.timeline_date ? 1 : 0
+					)
+			);
+		}
 
 		res.status(200).json({
 			status: "success",
-			data: { transaction }
+			data: { transaction: { ...transaction, timeline } }
 		});
 	} catch (error: any) {
 		res.status(error.statusCode || 500).json({
@@ -59,7 +95,7 @@ export const createTransaction = async (req: Request, res: Response) => {
 	const {
 		voucher_code,
 		address_id,
-		order_note = "",
+		customer_note = "",
 		gift_note = "",
 		shipping_courier,
 		payment_method
@@ -126,7 +162,7 @@ export const createTransaction = async (req: Request, res: Response) => {
 				total,
 				subtotal,
 				user,
-				order_note,
+				customer_note,
 				gift_note,
 				userCartItems,
 				selectedAddress,

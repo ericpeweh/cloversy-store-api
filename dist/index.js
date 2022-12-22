@@ -58,6 +58,8 @@ app.use("/account", middlewares_1.getUserData, client_1.default.accountRouter);
 app.use("/data", middlewares_1.getUserData, client_1.default.dataRouter);
 app.use("/cart", middlewares_1.passAuth, middlewares_1.getUserDataOptional, client_1.default.cartRouter);
 app.use("/transactions", middlewares_1.getUserData, client_1.default.transactionRouter);
+// Backend-to-backend (Midtrans notifications)
+app.use("/midtrans", client_1.default.midtransRouter);
 // Admin routes
 app.use(middlewares_1.isAuth);
 app.use("/admin/products", middlewares_1.isAdmin, routes_1.default.productRouter);

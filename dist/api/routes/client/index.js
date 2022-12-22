@@ -12,6 +12,7 @@ const data_route_1 = __importDefault(require("./data.route"));
 const account_route_1 = __importDefault(require("./account.route"));
 const cart_route_1 = __importDefault(require("./cart.route"));
 const transaction_route_1 = __importDefault(require("./transaction.route"));
+const midtrans_route_1 = __importDefault(require("./midtrans.route"));
 exports.default = {
     productRouter: product_route_1.default,
     categoryRouter: category_route_1.default,
@@ -20,5 +21,6 @@ exports.default = {
     dataRouter: data_route_1.default,
     accountRouter: account_route_1.default,
     cartRouter: cart_route_1.default,
-    transactionRouter: transaction_route_1.default
+    transactionRouter: transaction_route_1.default,
+    midtransRouter: midtrans_route_1.default
 };

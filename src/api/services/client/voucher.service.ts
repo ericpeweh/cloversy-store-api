@@ -47,3 +47,9 @@ export const getSingleVoucher = async (voucherCode: string, userId: string) => {
 		throw error;
 	}
 };
+
+export const getVoucherItem = async (voucherCode: string) => {
+	const voucher = await voucherRepo.getVoucherItem(voucherCode);
+
+	return voucher;
+};

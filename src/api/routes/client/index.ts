@@ -7,6 +7,7 @@ import dataRouter from "./data.route";
 import accountRouter from "./account.route";
 import cartRouter from "./cart.route";
 import transactionRouter from "./transaction.route";
+import midtransRouter from "./midtrans.route";
 
 export default {
 	productRouter,
@@ -16,5 +17,6 @@ export default {
 	dataRouter,
 	accountRouter,
 	cartRouter,
-	transactionRouter
+	transactionRouter,
+	midtransRouter
 };

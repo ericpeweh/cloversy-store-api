@@ -23,7 +23,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.transactionController = exports.cartController = exports.wishlistController = exports.userController = exports.addressController = exports.dataController = exports.voucherController = exports.brandController = exports.categoryController = exports.productController = void 0;
+exports.midtransController = exports.transactionController = exports.cartController = exports.wishlistController = exports.userController = exports.addressController = exports.dataController = exports.voucherController = exports.brandController = exports.categoryController = exports.productController = void 0;
 // Controllers
 const productController = __importStar(require("./product.controller"));
 exports.productController = productController;
@@ -45,3 +45,5 @@ const cartController = __importStar(require("./cart.controller"));
 exports.cartController = cartController;
 const transactionController = __importStar(require("./transaction.controller"));
 exports.transactionController = transactionController;
+const midtransController = __importStar(require("./midtrans.controller"));
+exports.midtransController = midtransController;

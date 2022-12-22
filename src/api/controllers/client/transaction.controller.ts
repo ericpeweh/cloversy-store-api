@@ -2,7 +2,7 @@
 import { Response, Request } from "express";
 
 // Types
-import { ShippingManifestItem, TransactionTimelineItem } from "../../interfaces";
+import { ShippingManifestItem, TransactionTimelineItem, Voucher } from "../../interfaces";
 
 // Services
 import {
@@ -191,6 +191,54 @@ export const createTransaction = async (req: Request, res: Response) => {
 		if (error?.ApiResponse?.status_code === "500") {
 			errorMessage =
 				"Transaksi gagal: Sistem sedang bermasalah, mohon coba kembali setelah beberapa saat.";
+		}
+
+		res.status(error.statusCode || 500).json({
+			status: "error",
+			message: errorMessage || error.message
+		});
+	}
+};
+
+export const cancelTransaction = async (req: Request, res: Response) => {
+	const userId = req.user?.id;
+	const { transactionId } = req.params;
+
+	try {
+		if (!userId) throw new ErrorObj.ClientError("Failed to identify user!");
+
+		if (!transactionId || transactionId.length !== 10)
+			throw new ErrorObj.ClientError("Invalid transaction id!");
+
+		// Check transaction exist and its status
+		const transaction = await transactionService.getTransactionItem(transactionId);
+
+		if (!transaction) throw new ErrorObj.ClientError("Transaction not found!", 404);
+
+		if (transaction.order_status !== "pending")
+			throw new ErrorObj.ClientError("Only transactions with pending status can be canceled");
+
+		// Check user authorization to cancel transaction
+		const isAuthorized = transaction.user_id === userId;
+
+		if (!isAuthorized) throw new ErrorObj.ClientError("You're not authorized", 403);
+
+		// Handle cancel transaction
+		let voucher: Voucher | undefined = undefined;
+		if (transaction.voucher_code) {
+			voucher = await voucherService.getVoucherItem(transaction.voucher_code);
+		}
+
+		await transactionService.cancelTransaction(transactionId, voucher, transaction);
+
+		res.status(200).json({
+			status: "success",
+			data: { transactionId }
+		});
+	} catch (error: any) {
+		let errorMessage = "";
+		if (error?.httpStatusCode === "412") {
+			errorMessage = "Failed: transaction can't be canceled";
 		}
 
 		res.status(error.statusCode || 500).json({

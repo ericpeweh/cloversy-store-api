@@ -6,7 +6,5 @@ const express_1 = require("express");
 const client_1 = require("../../controllers/client");
 const router = (0, express_1.Router)();
 // Routing
-router.post("/", client_1.transactionController.createTransaction);
-router.get("/", client_1.transactionController.getUserTransactions);
-router.get("/:transactionId", client_1.transactionController.getSingleTransaction);
+router.post("/notifications", client_1.midtransController.handleNotifications);
 exports.default = router;

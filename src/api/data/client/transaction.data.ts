@@ -5,12 +5,15 @@ import db from "../../../config/connectDB";
 import { QueryResult } from "pg";
 import {
 	Address,
+	PaymentStatus,
 	Transaction,
 	TransactionDetailsType,
 	TransactionItem,
 	TransactionPayment,
 	TransactionShipping,
-	TransactionTimelineItem
+	TransactionStatus,
+	TransactionTimelineItem,
+	Voucher
 } from "../../interfaces";
 
 // Utils
@@ -234,6 +237,16 @@ export const getSingleTransaction = async (userId: string, transactionId: string
 	};
 };
 
+export const getTransactionItem = async (transactionId: string) => {
+	const transactionQuery = `SELECT * FROM transactions WHERE id = $1`;
+
+	const transactionResult: QueryResult<Transaction> = await db.query(transactionQuery, [
+		transactionId
+	]);
+
+	return transactionResult?.rows[0];
+};
+
 export const getUserTransactions = async (userId: string) => {
 	const transactionsQuery = `
     SELECT 
@@ -276,4 +289,86 @@ export const getUserTransactions = async (userId: string) => {
 	> = await db.query(transactionsQuery, [userId]);
 
 	return transactionResult.rows;
+};
+
+export const updateTransaction = async (
+	orderId: string,
+	orderStatus: TransactionStatus,
+	paymentStatus: PaymentStatus,
+	newTimelineItem: TransactionTimelineItem | TransactionTimelineItem[] | null,
+	paymentObj: string,
+	voucher?: Voucher,
+	transaction?: Transaction
+) => {
+	const client = await db.pool.connect();
+
+	try {
+		await client.query("BEGIN");
+
+		// Update transactions
+		const transactionsQuery = `UPDATE transactions
+      SET order_status = $1, order_status_modified = $2
+    WHERE id = $3
+    `;
+
+		await client.query(transactionsQuery, [orderStatus, getLocalTime(), orderId]);
+
+		// Update transactions_payment
+		const tranasctionsPaymentQuery = `UPDATE transactions_payment
+      SET payment_status = $1, payment_status_modified = $2, payment_object = $3
+    WHERE transaction_id = $4`;
+
+		await client.query(tranasctionsPaymentQuery, [
+			paymentStatus,
+			getLocalTime(),
+			paymentObj,
+			orderId
+		]);
+
+		// Update transactions_timeline
+		if (newTimelineItem) {
+			const transactionsTimelineQuery = `UPDATE transactions_timeline
+      SET timeline_object = timeline_object || $1
+    WHERE transaction_id = $2`;
+
+			await client.query(transactionsTimelineQuery, [JSON.stringify(newTimelineItem), orderId]);
+		}
+
+		// Update voucher data based on type
+		let voucherQuery: string | undefined = undefined;
+		let voucherParams: string[] = [];
+		if (transaction && voucher && voucher?.voucher_scope === "user") {
+			voucherQuery = `INSERT INTO voucher_dist 
+        (user_id, voucher_code)
+      VALUES ($1, $2)`;
+			voucherParams = [transaction.user_id, voucher.code];
+		}
+
+		if (transaction && voucher && voucher?.voucher_scope === "global") {
+			voucherQuery = `UPDATE voucher 
+        SET current_usage = current_usage - 1
+      WHERE code = $1`;
+			voucherParams = [voucher.code];
+		}
+
+		if (voucherQuery && voucherParams.length !== 0) {
+			await client.query(voucherQuery, voucherParams);
+		}
+
+		await client.query("COMMIT");
+	} catch (error) {
+		await client.query("ROLLBACK");
+		throw error;
+	} finally {
+		client.release();
+	}
+};
+
+export const checkTransactionOwnByUser = async (userId: string, transactionId: string) => {
+	const transactionQuery = `SELECT id FROM transactions
+    WHERE id = $1 AND user_id = $2`;
+
+	const transactionResult = await db.query(transactionQuery, [transactionId, userId]);
+
+	return transactionResult.rowCount !== 0;
 };

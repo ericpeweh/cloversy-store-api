@@ -9,6 +9,7 @@ import * as userController from "./user.controller";
 import * as wishlistController from "./wishlist.controller";
 import * as cartController from "./cart.controller";
 import * as transactionController from "./transaction.controller";
+import * as midtransController from "./midtrans.controller";
 
 export {
 	productController,
@@ -20,5 +21,6 @@ export {
 	userController,
 	wishlistController,
 	cartController,
-	transactionController
+	transactionController,
+	midtransController
 };

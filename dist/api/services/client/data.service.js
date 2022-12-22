@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getShippingCostBySubdistrict = exports.getSubdistrictByCityId = exports.getCitiesByProvinceId = exports.getAllProvinces = void 0;
+exports.getShippingWaybill = exports.getShippingCostBySubdistrict = exports.getSubdistrictByCityId = exports.getCitiesByProvinceId = exports.getAllProvinces = void 0;
 // Data
 const axios_1 = __importDefault(require("axios"));
 const dotenv_1 = __importDefault(require("dotenv"));
@@ -97,3 +97,20 @@ const getShippingCostBySubdistrict = (subdistrictId) => __awaiter(void 0, void 0
     }
 });
 exports.getShippingCostBySubdistrict = getShippingCostBySubdistrict;
+const getShippingWaybill = (trackingCode, courierName) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const response = yield axios_1.default.post(`${RAJA_ONGKIR_BASE_URL}/waybill`, {
+            waybill: trackingCode,
+            courier: courierName === "J&T" ? "jnt" : courierName
+        }, {
+            headers: {
+                key: process.env.RAJA_ONGKIR_API_KEY
+            }
+        });
+        return response.data.rajaongkir.result.manifest;
+    }
+    catch (error) {
+        throw error;
+    }
+});
+exports.getShippingWaybill = getShippingWaybill;

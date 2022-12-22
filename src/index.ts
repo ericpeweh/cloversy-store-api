@@ -63,6 +63,9 @@ app.get("/", (req, res) => {
 
 app.use("/auth", isAuth, getUserData, router.authRouter);
 
+// Backend-to-backend (Midtrans notifications)
+app.use("/midtrans", clientRouter.midtransRouter);
+
 // Client routes
 app.use("/products", clientRouter.productRouter);
 app.use("/category", clientRouter.categoryRouter);

@@ -14,7 +14,12 @@ import {
 	User,
 	Voucher,
 	ClientPaymentDetailsItem,
-	ClientTransactionDetails
+	ClientTransactionDetails,
+	PaymentStatus,
+	TransactionTimelineItem,
+	TransactionStatus,
+	FraudStatus,
+	Transaction
 } from "../../interfaces";
 
 // Utils
@@ -23,6 +28,8 @@ import generateUniqueId from "../../utils/generateUniqueId";
 // Config
 import coreAPI from "../../../config/midtrans";
 import { transactionRepo } from "../../data/client";
+import getLocalTime from "../../utils/getLocalTime";
+import { ErrorObj } from "../../utils";
 
 dotenv.config();
 
@@ -206,4 +213,115 @@ export const getSingleTransaction = async (userId: string, transactionId: string
 	};
 
 	return result;
+};
+
+export const challengeTransactionNotification = async (
+	orderId: string,
+	transactionStatus: PaymentStatus,
+	paymentObj: string
+) => {
+	const orderStatus: TransactionStatus = "pending";
+	const paymentStatus: PaymentStatus = transactionStatus;
+	const newTimelineItem: TransactionTimelineItem = {
+		timeline_date: getLocalTime(),
+		description: "Pembayaran bermasalah, menunggu konfirmasi admin."
+	};
+
+	await transactionRepo.updateTransaction(
+		orderId,
+		orderStatus,
+		paymentStatus,
+		newTimelineItem,
+		paymentObj
+	);
+};
+
+export const successTransactionNotification = async (
+	orderId: string,
+	transactionStatus: PaymentStatus,
+	paymentObj: string
+) => {
+	const orderStatus: TransactionStatus = "process";
+	const paymentStatus: PaymentStatus = transactionStatus;
+
+	const newTimelineItem: TransactionTimelineItem[] = [
+		{
+			timeline_date: getLocalTime(),
+			description: "Berhasil melakukan pembayaran"
+		},
+		{
+			timeline_date: getLocalTime(),
+			description: "Pesanan akan segera diproses"
+		}
+	];
+
+	await transactionRepo.updateTransaction(
+		orderId,
+		orderStatus,
+		paymentStatus,
+		newTimelineItem,
+		paymentObj
+	);
+};
+
+export const cancelTransactionNotification = async (
+	orderId: string,
+	transactionStatus: PaymentStatus,
+	paymentObj: string,
+	fraudStatus: FraudStatus,
+	voucher: Voucher | undefined,
+	transaction: Transaction
+) => {
+	const orderStatus: TransactionStatus = "cancel";
+	const paymentStatus: PaymentStatus = transactionStatus;
+
+	const timelineDescription =
+		transactionStatus === "deny" || fraudStatus === "deny"
+			? "Pembayaran / transaksi ditolak, hubungi admin untuk info lebih lanjut"
+			: transactionStatus === "cancel"
+			? "Transaksi dibatalkan oleh konsumen"
+			: "Transaksi dibatalkan otomatis";
+
+	const newTimelineItem: TransactionTimelineItem = {
+		timeline_date: getLocalTime(),
+		description: timelineDescription
+	};
+
+	// Check for transaction voucher usage
+	await transactionRepo.updateTransaction(
+		orderId,
+		orderStatus,
+		paymentStatus,
+		newTimelineItem,
+		paymentObj,
+		voucher,
+		transaction
+	);
+};
+
+export const getTransactionItem = async (transactionId: string) => {
+	const transaction = await transactionRepo.getTransactionItem(transactionId);
+
+	return transaction;
+};
+
+export const cancelTransaction = async (
+	transactionId: string,
+	voucher: Voucher | undefined,
+	transaction: Transaction
+) => {
+	const paymentObj = await coreAPI.transaction.cancel(transactionId);
+
+	const orderStatus: TransactionStatus = "cancel";
+	const paymentStatus: PaymentStatus = paymentObj.transaction_status || "cancel";
+
+	await transactionRepo.updateTransaction(
+		transactionId,
+		orderStatus,
+		paymentStatus,
+		null,
+		paymentObj,
+		voucher,
+		transaction
+	);
 };

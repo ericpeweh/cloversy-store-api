@@ -77,6 +77,7 @@ app.use("/account", getUserData, clientRouter.accountRouter);
 app.use("/data", getUserData, clientRouter.dataRouter);
 app.use("/cart", passAuth, getUserDataOptional, clientRouter.cartRouter);
 app.use("/transactions", getUserData, clientRouter.transactionRouter);
+app.use("/activity", getUserData, clientRouter.activityRouter);
 
 // Admin routes
 app.use(isAuth);

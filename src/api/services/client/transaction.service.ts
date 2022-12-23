@@ -23,13 +23,11 @@ import {
 } from "../../interfaces";
 
 // Utils
-import generateUniqueId from "../../utils/generateUniqueId";
+import { generateUniqueId, getLocalTime } from "../../utils";
 
 // Config
 import coreAPI from "../../../config/midtrans";
 import { transactionRepo } from "../../data/client";
-import getLocalTime from "../../utils/getLocalTime";
-import { ErrorObj } from "../../utils";
 
 dotenv.config();
 

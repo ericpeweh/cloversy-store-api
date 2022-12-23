@@ -5,7 +5,6 @@ import { Request, Response } from "express";
 import { voucherService } from "../../services/client";
 
 // Utils
-import isDateSurpassToday from "../../utils/isDateSurpassToday";
 import { ErrorObj } from "../../utils";
 
 // Types

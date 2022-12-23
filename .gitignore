@@ -3,3 +3,4 @@ node_modules
 list.todo
 google-cloud.json
 uploads
+dist

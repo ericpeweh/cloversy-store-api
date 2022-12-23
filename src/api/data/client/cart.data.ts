@@ -5,9 +5,6 @@ import db from "../../../config/connectDB";
 // Types
 import { CartItem, CartItemDetails } from "../../interfaces";
 
-// Utils
-import generateUpdateQuery from "../../utils/generateUpdateQuery";
-
 export const getSessionCartItemsDetails = async (productIds: string[]) => {
 	const uniqueProductIds = [...new Set(productIds)];
 

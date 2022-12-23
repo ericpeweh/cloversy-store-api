@@ -33,3 +33,15 @@ export const getSingleProductBySlug = async (productSlug: string) => {
 
 	return { productResult, recommendationsResult };
 };
+
+export const getUserLastSeenProducts = async (userId: string) => {
+	const products = await productRepo.getUserLastSeenProducts(userId);
+
+	return products;
+};
+
+export const trackUserLastSeenProduct = async (productId: string, userId: string) => {
+	const lastSeenProductId = await productRepo.trackUserLastSeenProduct(productId, userId);
+
+	return lastSeenProductId;
+};

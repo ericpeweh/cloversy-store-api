@@ -6,7 +6,7 @@ import { QueryResult } from "pg";
 import { Address, UpdateAddressDataArgs } from "../../interfaces";
 
 // Utils
-import generateUpdateQuery from "../../utils/generateUpdateQuery";
+import { generateUpdateQuery } from "../../utils";
 
 export const getAllUserAddress = async (userId: string) => {
 	const addressQuery = `SELECT * FROM address

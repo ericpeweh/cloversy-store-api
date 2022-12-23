@@ -1,8 +1,12 @@
 // Config
+import { QueryResult } from "pg";
 import db from "../../../config/connectDB";
 
+// Types
+import { ProductLastSeen } from "../../interfaces";
+
 // Utils
-import { ErrorObj } from "../../utils";
+import { ErrorObj, getLocalTime } from "../../utils";
 
 export const getAllProducts = async (
 	page: string,
@@ -167,4 +171,37 @@ export const checkProductExistById = async (productId: string) => {
 	const productResult = await db.query(productQuery, [productId]);
 
 	return productResult.rows.length !== 0;
+};
+
+export const getUserLastSeenProducts = async (userId: string) => {
+	const productSeenQuery = `SELECT pls.*,
+    p.title as title,
+    ROUND(p.price) as price,
+    p.slug as slug,
+    (SELECT array_agg("url") AS images 
+        FROM product_image pi 
+        WHERE pi.product_id = p.id
+    )
+  FROM product_last_seen pls
+  JOIN product p ON pls.product_id = p.id
+  WHERE user_id = $1 AND p.status = 'active'
+  ORDER BY seen_date DESC
+  LIMIT 4`;
+
+	const productSeenResult: QueryResult<ProductLastSeen> = await db.query(productSeenQuery, [
+		userId
+	]);
+
+	return productSeenResult.rows;
+};
+
+export const trackUserLastSeenProduct = async (productId: string, userId: string) => {
+	const productSeenQuery = `INSERT INTO product_last_seen 
+    (product_id, user_id) VALUES($1, $2)
+  ON CONFLICT (product_id, user_id)
+  DO UPDATE SET seen_date = $3`;
+
+	await db.query(productSeenQuery, [productId, userId, getLocalTime()]);
+
+	return productId;
 };

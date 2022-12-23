@@ -6,8 +6,7 @@ import { UpdateProductDataArgs } from "../interfaces";
 import { UploadResponse } from "@google-cloud/storage";
 
 // Utils
-import { ErrorObj } from "../utils";
-import generateUpdateQuery from "../utils/generateUpdateQuery";
+import { ErrorObj, generateUpdateQuery } from "../utils";
 
 export const getAllProducts = async (
 	page: string,

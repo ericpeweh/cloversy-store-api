@@ -5,7 +5,7 @@ import db from "../../config/connectDB";
 import { CreateUserData, User } from "../interfaces";
 
 // Utils
-import generateUpdateQuery from "../utils/generateUpdateQuery";
+import { generateUpdateQuery } from "../utils";
 
 export const getAllCustomers = async (page: string, searchQuery: string, statusQuery: string) => {
 	let paramsIndex = 1;

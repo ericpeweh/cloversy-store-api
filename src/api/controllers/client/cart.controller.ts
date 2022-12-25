@@ -125,7 +125,7 @@ export const addProductToCart = async (req: Request, res: Response) => {
 		id: nanoid(),
 		product_id,
 		size,
-		quantity
+		quantity: +quantity
 	};
 	let cartResult: CartItemDetails[] = [];
 
@@ -189,7 +189,7 @@ export const updateCartItem = async (req: Request, res: Response) => {
 			const updatedCart = cartService.updateCartItemInCartSession(
 				currentCart,
 				cartItemId,
-				quantity
+				+quantity
 			);
 
 			req.session.cart = updatedCart;
@@ -197,7 +197,7 @@ export const updateCartItem = async (req: Request, res: Response) => {
 			cartResult = await getCartResultFromSession(updatedCart);
 		} else {
 			// Edit product to db
-			await cartService.updateCartItemInDB(cartItemId, quantity, userId);
+			await cartService.updateCartItemInDB(cartItemId, +quantity, userId);
 
 			cartResult = (await cartService.getDBCartItemsDetails(userId)).rows;
 		}

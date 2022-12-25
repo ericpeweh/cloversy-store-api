@@ -196,6 +196,11 @@ export const getUserLastSeenProducts = async (userId: string) => {
 };
 
 export const trackUserLastSeenProduct = async (productId: string, userId: string) => {
+	// Reset id sequence to current biggest id
+	await db.query(
+		`SELECT setval(pg_get_serial_sequence('product_last_seen', 'id'), MAX(id)) FROM product_last_seen;`
+	);
+
 	const productSeenQuery = `INSERT INTO product_last_seen 
     (product_id, user_id) VALUES($1, $2)
   ON CONFLICT (product_id, user_id)

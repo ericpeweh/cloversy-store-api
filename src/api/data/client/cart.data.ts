@@ -109,7 +109,7 @@ export const updateCartItemWithoutId = async (
 	return cartItemResult;
 };
 
-export const updateCartItemById = async (cartItemId: string, quantity: string, userId: string) => {
+export const updateCartItemById = async (cartItemId: string, quantity: number, userId: string) => {
 	const cartItemQuery = `UPDATE cart
     SET quantity = $1
     WHERE id = $2

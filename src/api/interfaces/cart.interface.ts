@@ -5,7 +5,7 @@ export interface CartItem {
 	user_id: string;
 	product_id: string;
 	size: string;
-	quantity: string;
+	quantity: number;
 }
 
 export type CartItemDetails = CartItem & ProductType;

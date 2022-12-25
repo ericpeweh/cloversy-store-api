@@ -35,7 +35,7 @@ export const addProductToSessionCart = (
 			return item.product_id === product_id
 				? {
 						...item,
-						quantity: item.quantity || 0 + quantity
+						quantity: (item?.quantity ? item.quantity : 0) + +quantity
 				  }
 				: item;
 		});
@@ -82,7 +82,7 @@ export const syncCartItems = async (
 export const updateCartItemInCartSession = (
 	currentCart: Partial<CartItem>[],
 	cartItemId: string,
-	quantity: string
+	quantity: number
 ) => {
 	// Update car item quantity to session cart
 	const isExist = currentCart.findIndex(item => item.id === cartItemId) !== -1;
@@ -103,7 +103,7 @@ export const updateCartItemInCartSession = (
 	return updatedCart;
 };
 
-export const updateCartItemInDB = async (cartItemId: string, quantity: string, userId: string) => {
+export const updateCartItemInDB = async (cartItemId: string, quantity: number, userId: string) => {
 	const isExist = cartRepo.checkCartItemExistById(cartItemId);
 
 	if (!isExist) {

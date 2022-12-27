@@ -184,6 +184,7 @@ export const getSingleTransaction = async (userId: string, transactionId: string
     t.id as id, t.user_id as user_id, t.order_status as order_status, 
     t.gift_note as gift_note, t.voucher_code as voucher_code, 
     t.customer_note as customer_note, t.created_at as created_at,
+    t.is_reviewed as is_reviewed,
     ROUND(t.subtotal) AS subtotal, 
     ROUND(t.discount_total) AS discount_total,
     ROUND(t.total) AS total,
@@ -250,7 +251,7 @@ export const getTransactionItem = async (transactionId: string) => {
 export const getUserTransactions = async (userId: string) => {
 	const transactionsQuery = `
     SELECT 
-    t.id as id, t.user_id as user_id, t.order_status as order_status, 
+    t.id as id, t.user_id as user_id, t.order_status as order_status, t.is_reviewed as is_reviewed,
     t.created_at as created_at, ROUND(t.total) AS total, 
     (
       SELECT json_agg(json_build_object(

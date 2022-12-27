@@ -2,7 +2,12 @@
 import { Response, Request } from "express";
 
 // Types
-import { ShippingManifestItem, TransactionTimelineItem, Voucher } from "../../interfaces";
+import {
+	ReviewRequestItem,
+	ShippingManifestItem,
+	TransactionTimelineItem,
+	Voucher
+} from "../../interfaces";
 
 // Services
 import {
@@ -10,7 +15,8 @@ import {
 	cartService,
 	addressService,
 	voucherService,
-	dataService
+	dataService,
+	reviewService
 } from "../../services/client";
 
 // Utils
@@ -244,6 +250,78 @@ export const cancelTransaction = async (req: Request, res: Response) => {
 		res.status(error.statusCode || 500).json({
 			status: "error",
 			message: errorMessage || error.message
+		});
+	}
+};
+
+export const reviewTransaction = async (req: Request, res: Response) => {
+	const { transactionId } = req.params;
+	const { reviews } = req.body;
+	const userId = req.user?.id;
+
+	try {
+		if (!userId) throw new ErrorObj.ClientError("Failed to identify user!");
+
+		if (!transactionId || transactionId.length !== 10) {
+			throw new ErrorObj.ClientError("Invalid transaction id!", 404);
+		}
+
+		if (!reviews || !(reviews instanceof Array))
+			throw new ErrorObj.ClientError("Invalid reviews data!");
+
+		const isValidReviews = reviews.every(
+			review =>
+				review.hasOwnProperty("rating") &&
+				review.hasOwnProperty("review") &&
+				[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].includes(+review?.rating) &&
+				review?.review.length >= 0 &&
+				review?.review.length <= 200
+		);
+
+		if (!isValidReviews) throw new ErrorObj.ClientError("Invalid reviews data!");
+
+		const transaction = await transactionService.getSingleTransaction(userId, transactionId);
+
+		if (transaction.user_id !== userId)
+			throw new ErrorObj.ClientError("You're not authorized to review this transaction!", 403);
+
+		if (transaction.is_reviewed)
+			throw new ErrorObj.ClientError("Unable to create review for already reviewed transaction!");
+
+		if (
+			transaction.order_status !== "success" ||
+			transaction.payment_details.payment_status !== "settlement"
+		) {
+			throw new ErrorObj.ClientError(
+				"Transaction need to be completed before able to create review."
+			);
+		}
+
+		const trackSavedId: number[] = [];
+		const savedReviewId = transaction.item_details.reduce((str, curr) => {
+			if (trackSavedId.includes(curr.product_id)) {
+				return str;
+			} else {
+				trackSavedId.push(curr.product_id);
+				return str + curr.product_id.toString();
+			}
+		}, "");
+
+		const reviewId = reviews.reduce((str, curr) => str + curr.product_id, "");
+
+		if (savedReviewId !== reviewId)
+			throw new ErrorObj.ClientError("Reviews data does not match transaction items!");
+
+		await reviewService.createReviews(userId, transactionId, reviews as ReviewRequestItem[]);
+
+		res.status(200).json({
+			status: "success",
+			data: { transactionId }
+		});
+	} catch (error: any) {
+		res.status(error.statusCode || 500).json({
+			status: "error",
+			message: error.message
 		});
 	}
 };

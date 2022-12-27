@@ -71,13 +71,18 @@ export const getSingleProductBySlug = async (req: Request, res: Response) => {
 			throw new ErrorObj.ClientError("Query param 'id' has to be type of string");
 		}
 
-		const { productResult, recommendationsResult } = await productService.getSingleProductBySlug(
-			productSlug
-		);
+		const { productResult, recommendationsResult, productReviews } =
+			await productService.getSingleProductBySlug(productSlug);
 
 		res.status(200).json({
 			status: "success",
-			data: { product: { ...productResult.rows[0], recommendations: recommendationsResult.rows } }
+			data: {
+				product: {
+					...productResult.rows[0],
+					recommendations: recommendationsResult.rows,
+					reviews: productReviews
+				}
+			}
 		});
 	} catch (error: any) {
 		res.status(error.statusCode || 500).json({

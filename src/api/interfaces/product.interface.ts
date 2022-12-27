@@ -30,3 +30,29 @@ export interface ProductLastSeen {
 	slug: string;
 	images: string[] | null;
 }
+
+export interface ProductReview {
+	id: number;
+	product_id: number;
+	user_id: number;
+	transaction_id: number;
+	rating: number;
+	description: string;
+	status: "active" | "disabled";
+	created_at: string;
+}
+
+export interface ProductReviewItem {
+	id: number;
+	rating: string;
+	description: string;
+	created_at: string;
+	profile_picture: string;
+	full_name: string;
+}
+
+export interface ReviewRequestItem {
+	product_id: number;
+	rating: number;
+	review: string;
+}

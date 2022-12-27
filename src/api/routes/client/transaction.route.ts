@@ -10,6 +10,7 @@ const router = Router();
 router.post("/", transactionController.createTransaction);
 router.get("/", transactionController.getUserTransactions);
 router.get("/:transactionId", transactionController.getSingleTransaction);
-router.get("/:transactionId/cancel", transactionController.cancelTransaction);
+router.post("/:transactionId/cancel", transactionController.cancelTransaction);
+router.post("/:transactionId/review", transactionController.reviewTransaction);
 
 export default router;

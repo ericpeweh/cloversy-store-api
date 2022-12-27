@@ -9,6 +9,7 @@ import * as userService from "./user.service";
 import * as wishlistService from "./wishlist.service";
 import * as cartService from "./cart.service";
 import * as transactionService from "./transaction.service";
+import * as reviewService from "./review.service";
 
 export {
 	productService,
@@ -20,5 +21,6 @@ export {
 	userService,
 	wishlistService,
 	cartService,
-	transactionService
+	transactionService,
+	reviewService
 };

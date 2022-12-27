@@ -1,5 +1,5 @@
 // Data
-import { productRepo } from "../../data/client";
+import { productRepo, reviewRepo } from "../../data/client";
 
 export const getAllProducts = async (
 	page: string,
@@ -31,7 +31,9 @@ export const getSingleProductBySlug = async (productSlug: string) => {
 
 	const recommendationsResult = await productRepo.getProductRecommendations(productTags, productId);
 
-	return { productResult, recommendationsResult };
+	const productReviews = await reviewRepo.getProductReviews(productId);
+
+	return { productResult, recommendationsResult, productReviews };
 };
 
 export const getUserLastSeenProducts = async (userId: string) => {

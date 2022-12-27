@@ -179,6 +179,7 @@ export interface Transaction {
 	subtotal: string;
 	total: string;
 	created_at: string;
+	is_reviewed: boolean;
 }
 
 export interface TransactionPayment {

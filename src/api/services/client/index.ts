@@ -10,6 +10,8 @@ import * as wishlistService from "./wishlist.service";
 import * as cartService from "./cart.service";
 import * as transactionService from "./transaction.service";
 import * as reviewService from "./review.service";
+import * as subscriptionService from "./subscription.service";
+import * as contactService from "./contact.service";
 
 export {
 	productService,
@@ -24,4 +26,5 @@ export {
 	transactionService,
 	reviewService,
 	subscriptionService,
+	contactService
 };

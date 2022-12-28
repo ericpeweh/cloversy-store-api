@@ -9,6 +9,8 @@ import * as wishlistRepo from "./wishlist.data";
 import * as cartRepo from "./cart.data";
 import * as transactionRepo from "./transaction.data";
 import * as reviewRepo from "./review.data";
+import * as subscriptionRepo from "./subscription.data";
+import * as contactRepo from "./contact.data";
 
 export {
 	productRepo,
@@ -22,4 +24,5 @@ export {
 	transactionRepo,
 	reviewRepo,
 	subscriptionRepo,
+	contactRepo
 };

@@ -11,6 +11,8 @@ import * as cartController from "./cart.controller";
 import * as transactionController from "./transaction.controller";
 import * as midtransController from "./midtrans.controller";
 import * as activityController from "./activity.controller";
+import * as subscriptionController from "./subscription.controller";
+import * as contactController from "./contact.controller";
 
 export {
 	productController,
@@ -26,4 +28,5 @@ export {
 	midtransController,
 	activityController,
 	subscriptionController,
+	contactController
 };

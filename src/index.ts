@@ -71,6 +71,7 @@ app.use("/products", clientRouter.productRouter);
 app.use("/category", clientRouter.categoryRouter);
 app.use("/brands", clientRouter.brandRouter);
 app.use("/subscription", clientRouter.subscriptionRouter);
+app.use("/contacts", clientRouter.contactRouter);
 
 app.use(isAuth);
 app.use("/vouchers", getUserData, clientRouter.voucherRouter);

@@ -20,5 +20,6 @@ export default {
 	cartRouter,
 	transactionRouter,
 	midtransRouter,
-	activityRouter
+	activityRouter,
+	subscriptionRouter,
 };

@@ -20,5 +20,6 @@ export {
 	wishlistRepo,
 	cartRepo,
 	transactionRepo,
-	reviewRepo
+	reviewRepo,
+	subscriptionRepo,
 };

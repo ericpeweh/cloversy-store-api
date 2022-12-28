@@ -24,5 +24,6 @@ export {
 	cartController,
 	transactionController,
 	midtransController,
-	activityController
+	activityController,
+	subscriptionController,
 };

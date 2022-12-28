@@ -22,5 +22,6 @@ export {
 	wishlistService,
 	cartService,
 	transactionService,
-	reviewService
+	reviewService,
+	subscriptionService,
 };

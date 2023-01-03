@@ -2,7 +2,8 @@
 import db from "../../config/connectDB";
 
 // Types
-import { CreateUserData, User } from "../interfaces";
+import { QueryResult } from "pg";
+import { CreateUserData, ProductLastSeen, User } from "../interfaces";
 
 // Utils
 import { generateUpdateQuery } from "../utils";
@@ -69,18 +70,39 @@ export const getUserDataById = async (userId: string) => {
 	const userQuery = "SELECT * FROM users WHERE id = $1";
 	const userResult = await db.query(userQuery, [userId]);
 
-	const addressQuery = "SELECT * FROM address WHERE user_id = $1";
+	const addressQuery = `SELECT * FROM address 
+    WHERE user_id = $1
+  ORDER BY is_default DESC, id ASC`;
 	const addressResult = await db.query(addressQuery, [userId]);
 
-	const lastSeenQuery = `SELECT p.id, p.title 
-    FROM user_last_seen uls
-    JOIN product p
-      ON uls.product_id = p.id
-    WHERE uls.user_id = $1
-  `;
-	const lastSeenResult = await db.query(lastSeenQuery, [userId]);
+	const productSeenQuery = `SELECT pls.*,
+    p.title as title,
+    ROUND(p.price) as price,
+    p.slug as slug,
+    (SELECT array_agg("url") AS images 
+        FROM product_image pi 
+        WHERE pi.product_id = p.id
+    )
+  FROM product_last_seen pls
+  JOIN product p ON pls.product_id = p.id
+  WHERE user_id = $1 AND p.status = 'active'
+  ORDER BY seen_date DESC
+  LIMIT 4`;
 
-	const wishlistQuery = "SELECT * FROM wishlist WHERE user_id = $1";
+	const productSeenResult: QueryResult<ProductLastSeen> = await db.query(productSeenQuery, [
+		userId
+	]);
+
+	const wishlistQuery = `SELECT 
+    w.*, p.title as title,
+    (SELECT array_agg("url") AS images 
+      FROM product_image pi 
+      WHERE pi.product_id = p.id
+    )
+  FROM wishlist w 
+  JOIN product p ON w.product_id = p.id
+  WHERE user_id = $1
+  ORDER BY w.created_at DESC`;
 	const wishlistResult = await db.query(wishlistQuery, [userId]);
 
 	const vouchersQuery = `SELECT v.* FROM voucher_dist vd 
@@ -90,7 +112,7 @@ export const getUserDataById = async (userId: string) => {
   `;
 	const vouchersResult = await db.query(vouchersQuery, [userId]);
 
-	return { userResult, addressResult, lastSeenResult, wishlistResult, vouchersResult };
+	return { userResult, addressResult, productSeenResult, wishlistResult, vouchersResult };
 };
 
 export const createNewUser = async (userData: CreateUserData) => {

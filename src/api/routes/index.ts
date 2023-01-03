@@ -5,6 +5,7 @@ import brandRouter from "./brand.route";
 import userRouter from "./user.route";
 import voucherRouter from "./voucher.route";
 import authRouter from "./auth.route";
+import transactionRouter from "./transaction.route";
 
 export default {
 	productRouter,
@@ -12,5 +13,6 @@ export default {
 	brandRouter,
 	userRouter,
 	voucherRouter,
-	authRouter
+	authRouter,
+	transactionRouter
 };

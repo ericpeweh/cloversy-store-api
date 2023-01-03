@@ -5,6 +5,7 @@ import * as brandController from "./brand.controller";
 import * as userController from "./user.controller";
 import * as voucherController from "./voucher.controller";
 import * as authController from "./auth.controller";
+import * as transactionController from "./transaction.controller";
 
 export {
 	productController,
@@ -12,5 +13,6 @@ export {
 	brandController,
 	userController,
 	voucherController,
-	authController
+	authController,
+	transactionController
 };

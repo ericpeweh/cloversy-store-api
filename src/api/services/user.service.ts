@@ -31,7 +31,7 @@ export const getUserDataById = async (userId: string) => {
 	return {
 		...userData.userResult.rows[0],
 		address: userData.addressResult.rows,
-		lastSeen: userData.lastSeenResult.rows,
+		lastSeen: userData.productSeenResult.rows,
 		wishlist: userData.wishlistResult.rows,
 		vouchers: userData.vouchersResult.rows
 	};

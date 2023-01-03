@@ -207,6 +207,17 @@ export interface ClientPaymentDetailsItem {
 	biller_code?: string;
 	va_number?: string;
 	actions?: GopayActionsObject;
+	payment_status_modified?: string;
+}
+
+export interface AdminTransactionDetails extends Transaction {
+	full_name: string;
+	emaiL: string;
+	contact: string;
+	shipping_details: Address & TransactionShipping;
+	item_details: TransactionItem[];
+	payment_details: ClientPaymentDetailsItem;
+	timeline: TransactionTimelineItem[];
 }
 
 export interface ClientTransactionDetails extends Transaction {
@@ -214,4 +225,11 @@ export interface ClientTransactionDetails extends Transaction {
 	item_details: TransactionItem[];
 	payment_details: ClientPaymentDetailsItem;
 	timeline: TransactionTimelineItem[];
+}
+
+export interface UpdateTransactionDataArgs {
+	updatedTransactionData: Object;
+	transactionId: string;
+	timelineObj: string;
+	shippingTrackingCode: string;
 }

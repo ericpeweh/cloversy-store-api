@@ -24,7 +24,11 @@ export const getAllProducts = async (
     (SELECT url FROM product_image pi 
       WHERE pi.product_id = p.id 
       LIMIT 1
-    ) AS image 
+    ) AS image,
+    (SELECT ROUND(AVG(rating) / 2, 2) AS rating
+      FROM review r
+      WHERE r.product_id = p.id AND r.status = 'active'
+    )
     FROM product p JOIN brand b
     ON p.brand_id = b.id`;
 
@@ -57,7 +61,7 @@ export const getAllProducts = async (
 		const sorter = sortBy === "low-to-high" || sortBy === "high-to-low" ? "price" : sortBy;
 		const sortType = sortBy === "low-to-high" ? "ASC" : "DESC";
 
-		query += ` ORDER BY ${sorter} ${sortType}`;
+		query += ` ORDER BY ${sorter} ${sortType} NULLS LAST`;
 	}
 
 	if (page) {
@@ -91,7 +95,15 @@ export const getSingleProductById = async (productId: string) => {
   (SELECT array_agg("tag") AS tags
     FROM product_tag pt
     WHERE pt.product_id = p.id
-  )
+  ),
+  (SELECT ROUND(AVG(rating) / 2, 2) AS rating
+		FROM review r
+		WHERE r.product_id = p.id AND r.status = 'active'
+	),
+	(SELECT COUNT(r.id) AS review_count
+		FROM review r
+		WHERE r.product_id = p.id AND r.status = 'active'
+	)
   FROM product p
   JOIN brand b ON p.brand_id = b.id 
   JOIN category c ON p.category_id = c.id 

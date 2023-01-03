@@ -9,6 +9,7 @@ const router = Router();
 // Routing
 router.get("/", userController.getAllCustomers);
 router.get("/:userId", userController.getSingleCustomer);
+router.get("/:userId/orders", userController.getSingleCustomerOrders);
 router.put("/:userId", userController.updateUserData);
 
 export default router;

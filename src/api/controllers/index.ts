@@ -6,6 +6,7 @@ import * as userController from "./user.controller";
 import * as voucherController from "./voucher.controller";
 import * as authController from "./auth.controller";
 import * as transactionController from "./transaction.controller";
+import * as reviewController from "./review.controller";
 
 export {
 	productController,
@@ -14,5 +15,6 @@ export {
 	userController,
 	voucherController,
 	authController,
-	transactionController
+	transactionController,
+	reviewController
 };

@@ -22,3 +22,22 @@ export const getProductReviews = async (productId: string) => {
 
 	return reviewsResult.rows;
 };
+
+export const getTransactionReviews = async (transactionId: string) => {
+	const reviewsQuery = `SELECT r.id as id,
+    ROUND(ROUND(r.rating, 2) / 2, 2) AS rating, 
+    r.description as description, r.created_at as created_at, 
+    r.status as status, r.transaction_id as transaction_id,
+    r.product_id as product_id,
+    u.profile_picture as profile_picture, u.full_name as full_name
+  FROM review r
+  JOIN users u ON r.user_id = u.id
+  WHERE r.transaction_id = $1
+  `;
+
+	const reviewsResult: QueryResult<AdminProductReviewItem> = await db.query(reviewsQuery, [
+		transactionId
+	]);
+
+	return reviewsResult.rows;
+};

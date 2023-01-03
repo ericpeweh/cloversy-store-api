@@ -7,6 +7,7 @@ import * as voucherService from "./voucher.service";
 import * as authService from "./auth.service";
 import * as transactionService from "./transaction.service";
 import * as dataService from "./data.service";
+import * as reviewService from "./review.service";
 
 export {
 	productService,
@@ -16,5 +17,6 @@ export {
 	voucherService,
 	authService,
 	transactionService,
-	dataService
+	dataService,
+	reviewService
 };

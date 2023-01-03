@@ -68,6 +68,32 @@ export const getSingleCustomer = async (req: Request, res: Response) => {
 	}
 };
 
+export const getSingleCustomerOrders = async (req: Request, res: Response) => {
+	const { userId } = req.params;
+
+	try {
+		if (isNaN(parseInt(userId))) {
+			throw new ErrorObj.ClientError("userId must be number");
+		}
+
+		const result = await userService.getUserDataById(userId);
+
+		if (result === undefined) {
+			throw new ErrorObj.ClientError("Customer not found!", 404);
+		}
+
+		res.status(200).json({
+			status: "success",
+			data: { customer: result }
+		});
+	} catch (error: any) {
+		res.status(error.statusCode || 500).json({
+			status: "error",
+			message: error.message
+		});
+	}
+};
+
 export const updateUserData = async (req: Request, res: Response) => {
 	const { userId } = req.params;
 	const { full_name, contact, profile_picture, user_status, credits, prev_status } = req.body;

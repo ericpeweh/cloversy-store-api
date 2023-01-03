@@ -51,8 +51,24 @@ export interface ProductReviewItem {
 	full_name: string;
 }
 
+export interface AdminProductReviewItem extends ProductReview {
+	profile_picture: string;
+	full_name: string;
+}
+
 export interface ReviewRequestItem {
 	product_id: number;
 	rating: number;
 	review: string;
+}
+
+export interface ProductLastSeen {
+	id: number;
+	user_id: number;
+	product_id: number;
+	seen_date: string;
+	title: string;
+	price: string;
+	slug: string;
+	images: string[] | null;
 }

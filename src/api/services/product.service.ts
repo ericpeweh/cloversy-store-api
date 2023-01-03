@@ -2,7 +2,7 @@
 import fs from "fs";
 
 // Data
-import { productRepo } from "../data";
+import { productRepo, reviewRepo } from "../data";
 
 // Types
 import { UpdateProductDataArgs } from "../interfaces";
@@ -26,7 +26,9 @@ export const getAllProducts = async (
 export const getSingleProduct = async (productId: string) => {
 	const productResult = await productRepo.getSingleProductById(productId);
 
-	return productResult;
+	const productReviews = await reviewRepo.getProductReviews(productId);
+
+	return { productResult, productReviews };
 };
 
 export const createProduct = async (

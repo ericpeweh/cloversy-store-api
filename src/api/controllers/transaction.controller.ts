@@ -2,18 +2,16 @@
 import { Response, Request } from "express";
 
 // Types
-import {
-	ReviewRequestItem,
-	ShippingManifestItem,
-	TransactionTimelineItem,
-	Voucher
-} from "../interfaces";
+import { ShippingManifestItem, TransactionTimelineItem } from "../interfaces";
 
 // Services
 import { dataService, transactionService } from "../services";
 
 // Utils
 import { ErrorObj } from "../utils";
+
+const _timelineSorter = (a: TransactionTimelineItem, b: TransactionTimelineItem) =>
+	a.timeline_date > b.timeline_date ? -1 : a.timeline_date < b.timeline_date ? 1 : 0;
 
 export const getTransactions = async (req: Request, res: Response) => {
 	try {
@@ -70,7 +68,7 @@ export const getTransactions = async (req: Request, res: Response) => {
 };
 
 export const getSingleTransaction = async (req: Request, res: Response) => {
-	const { noWaybill } = req.query;
+	const { edit } = req.query;
 	const { transactionId } = req.params;
 
 	try {
@@ -80,40 +78,49 @@ export const getSingleTransaction = async (req: Request, res: Response) => {
 		const transactionData = await transactionService.getSingleTransaction(transactionId);
 		const { timeline: timelineData, ...transaction } = transactionData;
 
-		const timeline = timelineData.reverse();
+		const timeline = timelineData;
 
-		if (noWaybill !== "1") {
-			// Add waybill tracking if tracking code is provided
-			const trackingCode = transaction.shipping_details.shipping_tracking_code;
-			if (trackingCode) {
+		// Add waybill tracking if tracking code is provided
+		let waybillTimeline: TransactionTimelineItem[] = [];
+		const trackingCode = transaction.shipping_details.shipping_tracking_code;
+		if (trackingCode) {
+			try {
 				const waybillManifest = await dataService.getShippingWaybill(
 					trackingCode,
 					transaction.shipping_details.shipping_courier
 				);
 
-				timeline.unshift(
-					...waybillManifest
-						.map((item: ShippingManifestItem) => ({
-							timeline_date: `${item.manifest_date}${
-								item.manifest_time.length === 5
-									? `T${item.manifest_time}:00`
-									: `T${item.manifest_time}`
-							}`,
-							description: `${item.city_name ? item.city_name + " - " : ""}${
-								item.manifest_description
-							}`
-						}))
-						// Sort manifest by date (DESCENDING)
-						.sort((a, b) =>
-							a.timeline_date > b.timeline_date ? -1 : a.timeline_date < b.timeline_date ? 1 : 0
-						)
-				);
-			}
+				const waybillManifestTimeline = waybillManifest.map((item: ShippingManifestItem) => ({
+					timeline_date: `${item.manifest_date}${
+						item.manifest_time.length === 5 ? `T${item.manifest_time}:00` : `T${item.manifest_time}`
+					}`,
+					description: `${item.city_name ? item.city_name + " - " : ""}${item.manifest_description}`
+				}));
+
+				if (edit === "1") {
+					const sortedWaybillManifestTimeline = waybillManifestTimeline
+						.sort(_timelineSorter)
+						.map(item => ({ ...item, waybill: true }));
+
+					waybillTimeline = sortedWaybillManifestTimeline;
+				} else {
+					timeline.unshift(...waybillManifestTimeline);
+				}
+			} catch (error) {}
 		}
+
+		// Sort manifest by date (DESCENDING)
+		const sortedTimeline = timeline.sort(_timelineSorter);
 
 		res.status(200).json({
 			status: "success",
-			data: { transaction: { ...transaction, timeline } }
+			data: {
+				transaction: {
+					...transaction,
+					timeline: sortedTimeline,
+					...(edit === "1" && { waybillTimeline: waybillTimeline })
+				}
+			}
 		});
 	} catch (error: any) {
 		res.status(error.statusCode || 500).json({

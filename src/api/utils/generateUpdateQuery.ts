@@ -3,7 +3,8 @@ const generateUpdateQuery = (
 	data: { [key: string]: any },
 	identifier?: { [key: string]: string | number },
 	extra?: string,
-	startIndex?: number
+	startIndex?: number,
+	readOnly?: string[]
 ) => {
 	const queryParams: (string | number)[] = [];
 	let query = "";
@@ -13,7 +14,7 @@ const generateUpdateQuery = (
 	query += `UPDATE ${tableName} SET`;
 	const pairs = Object.entries(data);
 	pairs.forEach(([key, value]) => {
-		if (value !== undefined) {
+		if (value !== undefined && !readOnly?.includes(key)) {
 			queryParams.push(value);
 			query += ` ${key} = $${queryIndex},`;
 			queryIndex += 1;

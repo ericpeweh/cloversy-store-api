@@ -6,3 +6,21 @@ export const getTransactionReviews = async (transactionId: string) => {
 
 	return reviews;
 };
+
+export const getAllReviews = async (
+	searchQuery: string,
+	reviewStatus: string,
+	sortBy: string,
+	page: string,
+	itemsLimit: string
+) => {
+	const reviews = await reviewRepo.getAllReviews(
+		searchQuery,
+		reviewStatus,
+		sortBy,
+		page,
+		itemsLimit
+	);
+
+	return reviews;
+};

@@ -51,7 +51,8 @@ export const getAllReviews = async (
 	reviewStatus: string,
 	sortBy: string,
 	page: string,
-	itemsLimit: string
+	itemsLimit: string,
+	transactionId: string
 ) => {
 	let paramsIndex = 0;
 	const params = [];
@@ -78,6 +79,17 @@ export const getAllReviews = async (
 		reviewsQuery += ` WHERE r.status = $${paramsIndex + 1}`;
 		totalQuery += ` WHERE r.status = $${paramsIndex + 1}`;
 		params.push(reviewStatus);
+		paramsIndex += 1;
+	}
+
+	if (transactionId) {
+		const transactionFilter = ` ${paramsIndex === 0 ? "WHERE" : "AND"} r.transaction_id = $${
+			paramsIndex + 1
+		}
+    `;
+		reviewsQuery += transactionFilter;
+		totalQuery += transactionFilter;
+		params.push(transactionId.toUpperCase());
 		paramsIndex += 1;
 	}
 
@@ -118,4 +130,39 @@ export const getAllReviews = async (
 		totalCount: parseInt(totalReviews),
 		totalPages: Math.ceil(totalReviews / limit)
 	};
+};
+
+export const getSingleReview = async (reviewId: string) => {
+	const reviewQuery = `SELECT r.id as id,
+    ROUND(ROUND(r.rating, 2) / 2, 2) AS rating, 
+    r.description as description, r.created_at as created_at, 
+    r.status as status, r.transaction_id as transaction_id,
+    r.product_id as product_id,
+    u.profile_picture as profile_picture, u.full_name as full_name,
+    p.title as product_title
+  FROM review r
+  JOIN users u ON r.user_id = u.id
+  JOIN product p ON r.product_id = p.id
+  WHERE r.id = $1`;
+
+	const reviewResult: QueryResult<AdminProductReviewItem> = await db.query(reviewQuery, [reviewId]);
+
+	return reviewResult;
+};
+
+export const updateReview = async (
+	reviewId: string,
+	rating: string,
+	review: string,
+	created_at: string,
+	status: "active" | "disabled"
+) => {
+	const reviewQuery = `UPDATE review
+    SET rating = $1, description = $2, created_at = $3, status = $4
+    WHERE id = $5
+  `;
+
+	await db.query(reviewQuery, [rating, review, created_at, status, reviewId]);
+
+	return reviewId;
 };

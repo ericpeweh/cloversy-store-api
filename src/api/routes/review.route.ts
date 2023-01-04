@@ -8,6 +8,7 @@ const router = Router();
 
 // Routing
 router.get("/", reviewController.getAllReviews);
-router.get("/:transactionId", reviewController.getTransactionReviews);
+router.get("/:reviewId", reviewController.getSingleReview);
+router.put("/:reviewId", reviewController.updateReview);
 
 export default router;

@@ -54,6 +54,7 @@ export interface ProductReviewItem {
 export interface AdminProductReviewItem extends ProductReview {
 	profile_picture: string;
 	full_name: string;
+	product_title: string;
 }
 
 export interface ReviewRequestItem {

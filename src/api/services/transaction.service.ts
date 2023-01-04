@@ -27,9 +27,9 @@ import {
 import { generateUniqueId, getLocalTime } from "../utils";
 
 // Config
-import coreAPI from "../../config/midtrans";
 import { transactionRepo } from "../data";
 import { transactionService } from ".";
+import coreAPI from "../../config/midtrans";
 
 dotenv.config();
 
@@ -112,23 +112,62 @@ export const updateTransaction = async (updateTransactionData: UpdateTransaction
 	return updatedTransaction;
 };
 
-// export const cancelTransaction = async (
-// 	transactionId: string,
-// 	voucher: Voucher | undefined,
-// 	transaction: Transaction
-// ) => {
-// 	const paymentObj = await coreAPI.transaction.cancel(transactionId);
+export const getTransactionItem = async (transactionId: string) => {
+	const transaction = await transactionRepo.getTransactionItem(transactionId);
 
-// 	const orderStatus: TransactionStatus = "cancel";
-// 	const paymentStatus: PaymentStatus = paymentObj.transaction_status || "cancel";
+	return transaction;
+};
 
-// 	await transactionRepo.updateTransaction(
-// 		transactionId,
-// 		orderStatus,
-// 		paymentStatus,
-// 		null,
-// 		paymentObj,
-// 		voucher,
-// 		transaction
-// 	);
-// };
+export const changeTransactionStatus = async (
+	transactionId: string,
+	orderStatus: TransactionStatus,
+	transaction: Transaction,
+	voucher: Voucher | undefined
+) => {
+	let timelineDesc = "";
+	let paymentStatus: "pending" | "settlement" | "cancel" = "pending";
+	let paymentObj = null;
+
+	if (orderStatus === "pending") {
+		timelineDesc = "Status transaksi diubah menjadi PENDING [ADMIN]";
+	} else if (orderStatus === "process") {
+		timelineDesc = "Status transaksi diubah menjadi PROCESS [ADMIN]";
+		paymentStatus = "settlement";
+	} else if (orderStatus === "sent") {
+		timelineDesc = "Produk telah dikirim, no resi pengiriman akan segera tersedia [ADMIN]";
+		paymentStatus = "settlement";
+	} else if (orderStatus === "success") {
+		timelineDesc = "Transaksi telah selesai, akses ulasan diberikan [ADMIN]";
+		paymentStatus = "settlement";
+	} else if (orderStatus === "cancel") {
+		// Try to cancel midtrans transaction
+		try {
+			paymentObj = await coreAPI.transaction.cancel(transactionId);
+
+			paymentStatus = paymentObj.transaction_status || "cancel";
+		} catch (error) {
+			paymentStatus = "cancel";
+		}
+
+		timelineDesc = "Transaksi dibatalkan oleh [ADMIN]";
+	}
+
+	const newTimelineItem: TransactionTimelineItem = {
+		timeline_date: getLocalTime(),
+		description: timelineDesc
+	};
+
+	await transactionRepo.changeTransactionStatus(
+		transactionId,
+		orderStatus,
+		paymentStatus,
+		newTimelineItem,
+		paymentObj,
+		voucher,
+		transaction
+	);
+
+	const updatedTransaction = await transactionService.getSingleTransaction(transactionId);
+
+	return updatedTransaction;
+};

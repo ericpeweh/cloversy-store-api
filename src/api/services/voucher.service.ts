@@ -52,3 +52,9 @@ export const updateVoucher = async (
 		throw error;
 	}
 };
+
+export const getVoucherItem = async (voucherCode: string) => {
+	const voucher = await voucherRepo.getVoucherItem(voucherCode);
+
+	return voucher;
+};

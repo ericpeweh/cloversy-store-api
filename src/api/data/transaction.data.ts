@@ -18,7 +18,7 @@ import {
 } from "../interfaces";
 
 // Utils
-import { ErrorObj, generateUpdateQuery } from "../utils";
+import { ErrorObj, generateUpdateQuery, getLocalTime } from "../utils";
 
 export const getTransactions = async (
 	userId: string,
@@ -84,6 +84,16 @@ export const getTransactions = async (
 		totalCount: parseInt(totalTransactions),
 		totalPages: Math.ceil(totalTransactions / limit)
 	};
+};
+
+export const getTransactionItem = async (transactionId: string) => {
+	const transactionQuery = `SELECT * FROM transactions WHERE id = $1`;
+
+	const transactionResult: QueryResult<Transaction> = await db.query(transactionQuery, [
+		transactionId
+	]);
+
+	return transactionResult?.rows[0];
 };
 
 export const getSingleTransaction = async (transactionId: string) => {
@@ -202,6 +212,79 @@ export const updateTransaction = async (updateTransactionData: UpdateTransaction
 
 		await client.query("COMMIT");
 		return { transactionResult, timelineResult };
+	} catch (error) {
+		await client.query("ROLLBACK");
+		throw error;
+	} finally {
+		client.release();
+	}
+};
+
+export const changeTransactionStatus = async (
+	transactionId: string,
+	orderStatus: TransactionStatus,
+	paymentStatus: "pending" | "settlement" | "cancel",
+	newTimelineItem: TransactionTimelineItem,
+	paymentObj: string | null,
+	voucher: Voucher | undefined,
+	transaction: Transaction
+) => {
+	const client = await db.pool.connect();
+
+	try {
+		await client.query("BEGIN");
+
+		// Update transaction status
+		const transactionQuery = `UPDATE transactions
+      SET order_status = $1, order_status_modified = $2 
+    WHERE id = $3`;
+
+		await client.query(transactionQuery, [orderStatus, getLocalTime(), transactionId]);
+
+		// Update transaction timeline
+		const transactionTimelineQuery = `UPDATE transactions_timeline 
+      SET timeline_object = timeline_object || $1
+    WHERE transaction_id = $2 `;
+
+		await client.query(transactionTimelineQuery, [JSON.stringify(newTimelineItem), transactionId]);
+
+		// Update transaction payment status (not modifying payment_object)
+		const transactionPaymentQuery = `UPDATE transactions_payment
+      SET payment_status = $1, payment_status_modified = $2
+    WHERE transaction_id = $3`;
+
+		await client.query(transactionPaymentQuery, [paymentStatus, getLocalTime(), transactionId]);
+
+		// Update payment obj if existed
+		if (paymentObj) {
+			const transactionPaymentObjQuery = `UPDATE transactions_payment
+      SET payment_object = $1 WHERE transaction_id = $2`;
+
+			await client.query(transactionPaymentObjQuery, [paymentObj, transactionId]);
+		}
+
+		// Update voucher data based on type
+		let voucherQuery: string | undefined = undefined;
+		let voucherParams: string[] = [];
+		if (transaction && voucher && voucher?.voucher_scope === "user") {
+			voucherQuery = `INSERT INTO voucher_dist 
+        (user_id, voucher_code)
+      VALUES ($1, $2)`;
+			voucherParams = [transaction.user_id, voucher.code];
+		}
+
+		if (transaction && voucher && voucher?.voucher_scope === "global") {
+			voucherQuery = `UPDATE voucher 
+        SET current_usage = current_usage - 1
+      WHERE code = $1`;
+			voucherParams = [voucher.code];
+		}
+
+		if (voucherQuery && voucherParams.length !== 0) {
+			await client.query(voucherQuery, voucherParams);
+		}
+
+		await client.query("COMMIT");
 	} catch (error) {
 		await client.query("ROLLBACK");
 		throw error;

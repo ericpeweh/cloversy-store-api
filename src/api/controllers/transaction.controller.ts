@@ -2,10 +2,10 @@
 import { Response, Request } from "express";
 
 // Types
-import { ShippingManifestItem, TransactionTimelineItem } from "../interfaces";
+import { ShippingManifestItem, TransactionTimelineItem, Voucher } from "../interfaces";
 
 // Services
-import { dataService, transactionService } from "../services";
+import { dataService, transactionService, voucherService } from "../services";
 
 // Utils
 import { ErrorObj } from "../utils";
@@ -166,70 +166,54 @@ export const updateTransaction = async (req: Request, res: Response) => {
 	}
 };
 
-// export const getUserTransactions = async (req: Request, res: Response) => {
-// 	const userId = req.user?.id;
+export const changeTransactionStatus = async (req: Request, res: Response) => {
+	const { transactionId } = req.params;
+	const { orderStatus } = req.body;
 
-// 	try {
-// 		if (!userId) throw new ErrorObj.ClientError("Failed to identify user!");
+	try {
+		if (!transactionId || transactionId.length !== 10)
+			throw new ErrorObj.ClientError("Invalid transaction id!");
 
-// 		const transactions = await transactionService.getUserTransactions(userId);
+		if (!orderStatus || !["pending", "process", "sent", "success", "cancel"].includes(orderStatus))
+			throw new ErrorObj.ClientError("Invalid order status!");
 
-// 		res.status(200).json({
-// 			status: "success",
-// 			data: { transactions }
-// 		});
-// 	} catch (error: any) {
-// 		res.status(error.statusCode || 500).json({
-// 			status: "error",
-// 			message: error.message
-// 		});
-// 	}
-// };
+		// Check transasction exist and its status
+		const transaction = await transactionService.getTransactionItem(transactionId);
 
-// export const cancelTransaction = async (req: Request, res: Response) => {
-// 	const userId = req.user?.id;
-// 	const { transactionId } = req.params;
+		if (!transaction) throw new ErrorObj.ClientError("Transaction not found!", 404);
 
-// 	try {
-// 		if (!userId) throw new ErrorObj.ClientError("Failed to identify user!");
+		if (transaction.order_status === "cancel" || transaction.order_status === "success")
+			throw new ErrorObj.ClientError(
+				"Transaction with 'cancel' or 'success' status cannot be modified!"
+			);
 
-// 		if (!transactionId || transactionId.length !== 10)
-// 			throw new ErrorObj.ClientError("Invalid transaction id!");
+		if (transaction.order_status === orderStatus)
+			throw new ErrorObj.ClientError("Failed to update: same order status is provided!");
 
-// 		// Check transaction exist and its status
-// 		const transaction = await transactionService.getTransactionItem(transactionId);
+		// Count in voucher if new status is 'cancel' to refund voucher back to user
+		let voucher: Voucher | undefined = undefined;
+		if (transaction.voucher_code && orderStatus === "cancel") {
+			voucher = await voucherService.getVoucherItem(transaction.voucher_code);
+		}
 
-// 		if (!transaction) throw new ErrorObj.ClientError("Transaction not found!", 404);
+		const updatedTransactionData = await transactionService.changeTransactionStatus(
+			transactionId,
+			orderStatus,
+			transaction,
+			voucher
+		);
 
-// 		if (transaction.order_status !== "pending")
-// 			throw new ErrorObj.ClientError("Only transactions with pending status can be canceled");
+		const { timeline: timelineData, ...transactionData } = updatedTransactionData;
+		const timeline = timelineData.reverse();
 
-// 		// Check user authorization to cancel transaction
-// 		const isAuthorized = transaction.user_id === userId;
-
-// 		if (!isAuthorized) throw new ErrorObj.ClientError("You're not authorized", 403);
-
-// 		// Handle cancel transaction
-// 		let voucher: Voucher | undefined = undefined;
-// 		if (transaction.voucher_code) {
-// 			voucher = await voucherService.getVoucherItem(transaction.voucher_code);
-// 		}
-
-// 		await transactionService.cancelTransaction(transactionId, voucher, transaction);
-
-// 		res.status(200).json({
-// 			status: "success",
-// 			data: { transactionId }
-// 		});
-// 	} catch (error: any) {
-// 		let errorMessage = "";
-// 		if (error?.httpStatusCode === "412") {
-// 			errorMessage = "Failed: transaction can't be canceled";
-// 		}
-
-// 		res.status(error.statusCode || 500).json({
-// 			status: "error",
-// 			message: errorMessage || error.message
-// 		});
-// 	}
-// };
+		res.status(200).json({
+			status: "success",
+			data: { updatedTransaction: { ...transactionData, timeline } }
+		});
+	} catch (error: any) {
+		res.status(error.statusCode || 500).json({
+			status: "error",
+			message: error.message
+		});
+	}
+};

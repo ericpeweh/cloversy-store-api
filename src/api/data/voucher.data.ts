@@ -1,6 +1,10 @@
 // Config
 import db from "../../config/connectDB";
 
+// Types
+import { QueryResult } from "pg";
+import { Voucher } from "../interfaces";
+
 // Utils
 import { ErrorObj } from "../utils";
 
@@ -156,4 +160,12 @@ export const updateVoucher = async (
 	} finally {
 		client.release();
 	}
+};
+
+export const getVoucherItem = async (voucherCode: string) => {
+	const voucherQuery = `SELECT * FROM voucher WHERE code = $1`;
+
+	const voucherResult: QueryResult<Voucher> = await db.query(voucherQuery, [voucherCode]);
+
+	return voucherResult.rows[0];
 };

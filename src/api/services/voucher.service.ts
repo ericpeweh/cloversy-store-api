@@ -1,11 +1,16 @@
 // Data
 import { voucherRepo } from "../data";
 
-export const getAllVouchers = async (voucherStatus: string, sortBy: string) => {
+export const getAllVouchers = async (
+	voucherStatus: string,
+	sortBy: string,
+	page: string,
+	itemsLimit: string
+) => {
 	try {
-		const vouchers = await voucherRepo.getAllVouchers(voucherStatus, sortBy);
+		const result = await voucherRepo.getAllVouchers(voucherStatus, sortBy, page, itemsLimit);
 
-		return vouchers;
+		return result;
 	} catch (error) {
 		throw error;
 	}

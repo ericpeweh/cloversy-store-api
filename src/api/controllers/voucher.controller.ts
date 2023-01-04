@@ -8,22 +8,38 @@ import { ErrorObj } from "../utils";
 // Types
 
 export const getAllVouchers = async (req: Request, res: Response) => {
-	const { status: voucherStatus = "", sortBy = "" } = req.query;
+	const {
+		status: voucherStatus = "",
+		sortBy = "",
+		page = "",
+		limit: itemsLimit = "10"
+	} = req.query;
 
 	try {
-		if (typeof voucherStatus !== "string" || typeof sortBy !== "string") {
-			throw new ErrorObj.ClientError("Query param 'status' and 'sortBy' has to be type of string");
+		if (
+			typeof voucherStatus !== "string" ||
+			typeof sortBy !== "string" ||
+			typeof page !== "string" ||
+			typeof itemsLimit !== "string"
+		) {
+			throw new ErrorObj.ClientError("Query params has to be type of string");
+		}
+
+		if (!["", "active", "disabled"].includes(voucherStatus)) {
+			throw new ErrorObj.ClientError(
+				`Query params 'status' of '${voucherStatus}' is not supported`
+			);
 		}
 
 		if (!["current_usage", "latest", "expiry_date", "id", ""].includes(sortBy)) {
-			throw new ErrorObj.ClientError("Query param 'sortBy' is not supported");
+			throw new ErrorObj.ClientError(`Query params 'sortBy' of '${sortBy}' is not supported`);
 		}
 
-		const result = await voucherService.getAllVouchers(voucherStatus, sortBy);
+		const result = await voucherService.getAllVouchers(voucherStatus, sortBy, page, itemsLimit);
 
 		res.status(200).json({
 			status: "success",
-			data: { vouchers: result.rows }
+			data: result
 		});
 	} catch (error: any) {
 		res.status(400).json({

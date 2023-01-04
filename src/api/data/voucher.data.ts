@@ -8,13 +8,24 @@ import { Voucher } from "../interfaces";
 // Utils
 import { ErrorObj } from "../utils";
 
-export const getAllVouchers = async (voucherStatus: string, sortBy: string) => {
+export const getAllVouchers = async (
+	voucherStatus: string,
+	sortBy: string,
+	page: string,
+	itemsLimit: string
+) => {
 	let paramsIndex = 0;
 	const params = [];
+	const limit = itemsLimit ? +itemsLimit : 12;
+	const offset = parseInt(page) * limit - limit;
+
 	let voucherQuery = `SELECT * FROM voucher`;
+
+	let totalQuery = `SELECT COUNT(code) FROM voucher`;
 
 	if (voucherStatus) {
 		voucherQuery += ` WHERE status = $${paramsIndex + 1}`;
+		totalQuery += ` WHERE status = $${paramsIndex + 1}`;
 		params.push(voucherStatus);
 		paramsIndex += 1;
 	}
@@ -27,8 +38,20 @@ export const getAllVouchers = async (voucherStatus: string, sortBy: string) => {
 		voucherQuery += ` ORDER BY created_at DESC`;
 	}
 
-	const voucherResult = await db.query(voucherQuery, params);
-	return voucherResult;
+	if (page) {
+		voucherQuery += ` LIMIT ${limit} OFFSET ${offset}`;
+	}
+
+	const totalVouchers = (await db.query(totalQuery, params)).rows[0].count;
+	const vouchers = (await db.query(voucherQuery, params)).rows;
+
+	return {
+		vouchers,
+		page: parseInt(page),
+		pageSize: limit,
+		totalCount: parseInt(totalVouchers),
+		totalPages: Math.ceil(totalVouchers / limit)
+	};
 };
 
 export const getSingleVoucher = async (voucherCode: string) => {

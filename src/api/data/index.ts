@@ -6,5 +6,15 @@ import * as userRepo from "./user.data";
 import * as voucherRepo from "./voucher.data";
 import * as reviewRepo from "./review.data";
 import * as transactionRepo from "./transaction.data";
+import * as notificationRepo from "./notification.data";
 
-export { productRepo, categoryRepo, brandRepo, userRepo, voucherRepo, reviewRepo, transactionRepo };
+export {
+	productRepo,
+	categoryRepo,
+	brandRepo,
+	userRepo,
+	voucherRepo,
+	reviewRepo,
+	transactionRepo,
+	notificationRepo
+};

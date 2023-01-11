@@ -8,6 +8,7 @@ import * as authService from "./auth.service";
 import * as transactionService from "./transaction.service";
 import * as dataService from "./data.service";
 import * as reviewService from "./review.service";
+import * as notificationService from "./notification.service";
 
 export {
 	productService,
@@ -18,5 +19,6 @@ export {
 	authService,
 	transactionService,
 	dataService,
-	reviewService
+	reviewService,
+	notificationService
 };

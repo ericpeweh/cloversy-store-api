@@ -49,3 +49,51 @@ export const unsubscribeFromEmail = async (req: Request, res: Response) => {
 		});
 	}
 };
+
+export const subscribeToPush = async (req: Request, res: Response) => {
+	const userId = req.user?.id;
+	const { token } = req.body;
+
+	try {
+		if (!userId) throw new ErrorObj.ClientError("Failed to identify user!");
+
+		if (!token) throw new ErrorObj.ClientError("Invalid token!");
+
+		const subscriptionId = await subscriptionService.subscribeToPush(token, userId.toString());
+
+		res.status(200).json({
+			status: "success",
+			data: {
+				subscriptionId
+			}
+		});
+	} catch (error: any) {
+		res.status(400).json({
+			status: "error",
+			message: error.message
+		});
+	}
+};
+
+export const unsubscribeFromPush = async (req: Request, res: Response) => {
+	const userId = req.user?.id;
+	const { subscriptionId } = req.body;
+
+	try {
+		if (!userId) throw new ErrorObj.ClientError("Failed to identify user!");
+
+		if (!subscriptionId) throw new ErrorObj.ClientError("Invalid subscription id!");
+
+		await subscriptionService.unsubscribeFromPush(+subscriptionId, userId.toString());
+
+		res.status(200).json({
+			status: "success",
+			data: { unsubscribedId: subscriptionId }
+		});
+	} catch (error: any) {
+		res.status(400).json({
+			status: "error",
+			message: error.message
+		});
+	}
+};

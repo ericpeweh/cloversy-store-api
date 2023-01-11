@@ -2,10 +2,15 @@
 import { Response, Request } from "express";
 
 // Types
-import { ShippingManifestItem, TransactionTimelineItem, Voucher } from "../interfaces";
+import {
+	NotificationMessage,
+	ShippingManifestItem,
+	TransactionTimelineItem,
+	Voucher
+} from "../interfaces";
 
 // Services
-import { dataService, transactionService, voucherService } from "../services";
+import { dataService, notificationService, transactionService, voucherService } from "../services";
 
 // Utils
 import { ErrorObj } from "../utils";
@@ -203,6 +208,47 @@ export const changeTransactionStatus = async (req: Request, res: Response) => {
 			voucher
 		);
 
+		// Send notification
+		const userTokens = await notificationService.getUserNotificationTokens([
+			updatedTransactionData.user_id
+		]);
+
+		// Send notification to user if order is canceled
+		if (userTokens) {
+			if (updatedTransactionData.order_status === "cancel") {
+				const message: NotificationMessage = {
+					title: "Pesanan telah dibatalkan oleh admin",
+					body: `Pesanan #${transaction.id} telah dibatalkan oleh admin, hubungi untuk informasi lebih lanjut.`,
+					actionTitle: "Hubungi admin",
+					actionLink: "http://localhost:3000/account/chat"
+				};
+
+				await notificationService.sendNotifications(message, userTokens);
+			}
+
+			if (updatedTransactionData.order_status === "sent") {
+				const message: NotificationMessage = {
+					title: "Pesanan telah dikirim",
+					body: `Pesanan #${transaction.id} telah dikirim, nomor resi pengiriman (tracking) akan segera tersedia.`,
+					actionTitle: "Detail transaksi",
+					actionLink: `http://localhost:3000/account/orders/${transaction.id}`
+				};
+
+				await notificationService.sendNotifications(message, userTokens);
+			}
+
+			if (updatedTransactionData.order_status === "success") {
+				const message: NotificationMessage = {
+					title: "Pesanan telah selesai",
+					body: `Pesanan #${transaction.id} telah selesai, yuk beri ulasan :)`,
+					actionTitle: "Beri ulasan",
+					actionLink: `http://localhost:3000/account/orders/${transaction.id}/review`
+				};
+
+				await notificationService.sendNotifications(message, userTokens);
+			}
+		}
+
 		const { timeline: timelineData, ...transactionData } = updatedTransactionData;
 		const timeline = timelineData.reverse();
 
@@ -211,6 +257,8 @@ export const changeTransactionStatus = async (req: Request, res: Response) => {
 			data: { updatedTransaction: { ...transactionData, timeline } }
 		});
 	} catch (error: any) {
+		console.log(error);
+
 		res.status(error.statusCode || 500).json({
 			status: "error",
 			message: error.message

@@ -56,6 +56,8 @@ export const getTransactions = async (
 export const getSingleTransaction = async (transactionId: string) => {
 	const { transaction, items, payment } = await transactionRepo.getSingleTransaction(transactionId);
 
+	console.log(transaction, items, payment);
+
 	let paymentResult: ClientPaymentDetailsItem;
 
 	if (payment.payment_method === "gopay") {
@@ -66,7 +68,7 @@ export const getSingleTransaction = async (transactionId: string) => {
 			payment_status: payment.payment_status,
 			expire_time: paymentObj.expire_time,
 			payment_status_modified: payment.payment_status_modified,
-			actions: paymentObj.actions
+			actions: paymentObj?.actions
 		};
 	} else if (payment.payment_method === "mandiri") {
 		const paymentObj = payment.payment_object as ChargeResponse<"mandiri">;
@@ -76,8 +78,8 @@ export const getSingleTransaction = async (transactionId: string) => {
 			payment_status: payment.payment_status,
 			expire_time: paymentObj.expire_time,
 			payment_status_modified: payment.payment_status_modified,
-			bill_key: paymentObj.bill_key,
-			biller_code: paymentObj.biller_code
+			bill_key: paymentObj?.bill_key,
+			biller_code: paymentObj?.biller_code
 		};
 	} else {
 		const paymentObj = payment.payment_object as ChargeResponse<"bni">;
@@ -89,7 +91,12 @@ export const getSingleTransaction = async (transactionId: string) => {
 			payment_status: payment.payment_status,
 			expire_time: paymentObj.expire_time,
 			payment_status_modified: payment.payment_status_modified,
-			va_number: isPermataBank ? paymentObj.permata_va_number : paymentObj.va_numbers[0].va_number
+			va_number:
+				payment.payment_status === "cancel"
+					? ""
+					: isPermataBank
+					? paymentObj?.permata_va_number
+					: paymentObj?.va_numbers[0]?.va_number
 		};
 	}
 

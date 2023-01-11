@@ -5,15 +5,17 @@ import { sha512 } from "js-sha512";
 
 dotenv.config();
 
+// Utils
+import { ErrorObj } from "../../utils";
+
+// Types
+import { Voucher, NotificationMessage } from "../../interfaces";
+
 // Services
 import { transactionService, voucherService } from "../../services/client";
-import { ErrorObj } from "../../utils";
-import { Voucher } from "../../interfaces";
+import { notificationService } from "../../services";
 
 export const handleNotifications = async (req: Request, res: Response) => {
-	console.log("TRIGGERED NOTIFICATIONS!");
-	console.log("NOTIFICATIONS BODY: ", req.body);
-
 	const { order_id, status_code, gross_amount, transaction_status, fraud_status, signature_key } =
 		req.body;
 
@@ -33,9 +35,23 @@ export const handleNotifications = async (req: Request, res: Response) => {
 
 		if (key !== signature_key) throw new ErrorObj.ClientError("Invalid request signature!", 403);
 
+		const transaction = await transactionService.getTransactionItem(order_id);
+		const userTokens = await notificationService.getUserNotificationTokens([transaction.user_id]);
+		const adminTokens = await notificationService.getAdminNotificationTokens();
+
 		if (fraud_status == "challenge") {
 			// Notify admin there is challenge transaction
-			// <HERE>
+			if (adminTokens) {
+				const message: NotificationMessage = {
+					title: "Pembayaran trannsaksi bermasalah",
+					body: `Pesanan #${order_id} mengalami masalah saat melakukan pembayaran, menunggu konfirmasi admin.`,
+					actionTitle: "Detail transaksi",
+					actionLink: `http://localhost:3001/orders/${order_id}`
+				};
+
+				await notificationService.sendNotifications(message, adminTokens);
+			}
+
 			await transactionService.challengeTransactionNotification(
 				order_id,
 				transaction_status,
@@ -68,6 +84,35 @@ export const handleNotifications = async (req: Request, res: Response) => {
 				voucher,
 				transaction
 			);
+
+			// Send notification to user and admin
+			// Notify user when transaction expired
+			if (transaction_status === "expire") {
+				if (userTokens) {
+					const message: NotificationMessage = {
+						title: "Pesanan dibatalkan otomatis",
+						body: `Pesanan #${order_id} telah dibatalkan otomatis oleh sistem dikarenakan pembayaran telah kadaluarsa.`,
+						actionTitle: "Detail transaksi",
+						actionLink: `http://localhost:3000/account/orders/${order_id}`
+					};
+
+					await notificationService.sendNotifications(message, userTokens);
+				}
+			}
+
+			// Notify admin when there is a problem with transaction (deny)
+			if (transaction_status === "deny" || fraud_status === "deny") {
+				if (adminTokens) {
+					const message: NotificationMessage = {
+						title: "Pesanan dibatalkan karena bermasalah",
+						body: `Pesanan #${order_id} telah dibatalkan karena bermasalah saat pembayaran.`,
+						actionTitle: "Detail transaksi",
+						actionLink: `http://localhost:3001/orders/${order_id}`
+					};
+
+					await notificationService.sendNotifications(message, adminTokens);
+				}
+			}
 		}
 
 		if (
@@ -79,14 +124,35 @@ export const handleNotifications = async (req: Request, res: Response) => {
 				transaction_status,
 				JSON.stringify(req.body)
 			);
+
+			// Notify user & admin on successfully paid transaction
+			if (userTokens) {
+				const message: NotificationMessage = {
+					title: `Info transaksi #${order_id}`,
+					body: `Pembayaran transaksi berhasil diterima, pesanan akan segera diproses.`,
+					actionTitle: "Detail transaksi",
+					actionLink: `http://localhost:3000/account/orders/${order_id}`
+				};
+
+				await notificationService.sendNotifications(message, userTokens);
+			}
+
+			if (adminTokens) {
+				const message: NotificationMessage = {
+					title: `Info transaksi #${order_id}`,
+					body: `Pembayaran transaksi berhasil, transaksi siap diproses.`,
+					actionTitle: "Detail transaksi",
+					actionLink: `http://localhost:3001/orders/${order_id}`
+				};
+
+				await notificationService.sendNotifications(message, adminTokens);
+			}
 		}
 
 		res.status(200).json({
 			status: "success"
 		});
 	} catch (error: any) {
-		console.log(error);
-
 		res.status(400).json({
 			status: "error",
 			message: error.message

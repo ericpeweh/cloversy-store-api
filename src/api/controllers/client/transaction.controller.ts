@@ -6,8 +6,10 @@ import {
 	ReviewRequestItem,
 	ShippingManifestItem,
 	TransactionTimelineItem,
-	Voucher
+	Voucher,
+	NotificationMessage
 } from "../../interfaces";
+import { notificationService } from "../../services";
 
 // Services
 import {
@@ -180,6 +182,32 @@ export const createTransaction = async (req: Request, res: Response) => {
 			throw new ErrorObj.ClientError("Failed to create transaction!");
 		}
 
+		// Send notification to user and admin
+		const userTokens = await notificationService.getUserNotificationTokens([user.id]);
+		const adminTokens = await notificationService.getAdminNotificationTokens();
+
+		if (userTokens) {
+			const message: NotificationMessage = {
+				title: "Berhasil membuat pesanan",
+				body: `Pesanan #${newTranactionId} telah dibuat, menunggu pembayaran.`,
+				actionTitle: "Bayar sekarang",
+				actionLink: `http://localhost:3000/account/orders/${newTranactionId}/payment`
+			};
+
+			await notificationService.sendNotifications(message, userTokens);
+		}
+
+		if (adminTokens) {
+			const message: NotificationMessage = {
+				title: "Pesanan baru telah dibuat",
+				body: `Pesanan #${newTranactionId} telah dibuat, menunggu pembayaran.`,
+				actionTitle: "Detail transaksi",
+				actionLink: `http://localhost:3001/orders/${newTranactionId}`
+			};
+
+			await notificationService.sendNotifications(message, adminTokens);
+		}
+
 		// Fetch transaction details
 		const transaction = await transactionService.getSingleTransaction(
 			user.id,
@@ -236,6 +264,19 @@ export const cancelTransaction = async (req: Request, res: Response) => {
 		}
 
 		await transactionService.cancelTransaction(transactionId, voucher, transaction);
+
+		// Notify user about canceled transaction
+		const userTokens = await notificationService.getUserNotificationTokens([userId]);
+		if (userTokens) {
+			const message: NotificationMessage = {
+				title: "Pesanan telah dibatalkan",
+				body: `Pesanan #${transaction.id} telah anda dibatalkan.`,
+				actionTitle: "Detail transaksi",
+				actionLink: `http://localhost:3000/account/orders/${transaction.id}`
+			};
+
+			await notificationService.sendNotifications(message, userTokens);
+		}
 
 		res.status(200).json({
 			status: "success",
@@ -313,6 +354,19 @@ export const reviewTransaction = async (req: Request, res: Response) => {
 			throw new ErrorObj.ClientError("Reviews data does not match transaction items!");
 
 		await reviewService.createReviews(userId, transactionId, reviews as ReviewRequestItem[]);
+
+		// Notify admin about new reviews
+		const adminTokens = await notificationService.getAdminNotificationTokens();
+		if (adminTokens) {
+			const message: NotificationMessage = {
+				title: `Review baru diterima #${transaction.id}`,
+				body: `Konsumen telah meninggalkan ulasan baru untuk transaksi #${transaction.id}, silahkan cek review.`,
+				actionTitle: "Lihat review",
+				actionLink: `http://localhost:3001/orders/${transaction.id}`
+			};
+
+			await notificationService.sendNotifications(message, adminTokens);
+		}
 
 		res.status(200).json({
 			status: "success",

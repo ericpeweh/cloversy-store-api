@@ -5,7 +5,6 @@ import { Response, Request } from "express";
 import {
 	ReviewRequestItem,
 	ShippingManifestItem,
-	TransactionTimelineItem,
 	Voucher,
 	NotificationMessage
 } from "../../interfaces";
@@ -194,7 +193,9 @@ export const createTransaction = async (req: Request, res: Response) => {
 				actionLink: `http://localhost:3000/account/orders/${newTranactionId}/payment`
 			};
 
-			await notificationService.sendNotifications(message, userTokens);
+			await notificationService.sendNotifications(message, userTokens, {
+				removeFailedTokens: true
+			});
 		}
 
 		if (adminTokens) {
@@ -205,7 +206,9 @@ export const createTransaction = async (req: Request, res: Response) => {
 				actionLink: `http://localhost:3001/orders/${newTranactionId}`
 			};
 
-			await notificationService.sendNotifications(message, adminTokens);
+			await notificationService.sendNotifications(message, adminTokens, {
+				removeFailedTokens: true
+			});
 		}
 
 		// Fetch transaction details
@@ -275,7 +278,9 @@ export const cancelTransaction = async (req: Request, res: Response) => {
 				actionLink: `http://localhost:3000/account/orders/${transaction.id}`
 			};
 
-			await notificationService.sendNotifications(message, userTokens);
+			await notificationService.sendNotifications(message, userTokens, {
+				removeFailedTokens: true
+			});
 		}
 
 		res.status(200).json({
@@ -365,7 +370,9 @@ export const reviewTransaction = async (req: Request, res: Response) => {
 				actionLink: `http://localhost:3001/orders/${transaction.id}`
 			};
 
-			await notificationService.sendNotifications(message, adminTokens);
+			await notificationService.sendNotifications(message, adminTokens, {
+				removeFailedTokens: true
+			});
 		}
 
 		res.status(200).json({

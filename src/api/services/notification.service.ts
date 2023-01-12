@@ -3,18 +3,21 @@ import { notificationRepo } from "../data";
 
 // Types
 import { MulticastMessage } from "firebase-admin/messaging";
-import {
-	NotificationMessage,
-	UpdateNotifMarketingDataArgs
-} from "../interfaces/notification.interface";
+import { NotificationMessage, SendNotificationResult } from "../interfaces";
 
 // Config
 import fcm from "../../config/firebase";
 
 // Utils
-import { ErrorObj, getLocalTime } from "../utils";
+import { getLocalTime } from "../utils";
 
-export const sendNotifications = async (message: NotificationMessage, target: string[]) => {
+export const sendNotifications = async (
+	message: NotificationMessage,
+	target: string[],
+	options?: {
+		removeFailedTokens?: boolean;
+	}
+): Promise<SendNotificationResult> => {
 	const failedTokens: string[] = [];
 	let successCount = 0;
 	let failureCount = 0;
@@ -44,28 +47,15 @@ export const sendNotifications = async (message: NotificationMessage, target: st
 		}
 	}
 
+	if (options?.removeFailedTokens) {
+		await notificationRepo.removeNotificationTokens(failedTokens);
+	}
+
 	return { failedTokens, successCount, failureCount, sendAt: getLocalTime() };
-
-	// Delete failed token from DB if 400 or 404
-
-	// Update notification_marketing data
-	// UPDATE REPO HERE
 };
 
 export const removeNotificationTokens = async (tokens: string[]) => {
 	await notificationRepo.removeNotificationTokens(tokens);
-};
-
-export const updateNotificationMarketing = async (data: UpdateNotifMarketingDataArgs) => {
-	const { notifMarketingId } = data;
-
-	const notifMarketingItem = await notificationRepo.getSingleNotificationMarketing(
-		notifMarketingId
-	);
-
-	if (!notifMarketingItem) throw new ErrorObj.ClientError("Notification marketing not found!", 404);
-
-	await notificationRepo.updateNotificationMarketing(data);
 };
 
 export const getUserNotificationTokens = async (userIds: string[] | number[]) => {
@@ -76,6 +66,12 @@ export const getUserNotificationTokens = async (userIds: string[] | number[]) =>
 
 export const getAdminNotificationTokens = async () => {
 	const tokens = await notificationRepo.getAdminNotificationTokens();
+
+	return tokens;
+};
+
+export const getAllUserNotificationTokens = async () => {
+	const tokens = await notificationRepo.getAllUserNotificationTokens();
 
 	return tokens;
 };

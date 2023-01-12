@@ -223,7 +223,9 @@ export const changeTransactionStatus = async (req: Request, res: Response) => {
 					actionLink: "http://localhost:3000/account/chat"
 				};
 
-				await notificationService.sendNotifications(message, userTokens);
+				await notificationService.sendNotifications(message, userTokens, {
+					removeFailedTokens: true
+				});
 			}
 
 			if (updatedTransactionData.order_status === "sent") {
@@ -234,7 +236,9 @@ export const changeTransactionStatus = async (req: Request, res: Response) => {
 					actionLink: `http://localhost:3000/account/orders/${transaction.id}`
 				};
 
-				await notificationService.sendNotifications(message, userTokens);
+				await notificationService.sendNotifications(message, userTokens, {
+					removeFailedTokens: true
+				});
 			}
 
 			if (updatedTransactionData.order_status === "success") {
@@ -245,7 +249,9 @@ export const changeTransactionStatus = async (req: Request, res: Response) => {
 					actionLink: `http://localhost:3000/account/orders/${transaction.id}/review`
 				};
 
-				await notificationService.sendNotifications(message, userTokens);
+				await notificationService.sendNotifications(message, userTokens, {
+					removeFailedTokens: true
+				});
 			}
 		}
 

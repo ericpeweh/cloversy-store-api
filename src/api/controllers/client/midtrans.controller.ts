@@ -49,7 +49,9 @@ export const handleNotifications = async (req: Request, res: Response) => {
 					actionLink: `http://localhost:3001/orders/${order_id}`
 				};
 
-				await notificationService.sendNotifications(message, adminTokens);
+				await notificationService.sendNotifications(message, adminTokens, {
+					removeFailedTokens: true
+				});
 			}
 
 			await transactionService.challengeTransactionNotification(
@@ -96,7 +98,9 @@ export const handleNotifications = async (req: Request, res: Response) => {
 						actionLink: `http://localhost:3000/account/orders/${order_id}`
 					};
 
-					await notificationService.sendNotifications(message, userTokens);
+					await notificationService.sendNotifications(message, userTokens, {
+						removeFailedTokens: true
+					});
 				}
 			}
 
@@ -110,7 +114,9 @@ export const handleNotifications = async (req: Request, res: Response) => {
 						actionLink: `http://localhost:3001/orders/${order_id}`
 					};
 
-					await notificationService.sendNotifications(message, adminTokens);
+					await notificationService.sendNotifications(message, adminTokens, {
+						removeFailedTokens: true
+					});
 				}
 			}
 		}
@@ -134,7 +140,9 @@ export const handleNotifications = async (req: Request, res: Response) => {
 					actionLink: `http://localhost:3000/account/orders/${order_id}`
 				};
 
-				await notificationService.sendNotifications(message, userTokens);
+				await notificationService.sendNotifications(message, userTokens, {
+					removeFailedTokens: true
+				});
 			}
 
 			if (adminTokens) {
@@ -145,7 +153,9 @@ export const handleNotifications = async (req: Request, res: Response) => {
 					actionLink: `http://localhost:3001/orders/${order_id}`
 				};
 
-				await notificationService.sendNotifications(message, adminTokens);
+				await notificationService.sendNotifications(message, adminTokens, {
+					removeFailedTokens: true
+				});
 			}
 		}
 

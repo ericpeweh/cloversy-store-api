@@ -7,6 +7,8 @@ import * as voucherController from "./voucher.controller";
 import * as authController from "./auth.controller";
 import * as transactionController from "./transaction.controller";
 import * as reviewController from "./review.controller";
+import * as subscriptionController from "./subscription.controller";
+import * as marketingController from "./marketing.controller";
 
 export {
 	productController,
@@ -16,5 +18,7 @@ export {
 	voucherController,
 	authController,
 	transactionController,
-	reviewController
+	reviewController,
+	subscriptionController,
+	marketingController
 };

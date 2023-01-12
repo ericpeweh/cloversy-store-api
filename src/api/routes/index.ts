@@ -7,6 +7,8 @@ import voucherRouter from "./voucher.route";
 import authRouter from "./auth.route";
 import transactionRouter from "./transaction.route";
 import reviewRouter from "./review.route";
+import subscriptionRouter from "./subscription.route";
+import marketingRouter from "./marketing.route";
 
 export default {
 	productRouter,
@@ -16,5 +18,7 @@ export default {
 	voucherRouter,
 	authRouter,
 	transactionRouter,
-	reviewRouter
+	reviewRouter,
+	subscriptionRouter,
+	marketingRouter
 };

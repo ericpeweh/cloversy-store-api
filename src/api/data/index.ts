@@ -7,6 +7,8 @@ import * as voucherRepo from "./voucher.data";
 import * as reviewRepo from "./review.data";
 import * as transactionRepo from "./transaction.data";
 import * as notificationRepo from "./notification.data";
+import * as subscriptionRepo from "./subscription.data";
+import * as marketingRepo from "./marketing.data";
 
 export {
 	productRepo,
@@ -16,5 +18,7 @@ export {
 	voucherRepo,
 	reviewRepo,
 	transactionRepo,
-	notificationRepo
+	notificationRepo,
+	subscriptionRepo,
+	marketingRepo
 };

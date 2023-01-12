@@ -4,3 +4,9 @@ export interface NotificationSubscription {
 	user_id: number;
 	last_online: string;
 }
+
+export interface PushSubscriptionItem extends NotificationSubscription {
+	profile_picture: string;
+	full_name: string;
+	email: string;
+}

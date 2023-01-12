@@ -90,6 +90,8 @@ app.use("/admin/customers", isAdmin, router.userRouter);
 app.use("/admin/vouchers", isAdmin, router.voucherRouter);
 app.use("/admin/transactions", isAdmin, router.transactionRouter);
 app.use("/admin/reviews", isAdmin, router.reviewRouter);
+app.use("/admin/subscription", isAdmin, router.subscriptionRouter);
+app.use("/admin/marketing", isAdmin, router.marketingRouter);
 
 // Error handling middleware
 app.use(errorHandler);

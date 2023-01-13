@@ -59,10 +59,6 @@ app.use(
 	})
 );
 
-// Init schedule
-initNotificationSubscriptionsCleanup();
-initScheduledNotifMarketings();
-
 // Routing
 app.get("/", (req, res) => {
 	res.send("<h1>Cloversy Store API</h1>");
@@ -105,4 +101,8 @@ app.use(errorHandler);
 
 app.listen(port, () => {
 	console.log(`Server is running at http://localhost:${port}`);
+
+	// Init schedule
+	initNotificationSubscriptionsCleanup();
+	initScheduledNotifMarketings();
 });

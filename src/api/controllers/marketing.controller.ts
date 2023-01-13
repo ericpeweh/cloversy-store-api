@@ -101,6 +101,10 @@ export const createNotificationMarketing = async (req: Request, res: Response) =
 					},
 					notifMarketingId: newNotifMarketing.id
 				});
+
+				console.log(
+					`Direct notification marketing #${newNotifMarketing.notification_code} successfully sent.`
+				);
 			});
 		}
 
@@ -133,11 +137,16 @@ export const getNotificationMarketings = async (req: Request, res: Response) => 
 				"Query param of 'scheduled' should be either 'true' or 'false'"
 			);
 
-		const result = await marketingService.getNotificationMarketings(page, searchQuery, scheduled);
+		const { notifMarketings, ...paginationData } = await marketingService.getNotificationMarketings(
+			page,
+			searchQuery,
+			scheduled
+		);
 
 		res.status(200).json({
 			status: "success",
-			data: result
+			...paginationData,
+			data: { notifMarketings }
 		});
 	} catch (error: any) {
 		res.status(error.statusCode || 500).json({

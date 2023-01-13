@@ -64,6 +64,10 @@ const initScheduledNotifMarketings = async () => {
 				},
 				notifMarketingId: notifMarketing.id
 			});
+
+			console.log(
+				`Scheduled notification marketing #${notifMarketing.notification_code} successfully sent.`
+			);
 		});
 
 		initialiedJobsCount += 1;

@@ -35,11 +35,17 @@ export const getAllVouchers = async (req: Request, res: Response) => {
 			throw new ErrorObj.ClientError(`Query params 'sortBy' of '${sortBy}' is not supported`);
 		}
 
-		const result = await voucherService.getAllVouchers(voucherStatus, sortBy, page, itemsLimit);
+		const { vouchers, ...paginationData } = await voucherService.getAllVouchers(
+			voucherStatus,
+			sortBy,
+			page,
+			itemsLimit
+		);
 
 		res.status(200).json({
 			status: "success",
-			data: result
+			...paginationData,
+			data: { vouchers }
 		});
 	} catch (error: any) {
 		res.status(400).json({

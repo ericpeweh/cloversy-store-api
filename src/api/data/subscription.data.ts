@@ -82,8 +82,8 @@ export const getAllNotifSubscriptions = async () => {
 
 export const deleteExpiredTokens = async () => {
 	const notificationQuery = `DELETE FROM notification_subscription
-    WHERE last_online < NOW() - INTERVAL '60 days
-  RETURNING id'`;
+    WHERE last_online < NOW() - INTERVAL '60 days'
+  RETURNING id`;
 
 	const notificationResult = await db.query(notificationQuery);
 

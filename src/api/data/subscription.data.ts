@@ -11,7 +11,7 @@ export const getPushSubscriptions = async (page: string, searchQuery: string) =>
 	const limit = 12;
 	const offset = parseInt(page) * limit - limit;
 
-	let query = `SELECT DISTINCT ON (id)
+	let query = `SELECT DISTINCT ON (ns.user_id)
     ns.user_id as id,
     ns.last_online as last_online, 
     u.profile_picture as profile_picture,
@@ -20,7 +20,13 @@ export const getPushSubscriptions = async (page: string, searchQuery: string) =>
   FROM notification_subscription ns
   JOIN users u ON ns.user_id = u.id
   `;
-	let totalQuery = "SELECT COUNT(id) FROM notification_subscription";
+	let totalQuery = `SELECT COUNT(ns.id) 
+    FROM notification_subscription ns
+  JOIN users u ON ns.user_id = u.id`;
+
+	// Filter for user only (no admin)
+	query += ` WHERE u.user_role = 'user'`;
+	totalQuery += ` WHERE u.user_role = 'user'`;
 
 	if (searchQuery) {
 		const searchPart = ` WHERE (u.email iLIKE $${paramsIndex} OR u.full_name iLIKE $${paramsIndex})`;
@@ -31,8 +37,7 @@ export const getPushSubscriptions = async (page: string, searchQuery: string) =>
 		params.push(`%${searchQuery}%`);
 	}
 
-	// INI buat rest api
-	query += " ORDER BY id DESC";
+	query += ` ORDER BY ns.user_id DESC`;
 	query += ` LIMIT ${limit} OFFSET ${offset}`;
 
 	const subscriptions: QueryResult<PushSubscriptionItem> = await db.query(query, params);
@@ -59,4 +64,28 @@ export const getNotifSubscriptionsByUserIds = async (userIds: string[] | number[
 	);
 
 	return notificationResult.rows;
+};
+
+export const getAllNotifSubscriptions = async () => {
+	const notificationQuery = `SELECT * 
+      FROM notification_subscription ns
+    JOIN users u ON ns.user_id = u.id
+    WHERE u.user_role = 'user'
+    `;
+
+	const notificationResult: QueryResult<NotificationSubscription> = await db.query(
+		notificationQuery
+	);
+
+	return notificationResult.rows;
+};
+
+export const deleteExpiredTokens = async () => {
+	const notificationQuery = `DELETE FROM notification_subscription
+    WHERE last_online < NOW() - INTERVAL '60 days
+  RETURNING id'`;
+
+	const notificationResult = await db.query(notificationQuery);
+
+	return notificationResult.rowCount;
 };

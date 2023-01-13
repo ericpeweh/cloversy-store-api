@@ -5,9 +5,7 @@ import db from "../../config/connectDB";
 import { QueryResult } from "pg";
 import {
 	Address,
-	PaymentStatus,
 	Transaction,
-	TransactionDetailsType,
 	TransactionItem,
 	TransactionPayment,
 	TransactionShipping,

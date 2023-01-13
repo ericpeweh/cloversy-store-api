@@ -35,7 +35,7 @@ export const getAllCustomers = async (page: string, searchQuery: string, statusQ
 
 		params.push(statusQuery);
 	}
-	// INI buat rest api
+
 	query += " ORDER BY id DESC";
 	query += ` LIMIT ${limit} OFFSET ${offset}`;
 

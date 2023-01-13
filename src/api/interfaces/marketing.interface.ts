@@ -1,6 +1,5 @@
 export interface CreateNotifMarketingData {
 	title: string;
-	code: string;
 	description: string | undefined;
 	scheduled: string | null;
 	message_title: string;
@@ -8,13 +7,13 @@ export interface CreateNotifMarketingData {
 	image_url: string | undefined;
 	action_link: string | undefined;
 	action_title: string | undefined;
+	send_to: "all" | "selected";
 }
 
 export interface NotifMarketingItem {
 	id: number;
 	notification_code: string;
 	title: string;
-	sent: boolean;
 	sent_at: string | null;
 	scheduled: string | null;
 	description: string | null;
@@ -26,6 +25,14 @@ export interface NotifMarketingItem {
 	success_count: number;
 	failure_count: number;
 	created_at: string;
+	send_to: "all" | "selected";
+}
+
+export interface ScheduledNotifMarketingItem
+	extends Omit<NotifMarketingItem, "scheduled" | "sent_at"> {
+	scheduled: string;
+	sent_at: null;
+	target_count: string;
 }
 
 export interface UpdateNotifMarketingDataArgs {

@@ -3,28 +3,18 @@ import dotenv from "dotenv";
 
 // Types
 import {
-	Address,
-	CartItemDetails,
-	ChargeResponseType,
 	ChargeResponse,
-	CostItem,
-	PaymentMethod,
-	PaymentType,
-	TransactionDetailsType,
-	User,
 	Voucher,
 	ClientPaymentDetailsItem,
 	AdminTransactionDetails,
-	PaymentStatus,
 	TransactionTimelineItem,
 	TransactionStatus,
-	FraudStatus,
 	Transaction,
 	UpdateTransactionDataArgs
 } from "../interfaces";
 
 // Utils
-import { generateUniqueId, getLocalTime } from "../utils";
+import { getLocalTime } from "../utils";
 
 // Config
 import { transactionRepo } from "../data";
@@ -55,8 +45,6 @@ export const getTransactions = async (
 
 export const getSingleTransaction = async (transactionId: string) => {
 	const { transaction, items, payment } = await transactionRepo.getSingleTransaction(transactionId);
-
-	console.log(transaction, items, payment);
 
 	let paymentResult: ClientPaymentDetailsItem;
 

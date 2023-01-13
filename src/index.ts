@@ -18,6 +18,9 @@ import {
 	getUserDataOptional
 } from "./api/middlewares";
 
+// Utils
+import { initNotificationSubscriptionsCleanup, initScheduledNotifMarketings } from "./api/utils";
+
 // Routes
 import router from "./api/routes";
 import clientRouter from "./api/routes/client";
@@ -56,9 +59,13 @@ app.use(
 	})
 );
 
+// Init schedule
+initNotificationSubscriptionsCleanup();
+initScheduledNotifMarketings();
+
 // Routing
 app.get("/", (req, res) => {
-	res.send("<h1>Hello world</h1>");
+	res.send("<h1>Cloversy Store API</h1>");
 });
 
 app.use("/auth", isAuth, getUserData, router.authRouter);

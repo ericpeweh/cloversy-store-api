@@ -3,30 +3,6 @@ import db from "../../config/connectDB";
 
 // Types
 import { QueryResult } from "pg";
-import { NotifMarketingItem, UpdateNotifMarketingDataArgs } from "../interfaces";
-
-// Utils
-import { generateUpdateQuery } from "../utils";
-
-export const updateNotificationMarketing = async (
-	updateNotifMarketingData: UpdateNotifMarketingDataArgs
-) => {
-	const { updatedNotifMarketingData, notifMarketingId } = updateNotifMarketingData;
-
-	const { query: notificationQuery, params: notificationParams } = generateUpdateQuery(
-		"notification_marketing",
-		updatedNotifMarketingData,
-		{ id: notifMarketingId },
-		" RETURNING *"
-	);
-
-	const result: QueryResult<NotifMarketingItem> = await db.query(
-		notificationQuery,
-		notificationParams
-	);
-
-	return result;
-};
 
 export const removeNotificationTokens = async (tokens: string[]) => {
 	const notificationQuery = `DELETE FROM notification_subscription WHERE token = ANY ($1)`;
@@ -45,8 +21,9 @@ export const getSingleNotificationMarketing = async (notifMarketingId: number | 
 export const getUserNotificationTokens = async (userIds: string[] | number[]) => {
 	const notificationQuery = `SELECT array_agg("token") 
     AS tokens
-    FROM notification_subscription 
-  WHERE user_id = ANY ($1)`;
+    FROM notification_subscription ns
+    JOIN users u ON ns.user_id = u.id
+  WHERE user_id = ANY ($1) AND u.user_role = 'user'`;
 
 	const notificationResult: QueryResult<{ tokens: string[] }> = await db.query(notificationQuery, [
 		userIds

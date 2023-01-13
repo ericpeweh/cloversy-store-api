@@ -13,7 +13,6 @@ import { ErrorObj, scheduler } from "../utils";
 export const createNotificationMarketing = async (req: Request, res: Response) => {
 	const {
 		title,
-		code,
 		description,
 		scheduled = null,
 		selectedUserIds = [],
@@ -27,14 +26,14 @@ export const createNotificationMarketing = async (req: Request, res: Response) =
 
 	const newNotifMarketingData: CreateNotifMarketingData = {
 		title,
-		code,
 		description,
 		scheduled,
 		message_title,
 		message_body,
 		image_url,
 		action_link,
-		action_title
+		action_title,
+		send_to: sendTo
 	};
 
 	try {
@@ -84,11 +83,13 @@ export const createNotificationMarketing = async (req: Request, res: Response) =
 		if (scheduled) {
 			const triggerAt = new Date(scheduled);
 
-			const job = scheduler.scheduleJob(triggerAt, async () => {
+			scheduler.scheduleJob(newNotifMarketing.notification_code, triggerAt, async () => {
 				const { successCount, failureCount, sendAt } = await notificationService.sendNotifications(
 					notificationMessage,
 					targets,
-					{ removeFailedTokens: true }
+					{
+						removeFailedTokens: true
+					}
 				);
 
 				// Update notification marketing
@@ -101,13 +102,62 @@ export const createNotificationMarketing = async (req: Request, res: Response) =
 					notifMarketingId: newNotifMarketing.id
 				});
 			});
-
-			console.log("SCHEDULED: ", job);
 		}
 
 		res.status(200).json({
 			status: "success",
 			data: { newNotifMarketing }
+		});
+	} catch (error: any) {
+		res.status(error.statusCode || 500).json({
+			status: "error",
+			message: error.message
+		});
+	}
+};
+
+export const getNotificationMarketings = async (req: Request, res: Response) => {
+	const { page = "1", q: searchQuery = "", scheduled = "false" } = req.query;
+
+	try {
+		if (
+			typeof page !== "string" ||
+			typeof searchQuery !== "string" ||
+			typeof scheduled !== "string"
+		) {
+			throw new ErrorObj.ClientError("Query params has to be type of string");
+		}
+
+		if (scheduled !== "true" && scheduled !== "false")
+			throw new ErrorObj.ClientError(
+				"Query param of 'scheduled' should be either 'true' or 'false'"
+			);
+
+		const result = await marketingService.getNotificationMarketings(page, searchQuery, scheduled);
+
+		res.status(200).json({
+			status: "success",
+			data: result
+		});
+	} catch (error: any) {
+		res.status(error.statusCode || 500).json({
+			status: "error",
+			message: error.message
+		});
+	}
+};
+
+export const getNotificationMarketingDetail = async (req: Request, res: Response) => {
+	const { notifMarketingId } = req.params;
+
+	try {
+		if (!notifMarketingId) throw new ErrorObj.ClientError("Invalid notification marketing id!");
+
+		const result = await marketingService.getNotificationMarketingDetail(notifMarketingId);
+
+		res.status(200).json({
+			status: "success",
+			data: { notifMarketing: result }
 		});
 	} catch (error: any) {
 		res.status(error.statusCode || 500).json({

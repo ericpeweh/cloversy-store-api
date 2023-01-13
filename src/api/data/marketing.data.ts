@@ -94,23 +94,88 @@ export const createNotificationMarketing = async (
 };
 
 export const updateNotificationMarketing = async (
-	updateNotifMarketingData: UpdateNotifMarketingDataArgs
+	updateNotifMarketingData: UpdateNotifMarketingDataArgs,
+	currentNotifMarketing: NotifMarketingItem,
+	notifSubscriptions: NotificationSubscription[],
+	selectedUserIds?: string[] | number[],
+	removedUserIds?: string[] | number[]
 ) => {
+	const client = await db.pool.connect();
 	const { updatedNotifMarketingData, notifMarketingId } = updateNotifMarketingData;
 
-	const { query: notificationQuery, params: notificationParams } = generateUpdateQuery(
-		"notification_marketing",
-		updatedNotifMarketingData,
-		{ id: notifMarketingId },
-		" RETURNING *"
-	);
+	try {
+		await client.query("BEGIN");
 
-	const result: QueryResult<NotifMarketingItem> = await db.query(
-		notificationQuery,
-		notificationParams
-	);
+		const { query: notificationQuery, params: notificationParams } = generateUpdateQuery(
+			"notification_marketing",
+			updatedNotifMarketingData,
+			{ id: notifMarketingId },
+			" RETURNING *"
+		);
 
-	return result;
+		const result: QueryResult<NotifMarketingItem> = await client.query(
+			notificationQuery,
+			notificationParams
+		);
+		const updatedNotifMarketing = result.rows[0];
+
+		// Handle send_to field changed
+		if (currentNotifMarketing.send_to !== updatedNotifMarketing.send_to) {
+			// Delete all notification marketing target
+			const notifMarketingDeleteQuery = `DELETE FROM notification_marketing_target WHERE notification_marketing_id = $1`;
+
+			await client.query(notifMarketingDeleteQuery, [notifMarketingId]);
+
+			// Re-insert updated targets
+			const notifMarketingInputQuery = `INSERT INTO notification_marketing_target(
+        notification_marketing_id,
+        user_id,
+        token
+      ) VALUES ($1, $2, $3)`;
+
+			notifSubscriptions.forEach(async sub => {
+				await client.query(notifMarketingInputQuery, [notifMarketingId, sub.user_id, sub.token]);
+			});
+		}
+
+		// Handle if same send_to (selected)
+		if (
+			currentNotifMarketing.send_to === "selected" &&
+			updatedNotifMarketing.send_to === "selected"
+		) {
+			if (selectedUserIds && selectedUserIds?.length > 0) {
+				const notifMarketingInputQuery = `INSERT INTO notification_marketing_target (
+          notification_marketing_id,
+          user_id,
+          token
+        ) VALUES ($1, $2, $3)`;
+
+				notifSubscriptions.forEach(async sub => {
+					await client.query(notifMarketingInputQuery, [notifMarketingId, sub.user_id, sub.token]);
+				});
+			}
+
+			if (removedUserIds && removedUserIds?.length > 0) {
+				const notifMarketingDeleteQuery = `DELETE FROM notification_marketing_target
+          WHERE notification_marketing_id = $1
+          AND user_id = $2`;
+
+				removedUserIds.forEach(async userId => {
+					await client.query(notifMarketingDeleteQuery, [notifMarketingId, userId]);
+				});
+			}
+		}
+
+		await client.query("COMMIT");
+		return updatedNotifMarketing;
+	} catch (error) {
+		await client.query("ROLLBACK");
+		console.log(error);
+
+		throw error;
+	} finally {
+		client.release();
+	}
 };
 
 export const getNotificationMarketings = async (
@@ -183,7 +248,7 @@ export const getNotificationMarketings = async (
 	};
 };
 
-export const getNotificationMarketingDetail = async (notifMarketingId: string) => {
+export const getNotificationMarketingDetail = async (notifMarketingId: string | number) => {
 	const notifMarketingQuery = `SELECT nm.*,
     (SELECT COUNT(id) AS target_count
       FROM notification_marketing_target nmt
@@ -218,12 +283,13 @@ export const getNotificationMarketingDetail = async (notifMarketingId: string) =
 	return { notifMarketingResult, selectedUsers: notifMarketingTargets };
 };
 
-export const getNotifMarketingTargetUserIds = async (notifMarketingId: string) => {
-	const notifMarketingQuery = `SELECT DISTINCT ON (user_id) * 
+export const getNotifMarketingTargetUserIds = async (notifMarketingId: string | number) => {
+	const notifMarketingQuery = `SELECT
+    array_agg(DISTINCT("user_id")) AS user_ids
     FROM notification_marketing_target
   WHERE notification_marketing_id = $1`;
 
 	const notifMarketingResult = await db.query(notifMarketingQuery, [notifMarketingId]);
 
-	return notifMarketingResult.rows;
+	return notifMarketingResult.rows[0].user_ids;
 };

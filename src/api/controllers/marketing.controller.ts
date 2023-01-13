@@ -2,13 +2,17 @@
 import { Request, Response } from "express";
 
 // Types
-import { CreateNotifMarketingData, NotificationMessage } from "../interfaces";
+import {
+	CreateNotifMarketingData,
+	NotificationMessage,
+	UpdateNotifMarketingData
+} from "../interfaces";
 
 // Services
 import { marketingService, notificationService } from "../services";
 
 // Utils
-import { ErrorObj, scheduler } from "../utils";
+import { ErrorObj, isDateBeforeCurrentTime, scheduler } from "../utils";
 
 export const createNotificationMarketing = async (req: Request, res: Response) => {
 	const {
@@ -71,6 +75,8 @@ export const createNotificationMarketing = async (req: Request, res: Response) =
 				targets,
 				{ removeFailedTokens: true }
 			);
+
+			console.log(`Direct notification marketing successfully sent.`);
 		}
 
 		const newNotifMarketing = await marketingService.createNotificationMarketing(
@@ -103,7 +109,7 @@ export const createNotificationMarketing = async (req: Request, res: Response) =
 				});
 
 				console.log(
-					`Direct notification marketing #${newNotifMarketing.notification_code} successfully sent.`
+					`Scheduled notification marketing #${newNotifMarketing.notification_code} successfully sent.`
 				);
 			});
 		}
@@ -167,6 +173,84 @@ export const getNotificationMarketingDetail = async (req: Request, res: Response
 		res.status(200).json({
 			status: "success",
 			data: { notifMarketing: result }
+		});
+	} catch (error: any) {
+		res.status(error.statusCode || 500).json({
+			status: "error",
+			message: error.message
+		});
+	}
+};
+
+export const updateNotificationMarketing = async (req: Request, res: Response) => {
+	const {
+		title,
+		description,
+		scheduled = null,
+		selectedUserIds = [],
+		removedUserIds = [],
+		message_title,
+		message_body,
+		image_url,
+		action_link,
+		action_title,
+		sendTo
+	} = req.body;
+	const { notifMarketingId } = req.params;
+
+	try {
+		if (!notifMarketingId) throw new ErrorObj.ClientError("Invalid notification marketing id!");
+
+		const notificationMarketingItem = await marketingService.getNotificationMarketingDetail(
+			notifMarketingId
+		);
+
+		let updatedNotifMarketingData: Partial<UpdateNotifMarketingData>;
+		if (notificationMarketingItem?.sent_at) {
+			// Handle update for already sent notification marketing
+			updatedNotifMarketingData = {
+				title,
+				description
+			};
+		} else {
+			// Handle scheduled / expired notification marketing
+			updatedNotifMarketingData = {
+				title,
+				description,
+				scheduled,
+				message_title,
+				message_body,
+				image_url,
+				action_link,
+				action_title,
+				send_to: sendTo
+			};
+		}
+
+		// Update notification marketing
+		const updatedNotifMarketing = await marketingService.updateNotificationMarketing(
+			{
+				updatedNotifMarketingData,
+				notifMarketingId
+			},
+			selectedUserIds,
+			removedUserIds
+		);
+
+		// Reschedule notification marketing if condition is fulfilled
+		if (!updatedNotifMarketing?.sent_at && updatedNotifMarketing?.scheduled) {
+			await marketingService.scheduleNotifMarketingNotification(updatedNotifMarketing.id, {
+				reschedule: true
+			});
+		}
+
+		const updatedNotifMarketingDetail = await marketingService.getNotificationMarketingDetail(
+			notifMarketingId
+		);
+
+		res.status(200).json({
+			status: "success",
+			data: { updatedNotifMarketing: updatedNotifMarketingDetail }
 		});
 	} catch (error: any) {
 		res.status(error.statusCode || 500).json({

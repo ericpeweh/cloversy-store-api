@@ -17,7 +17,7 @@ const initNotificationSubscriptionsCleanup = async () => {
 		);
 	});
 
-	console.log("Initialied notification subscription cleanup.");
+	console.log("Initialized notification subscription cleanup.");
 };
 
 export default initNotificationSubscriptionsCleanup;

@@ -3,6 +3,7 @@ import db from "../../config/connectDB";
 
 // Types
 import { QueryResult } from "pg";
+import { NotifMarketingItem } from "../interfaces";
 
 export const removeNotificationTokens = async (tokens: string[]) => {
 	const notificationQuery = `DELETE FROM notification_subscription WHERE token = ANY ($1)`;
@@ -13,7 +14,9 @@ export const removeNotificationTokens = async (tokens: string[]) => {
 export const getSingleNotificationMarketing = async (notifMarketingId: number | string) => {
 	const notificationQuery = `SELECT * FROM notification_marketing WHERE id = $1`;
 
-	const notificationResult = await db.query(notificationQuery, [notifMarketingId]);
+	const notificationResult: QueryResult<NotifMarketingItem> = await db.query(notificationQuery, [
+		notifMarketingId
+	]);
 
 	return notificationResult.rows[0];
 };

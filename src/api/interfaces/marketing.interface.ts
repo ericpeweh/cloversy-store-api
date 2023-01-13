@@ -10,6 +10,11 @@ export interface CreateNotifMarketingData {
 	send_to: "all" | "selected";
 }
 
+export interface UpdateNotifMarketingData extends CreateNotifMarketingData {
+	notifMarketingId: number;
+	selectedUserIds: number[];
+}
+
 export interface NotifMarketingItem {
 	id: number;
 	notification_code: string;
@@ -37,5 +42,5 @@ export interface ScheduledNotifMarketingItem
 
 export interface UpdateNotifMarketingDataArgs {
 	updatedNotifMarketingData: Partial<Omit<NotifMarketingItem, "id" | "notification_code">>;
-	notifMarketingId: number;
+	notifMarketingId: number | string;
 }

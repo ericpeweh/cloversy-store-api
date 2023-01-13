@@ -3,7 +3,7 @@ import { voucherRepo } from "../../data/client";
 
 // Utils
 import { ErrorObj } from "../../utils";
-import isDateSurpassToday from "../../utils/isDateSurpassToday";
+import isDateBeforeCurrentTime from "../../utils/isDateBeforeCurrentTime";
 
 export const getUserVouchers = async (userId: string) => {
 	try {
@@ -34,7 +34,7 @@ export const getSingleVoucher = async (voucherCode: string, userId: string) => {
 			throw new ErrorObj.ClientError("Voucher is no longer available.");
 		}
 
-		if (isDateSurpassToday(voucher.expiry_date)) {
+		if (isDateBeforeCurrentTime(voucher.expiry_date)) {
 			throw new ErrorObj.ClientError("Voucher is expired.");
 		}
 

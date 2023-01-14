@@ -3,13 +3,29 @@ import { notificationRepo } from "../data";
 
 // Types
 import { MulticastMessage } from "firebase-admin/messaging";
-import { NotificationMessage, SendNotificationResult } from "../interfaces";
+import {
+	NotificationItem,
+	NotificationMessage,
+	NotificationTypeFilter,
+	SendNotificationResult
+} from "../interfaces";
 
 // Config
 import fcm from "../../config/firebase";
 
 // Utils
 import { getLocalTime } from "../utils";
+
+export const getAllNotifications = async (
+	typeFilter: NotificationTypeFilter,
+	page: string,
+	itemsLimit: string,
+	userId: string
+) => {
+	const result = await notificationRepo.getAllNotifications(typeFilter, page, itemsLimit, userId);
+
+	return result;
+};
 
 export const sendNotifications = async (
 	message: NotificationMessage,
@@ -74,4 +90,23 @@ export const getAllUserNotificationTokens = async () => {
 	const tokens = await notificationRepo.getAllUserNotificationTokens();
 
 	return tokens;
+};
+
+export const getNotificationItem = async (notificationId: string) => {
+	const notification = await notificationRepo.getNotificationItem(notificationId);
+
+	return notification;
+};
+
+export const storeNotification = async (
+	userIds: number[],
+	notificationData: Omit<NotificationItem, "id" | "created_at" | "user_id">
+) => {
+	await notificationRepo.storeNotification(userIds, notificationData);
+};
+
+export const readNotification = async (notificationId: string, userId: string) => {
+	const readNotificationId = await notificationRepo.readNotification(notificationId, userId);
+
+	return readNotificationId;
 };

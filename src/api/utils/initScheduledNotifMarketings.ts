@@ -2,7 +2,7 @@
 import scheduler from "./scheduler";
 
 // Services
-import { marketingService, notificationService } from "../services";
+import { marketingService, notificationService, userService } from "../services";
 import { NotificationMessage } from "../interfaces";
 
 const initScheduledNotifMarketings = async () => {
@@ -64,6 +64,16 @@ const initScheduledNotifMarketings = async () => {
 				},
 				notifMarketingId: notifMarketing.id
 			});
+
+			// Store notification to admins
+			const adminUserIds = await userService.getAllAdminUserIds();
+			const notificationItem = {
+				title: "Marketing notifikasi terjadwal telah dikirim",
+				description: `Marketing notifikasi #${notification_code} berhasil dikirim.`,
+				category_id: 2, // = marketing category
+				action_link: `http://localhost:3001/marketing/notification/${notifMarketing.id}`
+			};
+			await notificationService.storeNotification(adminUserIds, notificationItem);
 
 			console.log(
 				`Scheduled notification marketing #${notifMarketing.notification_code} successfully sent.`

@@ -13,7 +13,7 @@ import { Voucher, NotificationMessage } from "../../interfaces";
 
 // Services
 import { transactionService, voucherService } from "../../services/client";
-import { notificationService } from "../../services";
+import { notificationService, userService } from "../../services";
 
 export const handleNotifications = async (req: Request, res: Response) => {
 	const { order_id, status_code, gross_amount, transaction_status, fraud_status, signature_key } =
@@ -41,18 +41,28 @@ export const handleNotifications = async (req: Request, res: Response) => {
 
 		if (fraud_status == "challenge") {
 			// Notify admin there is challenge transaction
-			if (adminTokens) {
-				const message: NotificationMessage = {
-					title: "Pembayaran trannsaksi bermasalah",
-					body: `Pesanan #${order_id} mengalami masalah saat melakukan pembayaran, menunggu konfirmasi admin.`,
-					actionTitle: "Detail transaksi",
-					actionLink: `http://localhost:3001/orders/${order_id}`
-				};
+			const message: NotificationMessage = {
+				title: "Pembayaran trannsaksi bermasalah",
+				body: `Pesanan #${order_id} mengalami masalah saat melakukan pembayaran, menunggu konfirmasi admin.`,
+				actionTitle: "Detail transaksi",
+				actionLink: `http://localhost:3001/orders/${order_id}`
+			};
 
+			if (adminTokens) {
 				await notificationService.sendNotifications(message, adminTokens, {
 					removeFailedTokens: true
 				});
 			}
+
+			// Store notification to admins
+			const adminUserIds = await userService.getAllAdminUserIds();
+			const notificationItem = {
+				title: message.title,
+				description: message.body,
+				category_id: 1, // = transaction category
+				action_link: message.actionLink || null
+			};
+			await notificationService.storeNotification(adminUserIds, notificationItem);
 
 			await transactionService.challengeTransactionNotification(
 				order_id,
@@ -145,18 +155,28 @@ export const handleNotifications = async (req: Request, res: Response) => {
 				});
 			}
 
-			if (adminTokens) {
-				const message: NotificationMessage = {
-					title: `Info transaksi #${order_id}`,
-					body: `Pembayaran transaksi berhasil, transaksi siap diproses.`,
-					actionTitle: "Detail transaksi",
-					actionLink: `http://localhost:3001/orders/${order_id}`
-				};
+			const message: NotificationMessage = {
+				title: `Info transaksi #${order_id}`,
+				body: `Pembayaran transaksi berhasil, transaksi siap diproses.`,
+				actionTitle: "Detail transaksi",
+				actionLink: `http://localhost:3001/orders/${order_id}`
+			};
 
+			if (adminTokens) {
 				await notificationService.sendNotifications(message, adminTokens, {
 					removeFailedTokens: true
 				});
 			}
+
+			// Store notification to admins
+			const adminUserIds = await userService.getAllAdminUserIds();
+			const notificationItem = {
+				title: message.title,
+				description: message.body,
+				category_id: 1, // = transaction category
+				action_link: message.actionLink || null
+			};
+			await notificationService.storeNotification(adminUserIds, notificationItem);
 		}
 
 		res.status(200).json({

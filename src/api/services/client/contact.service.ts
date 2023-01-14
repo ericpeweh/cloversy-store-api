@@ -5,5 +5,7 @@ import { contactRepo } from "../../data/client";
 import { CreateContactUsItem } from "../../interfaces";
 
 export const createMessageWebForm = async (newMessage: CreateContactUsItem) => {
-	await contactRepo.createMessageWebForm(newMessage);
+	const newMessageId = await contactRepo.createMessageWebForm(newMessage);
+
+	return newMessageId;
 };

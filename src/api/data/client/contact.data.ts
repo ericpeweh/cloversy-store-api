@@ -9,7 +9,16 @@ export const createMessageWebForm = async (newMessage: CreateContactUsItem) => {
 
 	const contactUsQuery = `INSERT INTO contact_us
     (sender_name, email, objective, title, message)
-    VALUES ($1, $2, $3, $4, $5)`;
+    VALUES ($1, $2, $3, $4, $5)
+    RETURNING id`;
 
-	await db.query(contactUsQuery, [senderName, email, objective, title, message]);
+	const contactUsResult = await db.query(contactUsQuery, [
+		senderName,
+		email,
+		objective,
+		title,
+		message
+	]);
+
+	return contactUsResult.rows[0].id;
 };

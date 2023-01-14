@@ -1,6 +1,9 @@
 // Data
 import { userRepo } from "../data";
 
+// Services
+import { userService } from ".";
+
 // Types
 import { User, UserStatus } from "../interfaces";
 
@@ -60,4 +63,10 @@ export const updateUser = async (
 	const userResult = await userRepo.updateUser(updatedUserData, userId);
 
 	return userResult.rows[0];
+};
+
+export const getAllAdminUserIds = async () => {
+	const adminUserIds = await userRepo.getAllAdminUserIds();
+
+	return adminUserIds;
 };

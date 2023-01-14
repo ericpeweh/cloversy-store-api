@@ -13,7 +13,7 @@ import {
 	SendNotificationResult,
 	UpdateNotifMarketingDataArgs
 } from "../interfaces";
-import { marketingService, notificationService } from ".";
+import { marketingService, notificationService, userService } from ".";
 
 export const createNotificationMarketing = async (
 	newNotifMarketingData: CreateNotifMarketingData,
@@ -173,6 +173,16 @@ export const scheduleNotifMarketingNotification = async (
 					},
 					notifMarketingId
 				});
+
+				// Store notification to admins
+				const adminUserIds = await userService.getAllAdminUserIds();
+				const notificationItem = {
+					title: "Marketing notifikasi terjadwal telah dikirim",
+					description: `Marketing notifikasi #${notification_code} berhasil dikirim.`,
+					category_id: 2, // = marketing category
+					action_link: `http://localhost:3001/marketing/notification/${notifMarketingId}`
+				};
+				await notificationService.storeNotification(adminUserIds, notificationItem);
 
 				console.log(`Scheduled notification marketing #${notification_code} successfully sent.`);
 			});

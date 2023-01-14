@@ -95,6 +95,7 @@ app.use("/admin/transactions", isAdmin, router.transactionRouter);
 app.use("/admin/reviews", isAdmin, router.reviewRouter);
 app.use("/admin/subscription", isAdmin, router.subscriptionRouter);
 app.use("/admin/marketing", isAdmin, router.marketingRouter);
+app.use("/admin/notifications", isAdmin, getUserData, router.notificationRouter);
 
 // Error handling middleware
 app.use(errorHandler);

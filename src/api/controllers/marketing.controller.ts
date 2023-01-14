@@ -9,7 +9,7 @@ import {
 } from "../interfaces";
 
 // Services
-import { marketingService, notificationService } from "../services";
+import { marketingService, notificationService, userService } from "../services";
 
 // Utils
 import { ErrorObj, isDateBeforeCurrentTime, scheduler } from "../utils";
@@ -68,6 +68,7 @@ export const createNotificationMarketing = async (req: Request, res: Response) =
 		if (action_title) notificationMessage.actionTitle = action_title;
 
 		let notificationResult;
+		let directNotifSent: boolean = false;
 		if (!scheduled) {
 			// Send notification directly
 			notificationResult = await notificationService.sendNotifications(
@@ -75,6 +76,8 @@ export const createNotificationMarketing = async (req: Request, res: Response) =
 				targets,
 				{ removeFailedTokens: true }
 			);
+
+			directNotifSent = true;
 
 			console.log(`Direct notification marketing successfully sent.`);
 		}
@@ -84,6 +87,18 @@ export const createNotificationMarketing = async (req: Request, res: Response) =
 			selectedUserIds,
 			notificationResult
 		);
+
+		if (directNotifSent) {
+			// Store notification to admins
+			const adminUserIds = await userService.getAllAdminUserIds();
+			const notificationItem = {
+				title: "Marketing notifikasi direct telah dikirim",
+				description: `Marketing notifikasi #${newNotifMarketing.notification_code} berhasil dikirim.`,
+				category_id: 2, // = marketing category
+				action_link: `http://localhost:3001/marketing/notification/${newNotifMarketing.id}`
+			};
+			await notificationService.storeNotification(adminUserIds, notificationItem);
+		}
 
 		// Schedule notification trigger if new notif marketing is scheduled type
 		if (scheduled) {
@@ -107,6 +122,16 @@ export const createNotificationMarketing = async (req: Request, res: Response) =
 					},
 					notifMarketingId: newNotifMarketing.id
 				});
+
+				// Store notification to admins
+				const adminUserIds = await userService.getAllAdminUserIds();
+				const notificationItem = {
+					title: "Marketing notifikasi terjadwal telah dikirim",
+					description: `Marketing notifikasi #${newNotifMarketing.notification_code} berhasil dikirim.`,
+					category_id: 2, // = marketing category
+					action_link: `http://localhost:3001/marketing/notification/${newNotifMarketing.id}`
+				};
+				await notificationService.storeNotification(adminUserIds, notificationItem);
 
 				console.log(
 					`Scheduled notification marketing #${newNotifMarketing.notification_code} successfully sent.`

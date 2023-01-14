@@ -3,7 +3,70 @@ import db from "../../config/connectDB";
 
 // Types
 import { QueryResult } from "pg";
-import { NotifMarketingItem } from "../interfaces";
+import { NotificationItem, NotificationTypeFilter, NotifMarketingItem } from "../interfaces";
+import { ErrorObj } from "../utils";
+
+export const getAllNotifications = async (
+	typeFilter: NotificationTypeFilter,
+	page: string,
+	itemsLimit: string,
+	userId: string
+) => {
+	let paramsIndex = 1;
+	const params = [userId];
+	const limit = itemsLimit ? +itemsLimit : 12;
+	const offset = parseInt(page) * limit - limit;
+
+	let notificationQuery = `SELECT 
+    n.*, nc.name as category_name, nr.is_read as is_read
+  FROM notification n
+  JOIN notification_category nc ON nc.id = n.category_id
+  LEFT JOIN notification_read nr ON nr.notification_id = n.id
+  WHERE nr.user_id = $1
+  `;
+
+	let totalQuery = `SELECT COUNT(n.id) as count, 
+  (
+    SELECT COUNT(n.id) AS not_read
+    FROM notification n
+    LEFT JOIN notification_read nr ON nr.notification_id = n.id
+    WHERE nr.user_id = $1 AND nr.is_read = FALSE
+  )
+  FROM notification n
+  JOIN notification_category nc ON nc.id = n.category_id
+  LEFT JOIN notification_read nr ON nr.notification_id = n.id
+  WHERE nr.user_id = $1
+  `;
+
+	if (typeFilter) {
+		const filterPart = ` AND nc.name = $${paramsIndex + 1}`;
+		notificationQuery += filterPart;
+		totalQuery += filterPart;
+
+		params.push(typeFilter);
+		paramsIndex += 1;
+	}
+
+	notificationQuery += ` ORDER BY n.created_at DESC`;
+
+	if (page) {
+		notificationQuery += ` LIMIT ${limit} OFFSET ${offset}`;
+	}
+
+	const totalResult = await db.query(totalQuery, params);
+	const totalNotifications = totalResult.rows[0].count;
+	const notRead = totalResult.rows[0].not_read;
+	const notifications = (await db.query(notificationQuery, params)).rows;
+
+	return {
+		notifications,
+		notRead,
+		page: parseInt(page),
+		pageSize: limit,
+		totalCount: parseInt(totalNotifications),
+		totalPages: Math.ceil(totalNotifications / limit)
+	};
+};
 
 export const removeNotificationTokens = async (tokens: string[]) => {
 	const notificationQuery = `DELETE FROM notification_subscription WHERE token = ANY ($1)`;
@@ -57,4 +120,73 @@ export const getAllUserNotificationTokens = async () => {
 	const notificationResult: QueryResult<{ tokens: string[] }> = await db.query(notificationQuery);
 
 	return notificationResult.rows[0].tokens;
+};
+
+export const storeNotification = async (
+	userIds: number[],
+	notificationData: Omit<NotificationItem, "id" | "created_at" | "user_id">
+) => {
+	if (userIds.length > 0) {
+		const { title, description, category_id, action_link } = notificationData;
+		const notificationQuery = `INSERT INTO notification(
+      title, description, user_id, category_id, action_link
+    ) VALUES ($1, $2, $3, $4, $5) RETURNING *`;
+
+		let newNotifications: NotificationItem[] = [];
+		for (const userId of userIds) {
+			const result: QueryResult<NotificationItem> = await db.query(notificationQuery, [
+				title,
+				description,
+				userId,
+				category_id,
+				action_link
+			]);
+
+			newNotifications.push(result.rows[0]);
+		}
+
+		const notificationReadQuery = `INSERT INTO notification_read(
+      user_id, notification_id
+    ) VALUES ($1, $2)`;
+
+		for (const { user_id, id } of newNotifications) {
+			await db.query(notificationReadQuery, [user_id, id]);
+		}
+	}
+};
+
+export const getNotificationItem = async (notificationId: string) => {
+	const notificationQuery = `SELECT * FROM notification WHERE id = $1`;
+
+	const notificationResult: QueryResult<NotificationItem> = await db.query(notificationQuery, [
+		notificationId
+	]);
+
+	if (notificationResult.rowCount === 0)
+		throw new ErrorObj.ClientError(`Notification with id ${notificationId} not found`, 404);
+
+	return notificationResult.rows[0];
+};
+
+export const readNotification = async (notificationId: string, userId: string) => {
+	const notificationQuery = `UPDATE notification_read nr
+    SET is_read = TRUE
+    WHERE notification_id = $1
+    AND user_id = $2
+    RETURNING notification_id
+  `;
+
+	const notificationResult = await db.query(notificationQuery, [notificationId, userId]);
+
+	const notReadQuery = `SELECT COUNT(n.id) AS not_read
+  FROM notification n
+  LEFT JOIN notification_read nr ON nr.notification_id = n.id
+  WHERE nr.user_id = $1 AND nr.is_read = FALSE`;
+
+	const notReadResult = await db.query(notReadQuery, [userId]);
+
+	return {
+		readNotificationId: notificationResult.rows[0].notification_id,
+		notRead: notReadResult.rows[0].not_read
+	};
 };

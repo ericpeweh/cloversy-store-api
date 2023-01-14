@@ -9,6 +9,7 @@ import * as transactionController from "./transaction.controller";
 import * as reviewController from "./review.controller";
 import * as subscriptionController from "./subscription.controller";
 import * as marketingController from "./marketing.controller";
+import * as notificationController from "./notification.controller";
 
 export {
 	productController,
@@ -20,5 +21,6 @@ export {
 	transactionController,
 	reviewController,
 	subscriptionController,
-	marketingController
+	marketingController,
+	notificationController
 };

@@ -9,6 +9,7 @@ import transactionRouter from "./transaction.route";
 import reviewRouter from "./review.route";
 import subscriptionRouter from "./subscription.route";
 import marketingRouter from "./marketing.route";
+import notificationRouter from "./notification.route";
 
 export default {
 	productRouter,
@@ -20,5 +21,6 @@ export default {
 	transactionRouter,
 	reviewRouter,
 	subscriptionRouter,
-	marketingRouter
+	marketingRouter,
+	notificationRouter
 };

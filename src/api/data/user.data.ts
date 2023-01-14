@@ -140,3 +140,14 @@ export const updateUser = async (updatedUserData: Partial<User>, userId: string)
 
 	return userResult;
 };
+
+export const getAllAdminUserIds = async () => {
+	const userQuery = `SELECT 
+    array_agg("id") AS user_ids
+  FROM users
+  WHERE users.user_role = 'admin'`;
+
+	const userResult: QueryResult<{ user_ids: number[] }> = await db.query(userQuery);
+
+	return userResult.rows[0].user_ids;
+};

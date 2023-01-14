@@ -8,9 +8,9 @@ import {
 	Voucher,
 	NotificationMessage
 } from "../../interfaces";
-import { notificationService } from "../../services";
 
 // Services
+import { notificationService, userService } from "../../services";
 import {
 	transactionService,
 	cartService,
@@ -198,18 +198,28 @@ export const createTransaction = async (req: Request, res: Response) => {
 			});
 		}
 
-		if (adminTokens) {
-			const message: NotificationMessage = {
-				title: "Pesanan baru telah dibuat",
-				body: `Pesanan #${newTranactionId} telah dibuat, menunggu pembayaran.`,
-				actionTitle: "Detail transaksi",
-				actionLink: `http://localhost:3001/orders/${newTranactionId}`
-			};
+		const message: NotificationMessage = {
+			title: "Pesanan baru telah dibuat",
+			body: `Pesanan #${newTranactionId} telah dibuat, menunggu pembayaran.`,
+			actionTitle: "Detail transaksi",
+			actionLink: `http://localhost:3001/orders/${newTranactionId}`
+		};
 
+		if (adminTokens) {
 			await notificationService.sendNotifications(message, adminTokens, {
 				removeFailedTokens: true
 			});
 		}
+
+		// Store notification to admins
+		const adminUserIds = await userService.getAllAdminUserIds();
+		const notificationItem = {
+			title: message.title,
+			description: message.body,
+			category_id: 1, // = transaction category,
+			action_link: message.actionLink || null
+		};
+		await notificationService.storeNotification(adminUserIds, notificationItem);
 
 		// Fetch transaction details
 		const transaction = await transactionService.getSingleTransaction(
@@ -361,19 +371,29 @@ export const reviewTransaction = async (req: Request, res: Response) => {
 		await reviewService.createReviews(userId, transactionId, reviews as ReviewRequestItem[]);
 
 		// Notify admin about new reviews
+		const message: NotificationMessage = {
+			title: `Review baru diterima #${transaction.id}`,
+			body: `Konsumen telah meninggalkan ulasan baru untuk transaksi #${transaction.id}, silahkan cek review.`,
+			actionTitle: "Lihat review",
+			actionLink: `http://localhost:3001/orders/${transaction.id}`
+		};
+
 		const adminTokens = await notificationService.getAdminNotificationTokens();
 		if (adminTokens) {
-			const message: NotificationMessage = {
-				title: `Review baru diterima #${transaction.id}`,
-				body: `Konsumen telah meninggalkan ulasan baru untuk transaksi #${transaction.id}, silahkan cek review.`,
-				actionTitle: "Lihat review",
-				actionLink: `http://localhost:3001/orders/${transaction.id}`
-			};
-
 			await notificationService.sendNotifications(message, adminTokens, {
 				removeFailedTokens: true
 			});
 		}
+
+		// Store notification to admins
+		const adminUserIds = await userService.getAllAdminUserIds();
+		const notificationItem = {
+			title: message.title,
+			description: message.body,
+			category_id: 1, // = transaction category
+			action_link: message.actionLink || null
+		};
+		await notificationService.storeNotification(adminUserIds, notificationItem);
 
 		res.status(200).json({
 			status: "success",

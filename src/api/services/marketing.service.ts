@@ -155,7 +155,7 @@ export const scheduleNotifMarketingNotification = async (
 
 		// Schedule notification if scheduled date is not expired
 		if (!isDateBeforeCurrentTime(scheduled)) {
-			const job = scheduler.scheduleJob(notification_code, triggerAt, async () => {
+			scheduler.scheduleJob(notification_code, triggerAt, async () => {
 				const { successCount, failureCount, sendAt } = await notificationService.sendNotifications(
 					notificationMessage,
 					targets,
@@ -174,7 +174,7 @@ export const scheduleNotifMarketingNotification = async (
 					notifMarketingId
 				});
 
-				console.log(`Direct notification marketing #${notification_code} successfully sent.`);
+				console.log(`Scheduled notification marketing #${notification_code} successfully sent.`);
 			});
 		}
 	}

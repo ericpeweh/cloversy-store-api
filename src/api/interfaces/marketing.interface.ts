@@ -31,6 +31,7 @@ export interface NotifMarketingItem {
 	failure_count: number;
 	created_at: string;
 	send_to: "all" | "selected";
+	canceled: boolean;
 }
 
 export interface ScheduledNotifMarketingItem

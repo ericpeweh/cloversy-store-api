@@ -119,8 +119,11 @@ export const updateNotificationMarketing = async (
 		);
 		const updatedNotifMarketing = result.rows[0];
 
-		// Handle send_to field changed
-		if (currentNotifMarketing.send_to !== updatedNotifMarketing.send_to) {
+		// Handle send_to field changed or send_to still 'all'
+		if (
+			currentNotifMarketing.send_to !== updatedNotifMarketing.send_to ||
+			(currentNotifMarketing.send_to === "all" && updatedNotifMarketing.send_to === "all")
+		) {
 			// Delete all notification marketing target
 			const notifMarketingDeleteQuery = `DELETE FROM notification_marketing_target WHERE notification_marketing_id = $1`;
 
@@ -213,10 +216,10 @@ export const getNotificationMarketings = async (
 	}
 
 	if (scheduled === "true") {
-		const filter = ` ${
-			paramsIndex === 0 ? "WHERE" : "AND"
-		} nm.scheduled IS NOT NULL AND nm.sent_at IS NULL
-      AND scheduled >= $${paramsIndex + 1}
+		const filter = ` ${paramsIndex === 0 ? "WHERE" : "AND"} nm.scheduled IS NOT NULL 
+      AND nm.sent_at IS NULL
+      AND nm.scheduled >= $${paramsIndex + 1}
+      AND nm.canceled = FALSE
     `;
 
 		notifMarketingQuery += filter;

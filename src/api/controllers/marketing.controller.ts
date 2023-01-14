@@ -259,3 +259,35 @@ export const updateNotificationMarketing = async (req: Request, res: Response) =
 		});
 	}
 };
+
+export const cancelNotificationMarketing = async (req: Request, res: Response) => {
+	const { notifMarketingId } = req.params;
+
+	try {
+		if (!notifMarketingId) throw new ErrorObj.ClientError("Invalid notification marketing id!");
+
+		// Get notif marketing item & check if exist
+		const notificationMarketingItem = await marketingService.getNotificationMarketingDetail(
+			notifMarketingId
+		);
+
+		if (notificationMarketingItem?.sent_at)
+			throw new ErrorObj.ClientError("Can't cancel already sent notification marketing!");
+
+		// Cancel notification marketing
+		const updatedNotifMarketing = await marketingService.updateNotificationMarketing({
+			updatedNotifMarketingData: { canceled: true },
+			notifMarketingId
+		});
+
+		res.status(200).json({
+			status: "success",
+			data: { canceledNotifMarketingId: updatedNotifMarketing.id }
+		});
+	} catch (error: any) {
+		res.status(error.statusCode || 500).json({
+			status: "error",
+			message: error.message
+		});
+	}
+};

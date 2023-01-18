@@ -151,3 +151,15 @@ export const getAllAdminUserIds = async () => {
 
 	return userResult.rows[0].user_ids;
 };
+
+export const getUserEmailAndNameByIds = async (userIds: string[] | number[]) => {
+	const userQuery = `SELECT email, full_name
+    FROM users
+  WHERE id = ANY ($1) AND user_role = 'user'`;
+
+	const userResult: QueryResult<{ email: string; full_name: string }> = await db.query(userQuery, [
+		userIds
+	]);
+
+	return userResult.rows;
+};

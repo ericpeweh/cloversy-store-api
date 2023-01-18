@@ -6,7 +6,7 @@ import { marketingController } from "../controllers";
 
 const router = Router();
 
-// Routing
+// Notification marketing
 router.get("/notifications", marketingController.getNotificationMarketings);
 router.get("/notifications/:notifMarketingId", marketingController.getNotificationMarketingDetail);
 router.post("/notifications", marketingController.createNotificationMarketing);
@@ -15,5 +15,13 @@ router.post(
 	marketingController.cancelNotificationMarketing
 );
 router.put("/notifications/:notifMarketingId", marketingController.updateNotificationMarketing);
+
+// Email marekting
+router.get("/emails/template", marketingController.getEmailsTemplate);
+router.get("/emails", marketingController.getEmailMarketings);
+router.get("/emails/:emailMarketingId", marketingController.getEmailMarketingDetail);
+router.post("/emails", marketingController.createEmailMarketing);
+router.post("/emails/:emailMarketingId/cancel", marketingController.cancelEmailMarketing);
+router.put("/emails/:emailMarketingId", marketingController.updateEmailMarketing);
 
 export default router;

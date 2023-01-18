@@ -19,7 +19,11 @@ import {
 } from "./api/middlewares";
 
 // Utils
-import { initNotificationSubscriptionsCleanup, initScheduledNotifMarketings } from "./api/utils";
+import {
+	initNotificationSubscriptionsCleanup,
+	initScheduledNotifMarketings,
+	initScheduledEmailMarketings
+} from "./api/utils";
 
 // Routes
 import router from "./api/routes";
@@ -106,4 +110,5 @@ app.listen(port, () => {
 	// Init schedule
 	initNotificationSubscriptionsCleanup();
 	initScheduledNotifMarketings();
+	initScheduledEmailMarketings();
 });

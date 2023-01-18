@@ -70,3 +70,9 @@ export const getAllAdminUserIds = async () => {
 
 	return adminUserIds;
 };
+
+export const getUserEmailAndNameByIds = async (userIds: string[] | number[]) => {
+	const emails = await userRepo.getUserEmailAndNameByIds(userIds);
+
+	return emails;
+};

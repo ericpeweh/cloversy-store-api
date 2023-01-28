@@ -151,6 +151,7 @@ export const createTransaction = async (
 
 		// Update voucher if using voucher
 		if (selectedVoucher) {
+			// Incremment voucher usage linit by 1 (+1)
 			const voucherUsageQuery = `UPDATE voucher 
         SET current_usage = current_usage + 1 
       WHERE code = $1`;
@@ -353,6 +354,7 @@ export const updateTransaction = async (
 		}
 
 		if (voucherQuery && voucherParams.length !== 0) {
+			// Refund voucher to user (order is canceled / expired)
 			await client.query(voucherQuery, voucherParams);
 		}
 

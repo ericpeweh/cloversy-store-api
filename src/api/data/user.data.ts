@@ -163,3 +163,13 @@ export const getUserEmailAndNameByIds = async (userIds: string[] | number[]) => 
 
 	return userResult.rows;
 };
+
+export const getCustomerCount = async () => {
+	const userQuery = `SELECT COUNT(id) AS customer_count 
+    FROM users
+  WHERE user_role = 'user'`;
+
+	const userResult = await db.query(userQuery);
+
+	return userResult.rows[0].customer_count;
+};

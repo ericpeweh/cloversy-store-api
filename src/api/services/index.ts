@@ -11,6 +11,8 @@ import * as reviewService from "./review.service";
 import * as notificationService from "./notification.service";
 import * as subscriptionService from "./subscription.service";
 import * as marketingService from "./marketing.service";
+import * as dashboardService from "./dashboard.service";
+import * as analyticsService from "./analytics.service";
 
 export {
 	productService,
@@ -24,5 +26,7 @@ export {
 	reviewService,
 	notificationService,
 	subscriptionService,
-	marketingService
+	marketingService,
+	dashboardService,
+	analyticsService
 };

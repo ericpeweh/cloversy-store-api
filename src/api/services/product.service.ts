@@ -11,6 +11,9 @@ import { UpdateProductDataArgs } from "../interfaces";
 import bucket from "../../config/cloudStorage";
 import { UploadResponse, DeleteFileResponse } from "@google-cloud/storage";
 
+// Services
+import { analyticsService } from ".";
+
 export const getAllProducts = async (
 	page: string,
 	q: string,
@@ -23,12 +26,39 @@ export const getAllProducts = async (
 	return products;
 };
 
-export const getSingleProduct = async (productId: string) => {
-	const productResult = await productRepo.getSingleProductById(productId);
+export const getSingleProduct = async (
+	productId: string,
+	salesYearFilter: string,
+	visitorYearFilter: string
+) => {
+	const { productResult, analytics } = await productRepo.getSingleProductById(
+		productId,
+		salesYearFilter
+	);
 
 	const productReviews = await reviewRepo.getProductReviews(productId);
 
-	return { productResult, productReviews };
+	const productSlug = productResult.slug;
+	const productPageViewAnalytics = await analyticsService.getPageMonthlyVisitorAnalytics(
+		`/products/${productSlug}`,
+		visitorYearFilter
+	);
+
+	// Combine with GA pageviews data
+	const productAnalytics = analytics.map(item => ({ ...item, page_views: "0" }));
+
+	productPageViewAnalytics.forEach(item => {
+		if (item.dimensionValues && item.metricValues) {
+			const month = parseInt(item.dimensionValues[0]?.value || "");
+			const pageViews = parseInt(item.metricValues[0]?.value || "");
+
+			if (month && pageViews) {
+				productAnalytics[month - 1].page_views = pageViews.toString();
+			}
+		}
+	});
+
+	return { ...productResult, reviews: productReviews, analytics: productAnalytics };
 };
 
 export const createProduct = async (

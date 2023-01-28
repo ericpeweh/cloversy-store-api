@@ -166,3 +166,11 @@ export const updateReview = async (
 
 	return reviewId;
 };
+
+export const getReviewCount = async () => {
+	const reviewQuery = `SELECT COUNT(id) AS review_count FROM review`;
+
+	const reviewResult = await db.query(reviewQuery);
+
+	return reviewResult.rows[0].review_count;
+};

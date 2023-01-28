@@ -82,7 +82,7 @@ export const getAllProducts = async (
 	};
 };
 
-export const getSingleProductById = async (productId: string) => {
+export const getSingleProductById = async (productId: string, analyticYear: string) => {
 	const productQuery = `SELECT p.*, ROUND(p.price) AS price , b.name AS brand, c.name AS category,
   (SELECT array_agg("url") AS images 
     FROM product_image pi 
@@ -115,7 +115,38 @@ export const getSingleProductById = async (productId: string) => {
 		throw new ErrorObj.ClientError("Product not found!", 404);
 	}
 
-	return productResult;
+	// Get product analytics data (total sales & page views)
+	const yearFilter = new Date(analyticYear).toISOString();
+
+	const productSoldAnalyticsQuery = `
+    WITH ml(months_list) AS
+    (SELECT generate_series(
+      date_trunc('year', $1::timestamp),
+      date_trunc('year', $1::timestamp) + '11 months',
+      '1 month'::interval
+    )),
+    ti AS
+      (SELECT quantity, created_at, order_status
+        FROM transactions_item ti
+        JOIN transactions t ON ti.transaction_id = t.id
+        WHERE ti.product_id = $2
+        AND order_status NOT IN ('pending', 'cancel')
+        AND date_trunc('year', created_at) = date_trunc('year', $1::timestamp)
+      )
+    SELECT to_char(ml.months_list, 'Mon') AS month,
+      COALESCE(SUM(ti.quantity), 0) AS product_sales
+    FROM ml LEFT JOIN ti
+      ON ml.months_list = date_trunc('month', ti.created_at)
+    GROUP BY ml.months_list
+    ORDER BY ml.months_list
+  `;
+
+	const productSoldAnalyticsResult = await db.query(productSoldAnalyticsQuery, [
+		yearFilter,
+		productId
+	]);
+
+	return { productResult: productResult.rows[0], analytics: productSoldAnalyticsResult.rows };
 };
 
 export const createProduct = async (productData: Array<any>, tags: string[], sizes: string[]) => {
@@ -305,4 +336,12 @@ export const deleteProduct = async (productId: string) => {
 	} finally {
 		client.release();
 	}
+};
+
+export const getProductCount = async () => {
+	const productQuery = `SELECT COUNT(id) AS product_count FROM product`;
+
+	const productResult = await db.query(productQuery);
+
+	return productResult.rows[0].product_count;
 };

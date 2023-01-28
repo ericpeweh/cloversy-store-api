@@ -54,7 +54,7 @@ export const getAllVouchers = async (
 	};
 };
 
-export const getSingleVoucher = async (voucherCode: string) => {
+export const getSingleVoucher = async (voucherCode: string, analyticYear: string) => {
 	const voucherQuery = `SELECT * FROM voucher WHERE code = $1`;
 
 	const voucherResult = await db.query(voucherQuery, [voucherCode]);
@@ -77,7 +77,37 @@ export const getSingleVoucher = async (voucherCode: string) => {
 		voucherDistResult = result.rows;
 	}
 
-	return { voucherResult, selectedUsers: voucherDistResult };
+	const voucherAnalyticsQuery = `
+    WITH ml(months_list) AS
+      (SELECT generate_series(
+        date_trunc('year', $1::timestamp), 
+        date_trunc('year', $1::timestamp) + '11 months', 
+        '1 month'::interval
+      )),
+    t AS 
+      (SELECT id, discount_total, created_at, voucher_code
+        FROM transactions
+        WHERE voucher_code = $2
+        AND order_status NOT IN ('pending', 'cancel')
+        AND date_trunc('year', created_at) = date_trunc('year', $1::timestamp)
+      )
+    SELECT to_char(ml.months_list, 'Mon') AS month,
+      COUNT(t.id) AS voucher_usage,
+      ROUND(COALESCE(SUM(t.discount_total), 0)) AS discount_total
+    FROM ml LEFT JOIN t
+      ON ml.months_list = date_trunc('month', t.created_at)
+    GROUP BY ml.months_list
+    ORDER BY ml.months_list`;
+
+	const yearFilter = new Date(analyticYear).toISOString();
+
+	const voucherAnalyticsResult = await db.query(voucherAnalyticsQuery, [yearFilter, voucherCode]);
+
+	return {
+		voucherResult,
+		analytics: voucherAnalyticsResult.rows,
+		selectedUsers: voucherDistResult
+	};
 };
 
 export const createVoucher = async (
@@ -191,4 +221,17 @@ export const getVoucherItem = async (voucherCode: string) => {
 	const voucherResult: QueryResult<Voucher> = await db.query(voucherQuery, [voucherCode]);
 
 	return voucherResult.rows[0];
+};
+
+export const getActiveVoucherCount = async () => {
+	const reviewQuery = `SELECT COUNT(code) AS active_voucher_count 
+    FROM voucher
+  WHERE status = 'active'
+  AND current_usage < usage_limit
+  AND expiry_date > NOW() 
+  `;
+
+	const reviewResult = await db.query(reviewQuery);
+
+	return reviewResult.rows[0].active_voucher_count;
 };

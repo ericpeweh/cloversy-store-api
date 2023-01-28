@@ -59,20 +59,48 @@ export const getAllProducts = async (req: Request, res: Response) => {
 export const getSingleProductById = async (req: Request, res: Response) => {
 	try {
 		const { productId } = req.params;
+		const {
+			sales_analytic_year: salesAnalyticYear = "",
+			visitor_analytic_year: visitorAnalyticYear = ""
+		} = req.query;
 
-		if (typeof productId !== "string") {
-			throw new ErrorObj.ClientError("Query param 'id' has to be type of string");
+		if (
+			typeof productId !== "string" ||
+			typeof salesAnalyticYear !== "string" ||
+			typeof visitorAnalyticYear !== "string"
+		) {
+			throw new ErrorObj.ClientError("Query params has to be type of string");
 		}
 
-		const { productResult, productReviews } = await productService.getSingleProduct(productId);
+		if (
+			salesAnalyticYear &&
+			salesAnalyticYear.length !== 4 &&
+			visitorAnalyticYear &&
+			visitorAnalyticYear.length !== 4
+		) {
+			throw new ErrorObj.ClientError(`Invalid query params`);
+		}
+
+		let salesYearFilter = salesAnalyticYear;
+		if (!salesAnalyticYear) {
+			salesYearFilter = new Date().getFullYear().toString();
+		}
+
+		let visitorYearFilter = visitorAnalyticYear;
+		if (!visitorAnalyticYear) {
+			visitorYearFilter = new Date().getFullYear().toString();
+		}
+
+		const result = await productService.getSingleProduct(
+			productId,
+			salesYearFilter,
+			visitorYearFilter
+		);
 
 		res.status(200).json({
 			status: "success",
 			data: {
-				product: {
-					...productResult.rows[0],
-					reviews: productReviews
-				}
+				product: result
 			}
 		});
 	} catch (error: any) {

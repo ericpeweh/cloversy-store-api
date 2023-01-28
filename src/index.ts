@@ -90,6 +90,7 @@ app.use("/activity", getUserData, clientRouter.activityRouter);
 
 // Admin routes
 app.use(isAuth);
+app.use("/admin", isAdmin, router.dashboardRouter);
 app.use("/admin/products", isAdmin, router.productRouter);
 app.use("/admin/category", isAdmin, router.categoryRouter);
 app.use("/admin/brands", isAdmin, router.brandRouter);
@@ -104,7 +105,7 @@ app.use("/admin/notifications", isAdmin, getUserData, router.notificationRouter)
 // Error handling middleware
 app.use(errorHandler);
 
-app.listen(port, () => {
+app.listen(port, async () => {
 	console.log(`Server is running at http://localhost:${port}`);
 
 	// Init schedule

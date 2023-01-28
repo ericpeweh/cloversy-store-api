@@ -261,7 +261,7 @@ export const changeTransactionStatus = async (
 			await client.query(transactionPaymentObjQuery, [paymentObj, transactionId]);
 		}
 
-		// Update voucher data based on type
+		// Update voucher data based on type (if order status is cancel / )
 		let voucherQuery: string | undefined = undefined;
 		let voucherParams: string[] = [];
 		if (transaction && voucher && voucher?.voucher_scope === "user") {
@@ -289,4 +289,53 @@ export const changeTransactionStatus = async (
 	} finally {
 		client.release();
 	}
+};
+
+export const getSalesTotal = async () => {
+	const transactionQuery = `SELECT 
+    ROUND(SUM(total)) AS total_sales 
+      FROM transactions
+    WHERE order_status NOT IN ('pending', 'cancel')
+  `;
+
+	const transactionResult = await db.query(transactionQuery);
+
+	return transactionResult.rows[0].total_sales;
+};
+
+export const getTransactionCount = async () => {
+	const transactionQuery = `SELECT COUNT(id) AS transaction_count FROM transactions`;
+
+	const transactionResult = await db.query(transactionQuery);
+
+	return transactionResult.rows[0].transaction_count;
+};
+
+export const getMonthlySalesCountAnalytics = async (analyticYear: string) => {
+	const transactionAnalyticsQuery = `
+    WITH ml(months_list) AS
+      (SELECT generate_series(
+        date_trunc('year', $1::timestamp), 
+        date_trunc('year', $1::timestamp) + '11 months', 
+        '1 month'::interval
+      )),
+    t AS 
+      (SELECT id, created_at, order_status
+        FROM transactions
+        WHERE order_status NOT IN ('pending', 'cancel')
+        AND date_trunc('year', created_at) = date_trunc('year', $1::timestamp)
+      )
+    SELECT to_char(ml.months_list, 'Mon') AS month,
+      COUNT(t.id) AS sales_count
+    FROM ml 
+    LEFT JOIN t
+      ON ml.months_list = date_trunc('month', t.created_at)
+    GROUP BY ml.months_list
+    ORDER BY ml.months_list`;
+
+	const yearFilter = new Date(analyticYear).toISOString();
+
+	const transactionAnalyticsResult = await db.query(transactionAnalyticsQuery, [yearFilter]);
+
+	return transactionAnalyticsResult.rows;
 };

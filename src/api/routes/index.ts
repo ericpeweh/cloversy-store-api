@@ -10,6 +10,7 @@ import reviewRouter from "./review.route";
 import subscriptionRouter from "./subscription.route";
 import marketingRouter from "./marketing.route";
 import notificationRouter from "./notification.route";
+import dashboardRouter from "./dashboard.route";
 
 export default {
 	productRouter,
@@ -22,5 +23,6 @@ export default {
 	reviewRouter,
 	subscriptionRouter,
 	marketingRouter,
-	notificationRouter
+	notificationRouter,
+	dashboardRouter
 };

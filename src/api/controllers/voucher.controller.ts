@@ -57,13 +57,23 @@ export const getAllVouchers = async (req: Request, res: Response) => {
 
 export const getSingleVoucher = async (req: Request, res: Response) => {
 	const { voucherCode } = req.params;
+	const { analytic_year: analyticYear = "" } = req.query;
 
 	try {
-		if (typeof voucherCode !== "string") {
-			throw new ErrorObj.ClientError("Query param 'voucherCode' has to be type of string");
+		if (typeof voucherCode !== "string" || typeof analyticYear !== "string") {
+			throw new ErrorObj.ClientError("Query param has to be type of string");
 		}
 
-		const result = await voucherService.getSingleVoucher(voucherCode);
+		if (analyticYear && analyticYear.length !== 4) {
+			throw new ErrorObj.ClientError(`Invalid analytic year of '${analyticYear}'`);
+		}
+
+		let yearFilter = analyticYear;
+		if (!analyticYear) {
+			yearFilter = new Date().getFullYear().toString();
+		}
+
+		const result = await voucherService.getSingleVoucher(voucherCode, yearFilter);
 
 		res.status(200).json({
 			status: "success",

@@ -10,6 +10,7 @@ import * as reviewController from "./review.controller";
 import * as subscriptionController from "./subscription.controller";
 import * as marketingController from "./marketing.controller";
 import * as notificationController from "./notification.controller";
+import * as dashboardController from "./dashboard.controller";
 
 export {
 	productController,
@@ -22,5 +23,6 @@ export {
 	reviewController,
 	subscriptionController,
 	marketingController,
-	notificationController
+	notificationController,
+	dashboardController
 };

@@ -16,13 +16,16 @@ export const getAllVouchers = async (
 	}
 };
 
-export const getSingleVoucher = async (voucherCode: string) => {
+export const getSingleVoucher = async (voucherCode: string, analyticYear: string) => {
 	try {
-		const { voucherResult, selectedUsers } = await voucherRepo.getSingleVoucher(voucherCode);
+		const { voucherResult, selectedUsers, analytics } = await voucherRepo.getSingleVoucher(
+			voucherCode,
+			analyticYear
+		);
 
 		return selectedUsers.length > 0
-			? { ...voucherResult.rows[0], selectedUsers }
-			: voucherResult.rows[0];
+			? { ...voucherResult.rows[0], selectedUsers, analytics }
+			: { ...voucherResult.rows[0], analytics };
 	} catch (error) {
 		throw error;
 	}

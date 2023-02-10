@@ -64,10 +64,6 @@ export const getSingleVoucher = async (req: Request, res: Response) => {
 			throw new ErrorObj.ClientError("Query param has to be type of string");
 		}
 
-		if (analyticYear && analyticYear.length !== 4) {
-			throw new ErrorObj.ClientError(`Invalid analytic year of '${analyticYear}'`);
-		}
-
 		let yearFilter = analyticYear;
 		if (!analyticYear) {
 			yearFilter = new Date().getFullYear().toString();

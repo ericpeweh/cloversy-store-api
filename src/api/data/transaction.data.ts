@@ -201,12 +201,10 @@ export const updateTransaction = async (updateTransactionData: UpdateTransaction
 			);
 		}
 
-		if (shippingTrackingCode) {
-			await client.query(
-				`UPDATE transactions_shipping SET shipping_tracking_code = $1 WHERE transaction_id = $2`,
-				[shippingTrackingCode, transactionId]
-			);
-		}
+		await client.query(
+			`UPDATE transactions_shipping SET shipping_tracking_code = $1 WHERE transaction_id = $2`,
+			[shippingTrackingCode, transactionId]
+		);
 
 		await client.query("COMMIT");
 		return { transactionResult, timelineResult };

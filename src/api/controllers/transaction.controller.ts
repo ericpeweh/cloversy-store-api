@@ -137,7 +137,13 @@ export const getSingleTransaction = async (req: Request, res: Response) => {
 
 export const updateTransaction = async (req: Request, res: Response) => {
 	const { transactionId } = req.params;
-	const { orderNote, customerNote, giftNote, shippingTrackingCode, timelineObj } = req.body;
+	const {
+		orderNote = "",
+		customerNote = "",
+		giftNote = "",
+		shippingTrackingCode = "",
+		timelineObj
+	} = req.body;
 
 	try {
 		if (!transactionId || transactionId.length !== 10)

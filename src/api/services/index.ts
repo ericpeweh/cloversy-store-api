@@ -13,6 +13,7 @@ import * as subscriptionService from "./subscription.service";
 import * as marketingService from "./marketing.service";
 import * as dashboardService from "./dashboard.service";
 import * as analyticsService from "./analytics.service";
+import * as chatService from "./chat.service";
 
 export {
 	productService,
@@ -28,5 +29,6 @@ export {
 	subscriptionService,
 	marketingService,
 	dashboardService,
-	analyticsService
+	analyticsService,
+	chatService
 };

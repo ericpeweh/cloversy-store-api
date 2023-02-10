@@ -12,6 +12,7 @@ import * as transactionService from "./transaction.service";
 import * as reviewService from "./review.service";
 import * as subscriptionService from "./subscription.service";
 import * as contactService from "./contact.service";
+import * as chatService from "./chat.service";
 
 export {
 	productService,
@@ -26,5 +27,6 @@ export {
 	transactionService,
 	reviewService,
 	subscriptionService,
-	contactService
+	contactService,
+	chatService
 };

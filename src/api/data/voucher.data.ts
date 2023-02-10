@@ -82,7 +82,7 @@ export const getSingleVoucher = async (voucherCode: string, analyticYear: string
       (SELECT generate_series(
         date_trunc('year', $1::timestamp), 
         date_trunc('year', $1::timestamp) + '11 months', 
-        '1 month'::interval
+      '1 month'::interval
       )),
     t AS 
       (SELECT id, discount_total, created_at, voucher_code

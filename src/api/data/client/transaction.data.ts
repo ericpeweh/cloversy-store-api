@@ -143,7 +143,7 @@ export const createTransaction = async (
 					description: "Pesanan telah dibuat"
 				},
 				{
-					timeline_date: getLocalTime(),
+					timeline_date: getLocalTime(1000),
 					description: "Menunggu pembayaran"
 				}
 			])

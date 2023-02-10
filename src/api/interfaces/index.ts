@@ -11,3 +11,4 @@ export * from "./contact.interface";
 export * from "./subscription.interface";
 export * from "./notification.interface";
 export * from "./marketing.interface";
+export * from "./chat.interface";

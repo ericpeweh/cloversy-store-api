@@ -11,6 +11,7 @@ import midtransRouter from "./midtrans.route";
 import activityRouter from "./activity.route";
 import subscriptionRouter from "./subscription.route";
 import contactRouter from "./contact.route";
+import chatRouter from "./chat.route";
 
 export default {
 	productRouter,
@@ -24,5 +25,6 @@ export default {
 	midtransRouter,
 	activityRouter,
 	subscriptionRouter,
-	contactRouter
+	contactRouter,
+	chatRouter
 };

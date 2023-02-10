@@ -74,6 +74,12 @@ export const removeNotificationTokens = async (tokens: string[]) => {
 	await notificationRepo.removeNotificationTokens(tokens);
 };
 
+export const getNotificationTokens = async (userIds: string[] | number[]) => {
+	const tokens = await notificationRepo.getNotificationTokens(userIds);
+
+	return tokens;
+};
+
 export const getUserNotificationTokens = async (userIds: string[] | number[]) => {
 	const tokens = await notificationRepo.getUserNotificationTokens(userIds);
 

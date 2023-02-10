@@ -11,6 +11,7 @@ import subscriptionRouter from "./subscription.route";
 import marketingRouter from "./marketing.route";
 import notificationRouter from "./notification.route";
 import dashboardRouter from "./dashboard.route";
+import chatRouter from "./chat.route";
 
 export default {
 	productRouter,
@@ -24,5 +25,6 @@ export default {
 	subscriptionRouter,
 	marketingRouter,
 	notificationRouter,
-	dashboardRouter
+	dashboardRouter,
+	chatRouter
 };

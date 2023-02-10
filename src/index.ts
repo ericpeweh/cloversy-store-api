@@ -1,5 +1,6 @@
 // Dependencies
 import express, { Express } from "express";
+import { createServer } from "http";
 import dotenv from "dotenv";
 import cors from "cors";
 import session from "express-session";
@@ -7,6 +8,8 @@ import sessionStore from "connect-pg-simple";
 
 // Configs
 import db from "./config/connectDB";
+import corsObject from "./config/corsObject";
+import initWebSocket from "./config/webSocket";
 
 // Middlewares
 import {
@@ -36,13 +39,7 @@ const port = process.env.PORT;
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-app.use(
-	cors({
-		origin: ["http://localhost:3000", "http://localhost:3001"],
-		methods: ["GET", "POST", "PUT", "PATCH", "OPTIONS", "HEAD", "DELETE"],
-		credentials: true
-	})
-);
+app.use(cors(corsObject));
 // app.set("trust proxy", 1);
 
 app.use(
@@ -87,6 +84,7 @@ app.use("/data", getUserData, clientRouter.dataRouter);
 app.use("/cart", passAuth, getUserDataOptional, clientRouter.cartRouter);
 app.use("/transactions", getUserData, clientRouter.transactionRouter);
 app.use("/activity", getUserData, clientRouter.activityRouter);
+app.use("/chat", getUserData, clientRouter.chatRouter);
 
 // Admin routes
 app.use(isAuth);
@@ -101,11 +99,17 @@ app.use("/admin/reviews", isAdmin, router.reviewRouter);
 app.use("/admin/subscription", isAdmin, router.subscriptionRouter);
 app.use("/admin/marketing", isAdmin, router.marketingRouter);
 app.use("/admin/notifications", isAdmin, getUserData, router.notificationRouter);
+app.use("/admin/chat", isAdmin, getUserData, router.chatRouter);
 
 // Error handling middleware
 app.use(errorHandler);
 
-app.listen(port, async () => {
+// Webscoket (Socket.io) setup
+const server = createServer(app);
+initWebSocket(server);
+
+// Start server
+server.listen(5000, () => {
 	console.log(`Server is running at http://localhost:${port}`);
 
 	// Init schedule

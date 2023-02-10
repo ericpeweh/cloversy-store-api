@@ -11,6 +11,7 @@ import * as transactionRepo from "./transaction.data";
 import * as reviewRepo from "./review.data";
 import * as subscriptionRepo from "./subscription.data";
 import * as contactRepo from "./contact.data";
+import * as chatRepo from "./chat.data";
 
 export {
 	productRepo,
@@ -24,5 +25,6 @@ export {
 	transactionRepo,
 	reviewRepo,
 	subscriptionRepo,
-	contactRepo
+	contactRepo,
+	chatRepo
 };

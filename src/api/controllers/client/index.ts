@@ -13,6 +13,7 @@ import * as midtransController from "./midtrans.controller";
 import * as activityController from "./activity.controller";
 import * as subscriptionController from "./subscription.controller";
 import * as contactController from "./contact.controller";
+import * as chatController from "./chat.controller";
 
 export {
 	productController,
@@ -28,5 +29,6 @@ export {
 	midtransController,
 	activityController,
 	subscriptionController,
-	contactController
+	contactController,
+	chatController
 };

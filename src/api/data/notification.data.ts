@@ -84,8 +84,24 @@ export const getSingleNotificationMarketing = async (notifMarketingId: number | 
 	return notificationResult.rows[0];
 };
 
+export const getNotificationTokens = async (userIds: string[] | number[]) => {
+	const notificationQuery = `SELECT 
+    COALESCE(array_agg("token"), '{}') 
+    AS tokens
+    FROM notification_subscription ns
+    JOIN users u ON ns.user_id = u.id
+  WHERE user_id = ANY ($1)`;
+
+	const notificationResult: QueryResult<{ tokens: string[] }> = await db.query(notificationQuery, [
+		userIds
+	]);
+
+	return notificationResult.rows[0].tokens;
+};
+
 export const getUserNotificationTokens = async (userIds: string[] | number[]) => {
-	const notificationQuery = `SELECT array_agg("token") 
+	const notificationQuery = `SELECT 
+    COALESCE(array_agg("token"), '{}') 
     AS tokens
     FROM notification_subscription ns
     JOIN users u ON ns.user_id = u.id
@@ -99,7 +115,8 @@ export const getUserNotificationTokens = async (userIds: string[] | number[]) =>
 };
 
 export const getAdminNotificationTokens = async () => {
-	const notificationQuery = `SELECT array_agg("token")
+	const notificationQuery = `SELECT 
+    COALESCE(array_agg("token"), '{}')
     AS tokens
     FROM notification_subscription ns
     JOIN users u ON ns.user_id = u.id
@@ -111,7 +128,8 @@ export const getAdminNotificationTokens = async () => {
 };
 
 export const getAllUserNotificationTokens = async () => {
-	const notificationQuery = `SELECT array_agg("token")
+	const notificationQuery = `SELECT 
+    COALESCE(array_agg("token"), '{}')
     AS tokens
     FROM notification_subscription ns
     JOIN users u ON ns.user_id = u.id

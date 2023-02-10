@@ -11,6 +11,7 @@ import * as subscriptionController from "./subscription.controller";
 import * as marketingController from "./marketing.controller";
 import * as notificationController from "./notification.controller";
 import * as dashboardController from "./dashboard.controller";
+import * as chatController from "./chat.controller";
 
 export {
 	productController,
@@ -24,5 +25,6 @@ export {
 	subscriptionController,
 	marketingController,
 	notificationController,
-	dashboardController
+	dashboardController,
+	chatController
 };

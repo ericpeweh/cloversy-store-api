@@ -93,7 +93,7 @@ const initWebSocket = (server: HTTPServer) => {
 			);
 
 			notificationService.sendNotifications(
-				{ title: "Pesan baru telah masuk", body: message, imageUrl: user.profile_picture || "" },
+				{ title: "Pesan baru telah masuk", body: `${user.full_name}: ${message}` },
 				notificationTokens
 			);
 		});

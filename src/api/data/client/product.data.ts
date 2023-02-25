@@ -41,7 +41,11 @@ export const getAllProducts = async (
 		(SELECT COUNT(r.id) AS review_count
 			FROM review r
 			WHERE r.product_id = p.id AND r.status = 'active'
-		)
+		),
+    (SELECT COALESCE(SUM(ti.quantity), 0) AS popularity
+      FROM transactions_item ti
+      WHERE ti.product_id = p.id
+    )
     FROM product p JOIN brand b
     ON p.brand_id = b.id
     WHERE p.status = 'active'`;

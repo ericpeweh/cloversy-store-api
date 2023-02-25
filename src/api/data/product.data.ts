@@ -28,6 +28,10 @@ export const getAllProducts = async (
     (SELECT ROUND(AVG(rating) / 2, 2) AS rating
       FROM review r
       WHERE r.product_id = p.id AND r.status = 'active'
+    ),
+    (SELECT COALESCE(SUM(ti.quantity), 0) AS popularity
+      FROM transactions_item ti
+      WHERE ti.product_id = p.id
     )
     FROM product p JOIN brand b
     ON p.brand_id = b.id`;

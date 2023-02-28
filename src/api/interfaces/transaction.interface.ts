@@ -63,7 +63,7 @@ export interface ChargeBaseResponse {
 	order_id: string;
 	gross_amount: string;
 	transaction_time: string;
-	expire_time: string;
+	expiry_time: string;
 }
 
 export interface BankTransferChargeResponse extends ChargeBaseResponse {
@@ -202,7 +202,7 @@ export interface TransactionShipping {
 export interface ClientPaymentDetailsItem {
 	payment_method: PaymentMethod;
 	payment_status: PaymentStatus;
-	expire_time: string;
+	expiry_time: string;
 	bill_key?: string;
 	biller_code?: string;
 	va_number?: string;

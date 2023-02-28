@@ -178,7 +178,7 @@ export const getSingleTransaction = async (userId: string, transactionId: string
 		paymentResult = {
 			payment_method: payment.payment_method,
 			payment_status: payment.payment_status,
-			expire_time: paymentObj.expire_time,
+			expiry_time: paymentObj.expiry_time,
 			actions: paymentObj.actions
 		};
 	} else if (payment.payment_method === "mandiri") {
@@ -187,7 +187,7 @@ export const getSingleTransaction = async (userId: string, transactionId: string
 		paymentResult = {
 			payment_method: payment.payment_method,
 			payment_status: payment.payment_status,
-			expire_time: paymentObj.expire_time,
+			expiry_time: paymentObj.expiry_time,
 			bill_key: paymentObj.bill_key,
 			biller_code: paymentObj.biller_code
 		};
@@ -199,7 +199,7 @@ export const getSingleTransaction = async (userId: string, transactionId: string
 		paymentResult = {
 			payment_method: payment.payment_method,
 			payment_status: payment.payment_status,
-			expire_time: paymentObj.expire_time,
+			expiry_time: paymentObj.expiry_time,
 			va_number: isPermataBank ? paymentObj.permata_va_number : paymentObj.va_numbers[0].va_number
 		};
 	}

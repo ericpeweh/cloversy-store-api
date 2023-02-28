@@ -54,7 +54,7 @@ export const getSingleTransaction = async (transactionId: string) => {
 		paymentResult = {
 			payment_method: payment.payment_method,
 			payment_status: payment.payment_status,
-			expire_time: paymentObj.expire_time,
+			expiry_time: paymentObj.expiry_time,
 			payment_status_modified: payment.payment_status_modified,
 			actions: paymentObj?.actions
 		};
@@ -64,7 +64,7 @@ export const getSingleTransaction = async (transactionId: string) => {
 		paymentResult = {
 			payment_method: payment.payment_method,
 			payment_status: payment.payment_status,
-			expire_time: paymentObj.expire_time,
+			expiry_time: paymentObj.expiry_time,
 			payment_status_modified: payment.payment_status_modified,
 			bill_key: paymentObj?.bill_key,
 			biller_code: paymentObj?.biller_code
@@ -77,7 +77,7 @@ export const getSingleTransaction = async (transactionId: string) => {
 		paymentResult = {
 			payment_method: payment.payment_method,
 			payment_status: payment.payment_status,
-			expire_time: paymentObj.expire_time,
+			expiry_time: paymentObj.expiry_time,
 			payment_status_modified: payment.payment_status_modified,
 			va_number:
 				payment.payment_status === "cancel"

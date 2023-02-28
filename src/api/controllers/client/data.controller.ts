@@ -96,7 +96,10 @@ export const getShippingCostBySubdistrict = async (req: Request, res: Response) 
 		res.status(200).json({
 			status: "success",
 			data: {
-				costs: result
+				costs: result,
+				query: {
+					addressId: +addressId
+				}
 			}
 		});
 	} catch (error: any) {

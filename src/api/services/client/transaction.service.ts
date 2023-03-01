@@ -94,13 +94,12 @@ export const chargeTransaction = async (
 					bill_info2: `Cloversy.id No #${orderId})`
 				}
 			}),
-			// FOR MOBILE APP
-			// ...(paymentType === "gopay" && {
-			// 	gopay: {
-			//     enable_callback: true,
-			//     callback_url: "someapps://callback"
-			//   }
-			// }),
+			...(paymentType === "gopay" && {
+				gopay: {
+					enable_callback: true,
+					callback_url: `id.cloversyid.cloversystoremobile://orders/payment`
+				}
+			}),
 			item_details: [
 				...userCartItems.map(cartItem => ({
 					id: `${+cartItem.product_id} ${cartItem.size}`,

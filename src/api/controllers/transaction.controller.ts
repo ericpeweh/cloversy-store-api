@@ -226,7 +226,8 @@ export const changeTransactionStatus = async (req: Request, res: Response) => {
 					title: "Pesanan telah dibatalkan oleh admin",
 					body: `Pesanan #${transaction.id} telah dibatalkan oleh admin, hubungi untuk informasi lebih lanjut.`,
 					actionTitle: "Hubungi admin",
-					actionLink: "http://localhost:3000/account/chat"
+					actionLink: "http://localhost:3000/account/chat",
+					deeplinkUrl: "account/livechat"
 				};
 
 				await notificationService.sendNotifications(message, userTokens, {
@@ -239,7 +240,8 @@ export const changeTransactionStatus = async (req: Request, res: Response) => {
 					title: "Pesanan telah dikirim",
 					body: `Pesanan #${transaction.id} telah dikirim, nomor resi pengiriman (tracking) akan segera tersedia.`,
 					actionTitle: "Detail transaksi",
-					actionLink: `http://localhost:3000/account/orders/${transaction.id}`
+					actionLink: `http://localhost:3000/account/orders/${transaction.id}`,
+					deeplinkUrl: `orders/${transaction.id}/details`
 				};
 
 				await notificationService.sendNotifications(message, userTokens, {
@@ -252,7 +254,8 @@ export const changeTransactionStatus = async (req: Request, res: Response) => {
 					title: "Pesanan telah selesai",
 					body: `Pesanan #${transaction.id} telah selesai, yuk beri ulasan :)`,
 					actionTitle: "Beri ulasan",
-					actionLink: `http://localhost:3000/account/orders/${transaction.id}/review`
+					actionLink: `http://localhost:3000/account/orders/${transaction.id}/review`,
+					deeplinkUrl: `orders/${transaction.id}/review`
 				};
 
 				await notificationService.sendNotifications(message, userTokens, {

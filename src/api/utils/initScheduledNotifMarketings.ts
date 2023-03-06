@@ -18,6 +18,7 @@ const initScheduledNotifMarketings = async () => {
 			message_title,
 			message_body,
 			image_url,
+			deeplink_url,
 			action_link,
 			action_title
 		} = notifMarketing;
@@ -42,6 +43,7 @@ const initScheduledNotifMarketings = async () => {
 			body: message_body
 		};
 		if (image_url) notificationMessage.imageUrl = image_url;
+		if (deeplink_url) notificationMessage.deeplinkUrl = deeplink_url;
 		if (action_link) notificationMessage.actionLink = action_link;
 		if (action_title) notificationMessage.actionTitle = action_title;
 

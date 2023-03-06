@@ -4,6 +4,7 @@ export interface NotificationMessage {
 	actionTitle?: string;
 	actionLink?: string;
 	imageUrl?: string;
+	deeplinkUrl?: string;
 }
 
 export interface SendNotificationResult {

@@ -190,7 +190,8 @@ export const createTransaction = async (req: Request, res: Response) => {
 				title: "Berhasil membuat pesanan",
 				body: `Pesanan #${newTranactionId} telah dibuat, menunggu pembayaran.`,
 				actionTitle: "Bayar sekarang",
-				actionLink: `http://localhost:3000/account/orders/${newTranactionId}/payment`
+				actionLink: `http://localhost:3000/account/orders/${newTranactionId}/payment`,
+				deeplinkUrl: `orders/payment?transactionId=${newTranactionId}`
 			};
 
 			await notificationService.sendNotifications(message, userTokens, {
@@ -285,7 +286,8 @@ export const cancelTransaction = async (req: Request, res: Response) => {
 				title: "Pesanan telah dibatalkan",
 				body: `Pesanan #${transaction.id} telah anda dibatalkan.`,
 				actionTitle: "Detail transaksi",
-				actionLink: `http://localhost:3000/account/orders/${transaction.id}`
+				actionLink: `http://localhost:3000/account/orders/${transaction.id}`,
+				deeplinkUrl: `orders/${transaction.id}/details`
 			};
 
 			await notificationService.sendNotifications(message, userTokens, {

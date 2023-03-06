@@ -34,6 +34,7 @@ export const createNotificationMarketing = async (
 		message_title,
 		message_body,
 		image_url,
+		deeplink_url,
 		action_link,
 		action_title,
 		send_to
@@ -45,9 +46,9 @@ export const createNotificationMarketing = async (
 		// Create notification marketing record
 		const notifMarketingQuery = `INSERT INTO notification_marketing (
       notification_code, title, sent_at, scheduled, description,
-      message_title, message_body, image_url, action_link, action_title,
+      message_title, message_body, image_url, deeplink_url, action_link, action_title,
       success_count, failure_count, send_to
-    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING *
+    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14) RETURNING *
 `;
 
 		const notifMarketingParams = [
@@ -59,6 +60,7 @@ export const createNotificationMarketing = async (
 			message_title,
 			message_body,
 			image_url,
+			deeplink_url,
 			action_link,
 			action_title,
 			notificationResult?.successCount,

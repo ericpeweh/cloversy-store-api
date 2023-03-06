@@ -43,12 +43,21 @@ export const sendNotifications = async (
 	// FCM support multicast to max 500 targets
 	for (let i = 0; i < target.length; i += 500) {
 		const selectedTargets = target.slice(i, i + 500);
-		const test: MulticastMessage = {
-			data: message as unknown as { [key: string]: string },
+		const messages: MulticastMessage = {
+			webpush: {
+				data: message as unknown as { [key: string]: string }
+			},
+			android: {
+				data: {
+					title: message.title,
+					message: message.body,
+					body: message?.deeplinkUrl ? JSON.stringify({ deeplinkUrl: message.deeplinkUrl }) : ""
+				}
+			},
 			tokens: selectedTargets
 		};
 
-		const res = await fcm.sendMulticast(test);
+		const res = await fcm.sendMulticast(messages);
 
 		successCount += res.successCount;
 		failureCount += res.failureCount;

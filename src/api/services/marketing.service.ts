@@ -127,6 +127,7 @@ export const scheduleNotifMarketingNotification = async (
 		message_body,
 		scheduled,
 		image_url,
+		deeplink_url,
 		action_link,
 		action_title,
 		notification_code,
@@ -140,6 +141,7 @@ export const scheduleNotifMarketingNotification = async (
 			body: message_body
 		};
 		if (image_url) notificationMessage.imageUrl = image_url;
+		if (deeplink_url) notificationMessage.deeplinkUrl = deeplink_url;
 		if (action_link) notificationMessage.actionLink = action_link;
 		if (action_title) notificationMessage.actionTitle = action_title;
 

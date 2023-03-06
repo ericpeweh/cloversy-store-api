@@ -105,7 +105,8 @@ export const handleNotifications = async (req: Request, res: Response) => {
 						title: "Pesanan dibatalkan otomatis",
 						body: `Pesanan #${order_id} telah dibatalkan otomatis oleh sistem dikarenakan pembayaran telah kadaluarsa.`,
 						actionTitle: "Detail transaksi",
-						actionLink: `http://localhost:3000/account/orders/${order_id}`
+						actionLink: `http://localhost:3000/account/orders/${order_id}`,
+						deeplinkUrl: `orders/${transaction.id}/details`
 					};
 
 					await notificationService.sendNotifications(message, userTokens, {
@@ -147,7 +148,8 @@ export const handleNotifications = async (req: Request, res: Response) => {
 					title: `Info transaksi #${order_id}`,
 					body: `Pembayaran transaksi berhasil diterima, pesanan akan segera diproses.`,
 					actionTitle: "Detail transaksi",
-					actionLink: `http://localhost:3000/account/orders/${order_id}`
+					actionLink: `http://localhost:3000/account/orders/${order_id}`,
+					deeplinkUrl: `orders/${transaction.id}/details`
 				};
 
 				await notificationService.sendNotifications(message, userTokens, {

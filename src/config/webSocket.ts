@@ -93,7 +93,11 @@ const initWebSocket = (server: HTTPServer) => {
 			);
 
 			notificationService.sendNotifications(
-				{ title: "Pesan baru telah masuk", body: `${user.full_name}: ${message}` },
+				{
+					title: "Pesan baru telah masuk",
+					body: `${user.full_name}: ${message}`,
+					deeplinkUrl: `account/livechat`
+				},
 				notificationTokens
 			);
 		});

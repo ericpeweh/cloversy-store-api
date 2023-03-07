@@ -381,3 +381,16 @@ export const scheduleEmailMarketing = async (
 		}
 	}
 };
+
+export const getSelectedBirthdayUsers = async () => {
+	const users = await marketingRepo.getSelectedBirthdayUsers();
+
+	return users.rows.map(user => user.id);
+};
+
+export const createOffers = async (
+	offerData: { offerName: string },
+	selectedUserIds: string[] | number[]
+) => {
+	await marketingRepo.createOffers(offerData, selectedUserIds);
+};

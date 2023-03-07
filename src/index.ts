@@ -23,6 +23,7 @@ import {
 
 // Utils
 import {
+	initBirthdayAutoOfferMarketing,
 	initNotificationSubscriptionsCleanup,
 	initScheduledNotifMarketings,
 	initScheduledEmailMarketings
@@ -100,6 +101,8 @@ app.use("/admin/subscription", isAdmin, router.subscriptionRouter);
 app.use("/admin/marketing", isAdmin, router.marketingRouter);
 app.use("/admin/notifications", isAdmin, getUserData, router.notificationRouter);
 app.use("/admin/chat", isAdmin, getUserData, router.chatRouter);
+app.use("/admin/account", isAdmin, getUserData, router.accountRouter);
+app.use("/admin/auth", isAuth, isAdmin, getUserData, router.authRouter);
 
 // Error handling middleware
 app.use(errorHandler);
@@ -113,6 +116,7 @@ server.listen(5000, () => {
 	console.log(`Server is running at http://localhost:${port}`);
 
 	// Init schedule
+	initBirthdayAutoOfferMarketing();
 	initNotificationSubscriptionsCleanup();
 	initScheduledNotifMarketings();
 	initScheduledEmailMarketings();

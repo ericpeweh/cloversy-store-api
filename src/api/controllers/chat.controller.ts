@@ -31,8 +31,6 @@ export const getConversation = async (req: Request, res: Response) => {
 			data: { conversation: { ...conversation, messages } }
 		});
 	} catch (error: any) {
-		console.log(error);
-
 		res.status(400).json({
 			status: "error",
 			message: error.message
@@ -62,8 +60,6 @@ export const getConversationList = async (req: Request, res: Response) => {
 			data: { conversations }
 		});
 	} catch (error: any) {
-		console.log(error);
-
 		res.status(400).json({
 			status: "error",
 			message: error.message

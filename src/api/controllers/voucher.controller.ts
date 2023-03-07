@@ -90,6 +90,7 @@ export const createVoucher = async (req: Request, res: Response) => {
 			title,
 			expiry_date = null,
 			status,
+			usage_limit = 10,
 			discount,
 			discount_type,
 			voucher_scope,
@@ -104,6 +105,7 @@ export const createVoucher = async (req: Request, res: Response) => {
 			discount,
 			discount_type,
 			status,
+			usage_limit,
 			voucher_scope,
 			description
 		];
@@ -129,6 +131,7 @@ export const updateVoucher = async (req: Request, res: Response) => {
 		const {
 			title,
 			status,
+			usage_limit,
 			expiry_date,
 			discount,
 			discount_type,
@@ -144,6 +147,7 @@ export const updateVoucher = async (req: Request, res: Response) => {
 			discount,
 			discount_type,
 			status,
+			usage_limit,
 			voucher_scope,
 			description
 		];

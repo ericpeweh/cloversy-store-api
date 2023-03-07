@@ -126,11 +126,12 @@ export const createVoucher = async (
       discount,
       discount_type,
       status,
+      usage_limit,
       voucher_scope,
       description
-    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *`;
+    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *`;
 
-		const voucherResult = await client.query(voucherQuery, voucherData);
+		const voucherResult: QueryResult<Voucher> = await client.query(voucherQuery, voucherData);
 		const newVoucherCode = voucherResult.rows[0].code;
 
 		if (selectedUserIds.length > 0) {
@@ -171,9 +172,10 @@ export const updateVoucher = async (
       discount = $3,
       discount_type = $4,
       status = $5,
-      voucher_scope = $6,
-      description = $7
-      WHERE code = $8 RETURNING *`;
+      usage_limit = $6,
+      voucher_scope = $7,
+      description = $8
+      WHERE code = $9 RETURNING *`;
 
 		const voucherResult = await client.query(voucherQuery, [...updatedVoucherData, code]);
 		const isVoucherGlobalScoped = voucherResult.rows[0].voucher_scope === "global";

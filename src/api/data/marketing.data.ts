@@ -547,3 +547,76 @@ export const getEmailMarketingTargetUserIds = async (emailMarketingId: string | 
 
 	return emailMarketingResult.rows[0].user_ids;
 };
+
+export const getSelectedBirthdayUsers = async () => {
+	const minTransactionTotal = 1000000;
+	const selectedUsersLimit = 100;
+
+	/* 
+    Select all users with req of:
+    - Have transaction_total >= Rp.1.000.000,-
+    - Must be 'user' (not 'admin')
+    - Active user (not banned)
+    - Account is more older or equal to 90 days
+    - Exact birth_date as today date
+    - No duplicate offer in the same year (offers table)
+  */
+	const usersQuery = `SELECT id
+    FROM users u
+    JOIN (
+      SELECT user_id, SUM(total) AS transaction_total
+      FROM transactions t
+      GROUP BY t.user_id
+      HAVING SUM(total) >= $1
+    ) t
+      ON u.id = t.user_id
+    WHERE NOT EXISTS (
+      SELECT 1
+      FROM offers o
+      WHERE o.user_id = u.id
+        AND o.offer_name = 'birthday_offer'
+        AND DATE_PART('year', o.created_at) = DATE_PART('year', CURRENT_DATE)
+    )
+      AND u.created_at <= NOW() - INTERVAL '90 days'
+      AND u.user_role = 'user'
+      AND u.banned_date IS NULL
+      AND DATE_PART('month', u.birth_date) = DATE_PART('month', CURRENT_DATE)
+      AND DATE_PART('day', u.birth_date) = DATE_PART('day', CURRENT_DATE)
+    ORDER BY t.transaction_total DESC
+    LIMIT $2;
+  `;
+
+	const usersResult: QueryResult<{ id: number }> = await db.query(usersQuery, [
+		minTransactionTotal,
+		selectedUsersLimit
+	]);
+
+	return usersResult;
+};
+
+export const createOffers = async (
+	{ offerName }: { offerName: string },
+	selectedUserIds: string[] | number[]
+) => {
+	const client = await db.pool.connect();
+
+	try {
+		await client.query("BEGIN");
+
+		const offersQuery = `INSERT INTO offers(
+    user_id,
+    offer_name
+  ) VALUES ($1, $2) RETURNING *`;
+
+		selectedUserIds.forEach(userId => {
+			client.query(offersQuery, [userId, offerName]);
+		});
+
+		await client.query("COMMIT");
+	} catch (error) {
+		await client.query("ROLLBACK");
+		throw error;
+	} finally {
+		client.release();
+	}
+};

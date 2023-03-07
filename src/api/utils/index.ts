@@ -8,3 +8,4 @@ export { default as initScheduledNotifMarketings } from "./initScheduledNotifMar
 export { default as initNotificationSubscriptionsCleanup } from "./initNotificationSubscriptionsCleanup";
 export { default as getEmailTemplateParams } from "./getEmailTemplateParams";
 export { default as initScheduledEmailMarketings } from "./initScheduledEmailMarketings";
+export { default as initBirthdayAutoOfferMarketing } from "./initBirthdayAutoOfferMarketing";

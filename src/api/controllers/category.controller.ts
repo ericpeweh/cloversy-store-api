@@ -1,5 +1,5 @@
 // Dependencies
-import { Request, Response } from "express";
+import { Request, Response, NextFunction } from "express";
 
 // Services
 import { categoryService } from "../services";
@@ -7,9 +7,7 @@ import { categoryService } from "../services";
 // Utils
 import { ErrorObj } from "../utils";
 
-// Types
-
-export const getAllCategories = async (req: Request, res: Response) => {
+export const getAllCategories = async (req: Request, res: Response, next: NextFunction) => {
 	const { page = "", q = "", sortBy = "id" } = req.query;
 
 	try {
@@ -34,15 +32,12 @@ export const getAllCategories = async (req: Request, res: Response) => {
 			...paginationData,
 			data: { categories: categories.rows }
 		});
-	} catch (error: any) {
-		res.status(400).json({
-			status: "error",
-			message: error.message
-		});
+	} catch (error: unknown) {
+		return next(error);
 	}
 };
 
-export const createCategory = async (req: Request, res: Response) => {
+export const createCategory = async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		const { name, description, identifier } = req.body;
 
@@ -54,15 +49,12 @@ export const createCategory = async (req: Request, res: Response) => {
 			status: "success",
 			data: { newCategory: result.rows[0] }
 		});
-	} catch (error: any) {
-		res.status(400).json({
-			status: "error",
-			message: error.message
-		});
+	} catch (error: unknown) {
+		return next(error);
 	}
 };
 
-export const updateCategory = async (req: Request, res: Response) => {
+export const updateCategory = async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		const { categoryId } = req.params;
 		const { name, description, identifier } = req.body;
@@ -75,15 +67,12 @@ export const updateCategory = async (req: Request, res: Response) => {
 			status: "success",
 			data: { updatedCategory: result.rows[0] }
 		});
-	} catch (error: any) {
-		res.status(400).json({
-			status: "error",
-			message: error.message
-		});
+	} catch (error: unknown) {
+		return next(error);
 	}
 };
 
-export const deleteCategory = async (req: Request, res: Response) => {
+export const deleteCategory = async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		const { categoryId } = req.params;
 
@@ -93,10 +82,7 @@ export const deleteCategory = async (req: Request, res: Response) => {
 			status: "success",
 			data: { deletedCategory: result.rows[0] }
 		});
-	} catch (error: any) {
-		res.status(400).json({
-			status: "error",
-			message: error.message
-		});
+	} catch (error: unknown) {
+		return next(error);
 	}
 };

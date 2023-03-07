@@ -1,10 +1,10 @@
 // Dependencies
-import { Request, Response } from "express";
+import { Request, Response, NextFunction } from "express";
 
 // Services
 import { categoryService } from "../../services/client";
 
-export const getAllCategories = async (req: Request, res: Response) => {
+export const getAllCategories = async (_: Request, res: Response, next: NextFunction) => {
 	try {
 		const { categories } = await categoryService.getAllCategories();
 
@@ -12,10 +12,7 @@ export const getAllCategories = async (req: Request, res: Response) => {
 			status: "success",
 			data: { categories: categories.rows }
 		});
-	} catch (error: any) {
-		res.status(400).json({
-			status: "error",
-			message: error.message
-		});
+	} catch (error: unknown) {
+		return next(error);
 	}
 };

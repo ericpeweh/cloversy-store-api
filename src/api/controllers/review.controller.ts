@@ -1,5 +1,5 @@
 // Dependencies
-import { Request, Response } from "express";
+import { Request, Response, NextFunction } from "express";
 
 // Services
 import { reviewService } from "../services";
@@ -7,7 +7,7 @@ import { reviewService } from "../services";
 // Utils
 import { ErrorObj } from "../utils";
 
-export const getSingleReview = async (req: Request, res: Response) => {
+export const getSingleReview = async (req: Request, res: Response, next: NextFunction) => {
 	const { reviewId } = req.params;
 
 	try {
@@ -19,15 +19,12 @@ export const getSingleReview = async (req: Request, res: Response) => {
 			status: "success",
 			data: { review }
 		});
-	} catch (error: any) {
-		res.status(400).json({
-			status: "error",
-			message: error.message
-		});
+	} catch (error: unknown) {
+		return next(error);
 	}
 };
 
-export const getAllReviews = async (req: Request, res: Response) => {
+export const getAllReviews = async (req: Request, res: Response, next: NextFunction) => {
 	const {
 		q: searchQuery = "",
 		status: reviewStatus = "",
@@ -72,15 +69,12 @@ export const getAllReviews = async (req: Request, res: Response) => {
 			status: "success",
 			data: result
 		});
-	} catch (error: any) {
-		res.status(400).json({
-			status: "error",
-			message: error.message
-		});
+	} catch (error: unknown) {
+		return next(error);
 	}
 };
 
-export const updateReview = async (req: Request, res: Response) => {
+export const updateReview = async (req: Request, res: Response, next: NextFunction) => {
 	const { reviewId } = req.params;
 	const { rating, review, created_at, status } = req.body;
 
@@ -115,10 +109,7 @@ export const updateReview = async (req: Request, res: Response) => {
 			status: "success",
 			data: { updatedReview }
 		});
-	} catch (error: any) {
-		res.status(400).json({
-			status: "error",
-			message: error.message
-		});
+	} catch (error: unknown) {
+		return next(error);
 	}
 };

@@ -1,5 +1,5 @@
 // Dependencies
-import { Request, Response } from "express";
+import { Request, Response, NextFunction } from "express";
 import dotenv from "dotenv";
 import { sha512 } from "js-sha512";
 
@@ -15,7 +15,7 @@ import { Voucher, NotificationMessage } from "../../interfaces";
 import { transactionService, voucherService } from "../../services/client";
 import { notificationService, userService } from "../../services";
 
-export const handleNotifications = async (req: Request, res: Response) => {
+export const handleNotifications = async (req: Request, res: Response, next: NextFunction) => {
 	const { order_id, status_code, gross_amount, transaction_status, fraud_status, signature_key } =
 		req.body;
 
@@ -185,9 +185,6 @@ export const handleNotifications = async (req: Request, res: Response) => {
 			status: "success"
 		});
 	} catch (error: any) {
-		res.status(400).json({
-			status: "error",
-			message: error.message
-		});
+		return next(error);
 	}
 };

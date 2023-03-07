@@ -1,5 +1,5 @@
 // Dependencies
-import { Request, Response } from "express";
+import { Request, Response, NextFunction } from "express";
 
 // Services
 import { userService } from "../services";
@@ -7,9 +7,7 @@ import { userService } from "../services";
 // Utils
 import { ErrorObj } from "../utils";
 
-// Types
-
-export const getAllCustomers = async (req: Request, res: Response) => {
+export const getAllCustomers = async (req: Request, res: Response, next: NextFunction) => {
 	const { page = "1", q: searchQuery = "", status: statusQuery = "" } = req.query;
 
 	try {
@@ -34,15 +32,12 @@ export const getAllCustomers = async (req: Request, res: Response) => {
 			...paginationData,
 			data: { customers: customers.rows }
 		});
-	} catch (error: any) {
-		res.status(error.statusCode || 500).json({
-			status: "error",
-			message: error.message
-		});
+	} catch (error: unknown) {
+		return next(error);
 	}
 };
 
-export const getSingleCustomer = async (req: Request, res: Response) => {
+export const getSingleCustomer = async (req: Request, res: Response, next: NextFunction) => {
 	const { userId } = req.params;
 
 	try {
@@ -60,15 +55,12 @@ export const getSingleCustomer = async (req: Request, res: Response) => {
 			status: "success",
 			data: { customer: result }
 		});
-	} catch (error: any) {
-		res.status(error.statusCode || 500).json({
-			status: "error",
-			message: error.message
-		});
+	} catch (error: unknown) {
+		return next(error);
 	}
 };
 
-export const getSingleCustomerOrders = async (req: Request, res: Response) => {
+export const getSingleCustomerOrders = async (req: Request, res: Response, next: NextFunction) => {
 	const { userId } = req.params;
 
 	try {
@@ -86,15 +78,12 @@ export const getSingleCustomerOrders = async (req: Request, res: Response) => {
 			status: "success",
 			data: { customer: result }
 		});
-	} catch (error: any) {
-		res.status(error.statusCode || 500).json({
-			status: "error",
-			message: error.message
-		});
+	} catch (error: unknown) {
+		return next(error);
 	}
 };
 
-export const updateUserData = async (req: Request, res: Response) => {
+export const updateUserData = async (req: Request, res: Response, next: NextFunction) => {
 	const { userId } = req.params;
 	const { full_name, contact, profile_picture, user_status, credits, prev_status } = req.body;
 
@@ -113,10 +102,7 @@ export const updateUserData = async (req: Request, res: Response) => {
 			status: "success",
 			data: { updatedCustomer: result }
 		});
-	} catch (error: any) {
-		res.status(400).json({
-			status: "error",
-			message: error.message
-		});
+	} catch (error: unknown) {
+		return next(error);
 	}
 };

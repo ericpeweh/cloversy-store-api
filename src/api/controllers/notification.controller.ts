@@ -1,16 +1,16 @@
 // Dependencies
-import { Request, Response } from "express";
+import { Request, Response, NextFunction } from "express";
+
+// Types
 import { NotificationTypeFilter } from "../interfaces";
 
 // Services
-import { brandService, notificationService } from "../services";
+import { notificationService } from "../services";
 
 // Utils
 import { ErrorObj } from "../utils";
 
-// Types
-
-export const getAllNotifications = async (req: Request, res: Response) => {
+export const getAllNotifications = async (req: Request, res: Response, next: NextFunction) => {
 	const userId = req.user?.id;
 	const { page = "", type = "", limit: itemsLimit = "10" } = req.query;
 
@@ -38,15 +38,12 @@ export const getAllNotifications = async (req: Request, res: Response) => {
 			...paginationData,
 			data: { notifications, notRead }
 		});
-	} catch (error: any) {
-		res.status(400).json({
-			status: "error",
-			message: error.message
-		});
+	} catch (error: unknown) {
+		return next(error);
 	}
 };
 
-export const readNotification = async (req: Request, res: Response) => {
+export const readNotification = async (req: Request, res: Response, next: NextFunction) => {
 	const userId = req.user?.id;
 	const { notificationId } = req.params;
 
@@ -66,10 +63,7 @@ export const readNotification = async (req: Request, res: Response) => {
 			status: "success",
 			data: { notRead, readNotificationId }
 		});
-	} catch (error: any) {
-		res.status(400).json({
-			status: "error",
-			message: error.message
-		});
+	} catch (error: unknown) {
+		return next(error);
 	}
 };

@@ -1,5 +1,5 @@
 // Dependencies
-import { Request, Response } from "express";
+import { Request, Response, NextFunction } from "express";
 
 // Services
 import { brandService } from "../services";
@@ -7,9 +7,7 @@ import { brandService } from "../services";
 // Utils
 import { ErrorObj } from "../utils";
 
-// Types
-
-export const getAllBrands = async (req: Request, res: Response) => {
+export const getAllBrands = async (req: Request, res: Response, next: NextFunction) => {
 	const { page = "", q = "", sortBy = "id" } = req.query;
 
 	try {
@@ -30,15 +28,12 @@ export const getAllBrands = async (req: Request, res: Response) => {
 			...paginationData,
 			data: { brands: brands.rows }
 		});
-	} catch (error: any) {
-		res.status(400).json({
-			status: "error",
-			message: error.message
-		});
+	} catch (error: unknown) {
+		return next(error);
 	}
 };
 
-export const createBrand = async (req: Request, res: Response) => {
+export const createBrand = async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		const { name, identifier } = req.body;
 
@@ -50,15 +45,12 @@ export const createBrand = async (req: Request, res: Response) => {
 			status: "success",
 			data: { newBrand: result.rows[0] }
 		});
-	} catch (error: any) {
-		res.status(400).json({
-			status: "error",
-			message: error.message
-		});
+	} catch (error: unknown) {
+		return next(error);
 	}
 };
 
-export const updateBrand = async (req: Request, res: Response) => {
+export const updateBrand = async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		const { brandId } = req.params;
 		const { name, identifier } = req.body;
@@ -71,15 +63,12 @@ export const updateBrand = async (req: Request, res: Response) => {
 			status: "success",
 			data: { updatedBrand: result.rows[0] }
 		});
-	} catch (error: any) {
-		res.status(400).json({
-			status: "error",
-			message: error.message
-		});
+	} catch (error: unknown) {
+		return next(error);
 	}
 };
 
-export const deleteBrand = async (req: Request, res: Response) => {
+export const deleteBrand = async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		const { brandId } = req.params;
 
@@ -89,10 +78,7 @@ export const deleteBrand = async (req: Request, res: Response) => {
 			status: "success",
 			data: { deletedBrand: result.rows[0] }
 		});
-	} catch (error: any) {
-		res.status(400).json({
-			status: "error",
-			message: error.message
-		});
+	} catch (error: unknown) {
+		return next(error);
 	}
 };

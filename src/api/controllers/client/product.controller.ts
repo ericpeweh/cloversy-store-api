@@ -1,5 +1,5 @@
 // Dependencies
-import { Request, Response } from "express";
+import { Request, Response, NextFunction } from "express";
 
 // Services
 import { productService } from "../../services/client";
@@ -9,7 +9,7 @@ import { ErrorObj } from "../../utils";
 
 // Types
 
-export const getAllProducts = async (req: Request, res: Response) => {
+export const getAllProducts = async (req: Request, res: Response, next: NextFunction) => {
 	const {
 		brand: brandFilter = "",
 		sortBy = "id",
@@ -55,15 +55,12 @@ export const getAllProducts = async (req: Request, res: Response) => {
 			...paginationData,
 			data: { products: productsData.rows, priceRange: [minPrice, maxPrice] }
 		});
-	} catch (error: any) {
-		res.status(400).json({
-			status: "error",
-			message: error.message
-		});
+	} catch (error: unknown) {
+		return next(error);
 	}
 };
 
-export const getSingleProductBySlug = async (req: Request, res: Response) => {
+export const getSingleProductBySlug = async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		const { productSlug } = req.params;
 
@@ -84,10 +81,7 @@ export const getSingleProductBySlug = async (req: Request, res: Response) => {
 				}
 			}
 		});
-	} catch (error: any) {
-		res.status(error.statusCode || 500).json({
-			status: "error",
-			message: error.message
-		});
+	} catch (error: unknown) {
+		return next(error);
 	}
 };

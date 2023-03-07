@@ -1,5 +1,5 @@
 // Dependencies
-import { Request, Response } from "express";
+import { Request, Response, NextFunction } from "express";
 
 // Services
 import { userService } from "../../services/client";
@@ -7,7 +7,7 @@ import { userService } from "../../services/client";
 // Utils
 import { ErrorObj } from "../../utils";
 
-export const updateUserAccountDetails = async (req: Request, res: Response) => {
+export const updateUserAccountDetails = async (req: Request, res: Response, next: NextFunction) => {
 	const { full_name, contact, birth_date } = req.body;
 	const userSub = req.auth?.sub;
 
@@ -27,15 +27,12 @@ export const updateUserAccountDetails = async (req: Request, res: Response) => {
 			status: "success",
 			data: { updatedAccountDetails: result.rows[0] }
 		});
-	} catch (error: any) {
-		res.status(400).json({
-			status: "error",
-			message: error.message
-		});
+	} catch (error: unknown) {
+		return next(error);
 	}
 };
 
-export const changeUserProfilePicture = async (req: Request, res: Response) => {
+export const changeUserProfilePicture = async (req: Request, res: Response, next: NextFunction) => {
 	const userEmail = req.user?.email;
 	const userCurrentPicture = req.user?.profile_picture || "";
 
@@ -52,15 +49,12 @@ export const changeUserProfilePicture = async (req: Request, res: Response) => {
 			status: "success",
 			data: { updatedAccountDetails: result.rows[0] }
 		});
-	} catch (error: any) {
-		res.status(400).json({
-			status: "error",
-			message: error.message
-		});
+	} catch (error: unknown) {
+		return next(error);
 	}
 };
 
-export const deleteUserProfilePicture = async (req: Request, res: Response) => {
+export const deleteUserProfilePicture = async (req: Request, res: Response, next: NextFunction) => {
 	const userEmail = req.user?.email;
 	const userCurrentPicture = req.user?.profile_picture || "";
 
@@ -75,10 +69,7 @@ export const deleteUserProfilePicture = async (req: Request, res: Response) => {
 			status: "success",
 			data: { updatedAccountDetails: result.rows[0] }
 		});
-	} catch (error: any) {
-		res.status(400).json({
-			status: "error",
-			message: error.message
-		});
+	} catch (error: unknown) {
+		return next(error);
 	}
 };

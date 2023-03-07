@@ -1,5 +1,5 @@
 // Dependencies
-import { Request, Response } from "express";
+import { Request, Response, NextFunction } from "express";
 
 // Services
 import { dashboardService } from "../services";
@@ -7,7 +7,7 @@ import { dashboardService } from "../services";
 // Utils
 import { ErrorObj } from "../utils";
 
-export const getDashboardData = async (req: Request, res: Response) => {
+export const getDashboardData = async (req: Request, res: Response, next: NextFunction) => {
 	const {
 		sales_analytic_year: salesAnalyticYear = "",
 		visitor_analytic_year: visitorAnalyticYear = ""
@@ -43,10 +43,7 @@ export const getDashboardData = async (req: Request, res: Response) => {
 			status: "success",
 			data: result
 		});
-	} catch (error: any) {
-		res.status(400).json({
-			status: "error",
-			message: error.message
-		});
+	} catch (error: unknown) {
+		return next(error);
 	}
 };

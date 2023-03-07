@@ -1,11 +1,13 @@
 // Dependencies
-import { Response, Request } from "express";
+import { Response, Request, NextFunction } from "express";
 
 // Services
 import { dataService, addressService } from "../../services/client";
+
+// Utils
 import { ErrorObj } from "../../utils";
 
-export const getAllProvinces = async (req: Request, res: Response) => {
+export const getAllProvinces = async (_: Request, res: Response, next: NextFunction) => {
 	try {
 		const provinces = await dataService.getAllProvinces();
 
@@ -15,15 +17,12 @@ export const getAllProvinces = async (req: Request, res: Response) => {
 				provinces
 			}
 		});
-	} catch (error: any) {
-		res.status(error.statusCode || 500).json({
-			status: "error",
-			message: error.message
-		});
+	} catch (error: unknown) {
+		return next(error);
 	}
 };
 
-export const getCitiesByProvinceId = async (req: Request, res: Response) => {
+export const getCitiesByProvinceId = async (req: Request, res: Response, next: NextFunction) => {
 	const { province: provinceId } = req.query;
 
 	try {
@@ -39,15 +38,12 @@ export const getCitiesByProvinceId = async (req: Request, res: Response) => {
 				cities
 			}
 		});
-	} catch (error: any) {
-		res.status(error.statusCode || 500).json({
-			status: "error",
-			message: error.message
-		});
+	} catch (error: unknown) {
+		return next(error);
 	}
 };
 
-export const getSubdistrictByCityId = async (req: Request, res: Response) => {
+export const getSubdistrictByCityId = async (req: Request, res: Response, next: NextFunction) => {
 	const { city: cityId } = req.query;
 
 	try {
@@ -63,15 +59,16 @@ export const getSubdistrictByCityId = async (req: Request, res: Response) => {
 				subdistricts
 			}
 		});
-	} catch (error: any) {
-		res.status(error.statusCode || 500).json({
-			status: "error",
-			message: error.message
-		});
+	} catch (error: unknown) {
+		return next(error);
 	}
 };
 
-export const getShippingCostBySubdistrict = async (req: Request, res: Response) => {
+export const getShippingCostBySubdistrict = async (
+	req: Request,
+	res: Response,
+	next: NextFunction
+) => {
 	const userId = req.user?.id;
 	const { addressId } = req.body;
 
@@ -102,10 +99,7 @@ export const getShippingCostBySubdistrict = async (req: Request, res: Response) 
 				}
 			}
 		});
-	} catch (error: any) {
-		res.status(error.statusCode || 500).json({
-			status: "error",
-			message: error.message
-		});
+	} catch (error: unknown) {
+		return next(error);
 	}
 };

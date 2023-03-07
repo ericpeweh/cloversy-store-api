@@ -1,5 +1,5 @@
 // Dependencies
-import { Request, Response } from "express";
+import { Request, Response, NextFunction } from "express";
 
 // Services
 import { chatService } from "../services";
@@ -7,7 +7,7 @@ import { chatService } from "../services";
 // Utils
 import { ErrorObj } from "../utils";
 
-export const getConversation = async (req: Request, res: Response) => {
+export const getConversation = async (req: Request, res: Response, next: NextFunction) => {
 	const userId = req.user?.id;
 	const { currentCursor = "" } = req.query;
 	const { conversationId } = req.params;
@@ -30,15 +30,12 @@ export const getConversation = async (req: Request, res: Response) => {
 			...paginationData,
 			data: { conversation: { ...conversation, messages } }
 		});
-	} catch (error: any) {
-		res.status(400).json({
-			status: "error",
-			message: error.message
-		});
+	} catch (error: unknown) {
+		return next(error);
 	}
 };
 
-export const getConversationList = async (req: Request, res: Response) => {
+export const getConversationList = async (req: Request, res: Response, next: NextFunction) => {
 	const userId = req.user?.id;
 	const { page = "" } = req.query;
 
@@ -59,10 +56,7 @@ export const getConversationList = async (req: Request, res: Response) => {
 			...paginationData,
 			data: { conversations }
 		});
-	} catch (error: any) {
-		res.status(400).json({
-			status: "error",
-			message: error.message
-		});
+	} catch (error: unknown) {
+		return next(error);
 	}
 };

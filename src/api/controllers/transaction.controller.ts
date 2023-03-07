@@ -1,5 +1,5 @@
 // Dependencies
-import { Response, Request } from "express";
+import { Response, Request, NextFunction } from "express";
 
 // Types
 import {
@@ -18,7 +18,7 @@ import { ErrorObj } from "../utils";
 const _timelineSorter = (a: TransactionTimelineItem, b: TransactionTimelineItem) =>
 	a.timeline_date > b.timeline_date ? -1 : a.timeline_date < b.timeline_date ? 1 : 0;
 
-export const getTransactions = async (req: Request, res: Response) => {
+export const getTransactions = async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		const {
 			userId = "",
@@ -64,15 +64,12 @@ export const getTransactions = async (req: Request, res: Response) => {
 			...paginationData,
 			data: { transactions: transactions.rows }
 		});
-	} catch (error: any) {
-		res.status(400).json({
-			status: "error",
-			message: error.message
-		});
+	} catch (error: unknown) {
+		return next(error);
 	}
 };
 
-export const getSingleTransaction = async (req: Request, res: Response) => {
+export const getSingleTransaction = async (req: Request, res: Response, next: NextFunction) => {
 	const { edit } = req.query;
 	const { transactionId } = req.params;
 
@@ -111,7 +108,9 @@ export const getSingleTransaction = async (req: Request, res: Response) => {
 				} else {
 					timeline.unshift(...waybillManifestTimeline);
 				}
-			} catch (error) {}
+			} catch (error) {
+				// No catch code -- only to prevent throw error (could be implemented by logging)
+			}
 		}
 
 		// Sort manifest by date (DESCENDING)
@@ -127,15 +126,12 @@ export const getSingleTransaction = async (req: Request, res: Response) => {
 				}
 			}
 		});
-	} catch (error: any) {
-		res.status(error.statusCode || 500).json({
-			status: "error",
-			message: error.message
-		});
+	} catch (error: unknown) {
+		return next(error);
 	}
 };
 
-export const updateTransaction = async (req: Request, res: Response) => {
+export const updateTransaction = async (req: Request, res: Response, next: NextFunction) => {
 	const { transactionId } = req.params;
 	const {
 		orderNote = "",
@@ -169,15 +165,12 @@ export const updateTransaction = async (req: Request, res: Response) => {
 			status: "success",
 			data: { updatedTransaction: { ...transaction, timeline } }
 		});
-	} catch (error: any) {
-		res.status(error.statusCode || 500).json({
-			status: "error",
-			message: error.message
-		});
+	} catch (error: unknown) {
+		return next(error);
 	}
 };
 
-export const changeTransactionStatus = async (req: Request, res: Response) => {
+export const changeTransactionStatus = async (req: Request, res: Response, next: NextFunction) => {
 	const { transactionId } = req.params;
 	const { orderStatus } = req.body;
 
@@ -271,12 +264,7 @@ export const changeTransactionStatus = async (req: Request, res: Response) => {
 			status: "success",
 			data: { updatedTransaction: { ...transactionData, timeline } }
 		});
-	} catch (error: any) {
-		console.log(error);
-
-		res.status(error.statusCode || 500).json({
-			status: "error",
-			message: error.message
-		});
+	} catch (error: unknown) {
+		return next(error);
 	}
 };

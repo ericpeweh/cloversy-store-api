@@ -1,11 +1,13 @@
 // Dependencies
-import { Request, Response } from "express";
+import { Request, Response, NextFunction } from "express";
 
 // Services
 import { productService } from "../../services/client";
+
+// Utils
 import { ErrorObj } from "../../utils";
 
-export const getUserLastSeenProducts = async (req: Request, res: Response) => {
+export const getUserLastSeenProducts = async (req: Request, res: Response, next: NextFunction) => {
 	const userId = req.user?.id;
 
 	try {
@@ -17,15 +19,12 @@ export const getUserLastSeenProducts = async (req: Request, res: Response) => {
 			status: "success",
 			data: { products }
 		});
-	} catch (error: any) {
-		res.status(400).json({
-			status: "error",
-			message: error.message
-		});
+	} catch (error: unknown) {
+		return next(error);
 	}
 };
 
-export const trackUserLastSeenProduct = async (req: Request, res: Response) => {
+export const trackUserLastSeenProduct = async (req: Request, res: Response, next: NextFunction) => {
 	const userId = req.user?.id;
 	const { productId } = req.body;
 
@@ -40,10 +39,7 @@ export const trackUserLastSeenProduct = async (req: Request, res: Response) => {
 			status: "success",
 			data: { lastSeenProductId }
 		});
-	} catch (error: any) {
-		res.status(400).json({
-			status: "error",
-			message: error.message
-		});
+	} catch (error: unknown) {
+		return next(error);
 	}
 };

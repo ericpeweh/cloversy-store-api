@@ -1,5 +1,5 @@
 // Dependencies
-import { Request, Response } from "express";
+import { Request, Response, NextFunction } from "express";
 
 // Types
 import {
@@ -17,7 +17,11 @@ import { marketingService, notificationService, userService } from "../services"
 // Utils
 import { ErrorObj, getEmailTemplateParams, scheduler } from "../utils";
 
-export const createNotificationMarketing = async (req: Request, res: Response) => {
+export const createNotificationMarketing = async (
+	req: Request,
+	res: Response,
+	next: NextFunction
+) => {
 	const {
 		title,
 		description,
@@ -151,15 +155,16 @@ export const createNotificationMarketing = async (req: Request, res: Response) =
 			status: "success",
 			data: { newNotifMarketing }
 		});
-	} catch (error: any) {
-		res.status(error.statusCode || 500).json({
-			status: "error",
-			message: error.message
-		});
+	} catch (error: unknown) {
+		return next(error);
 	}
 };
 
-export const getNotificationMarketings = async (req: Request, res: Response) => {
+export const getNotificationMarketings = async (
+	req: Request,
+	res: Response,
+	next: NextFunction
+) => {
 	const { page = "1", q: searchQuery = "", scheduled = "false" } = req.query;
 
 	try {
@@ -187,15 +192,16 @@ export const getNotificationMarketings = async (req: Request, res: Response) => 
 			...paginationData,
 			data: { notifMarketings }
 		});
-	} catch (error: any) {
-		res.status(error.statusCode || 500).json({
-			status: "error",
-			message: error.message
-		});
+	} catch (error: unknown) {
+		return next(error);
 	}
 };
 
-export const getNotificationMarketingDetail = async (req: Request, res: Response) => {
+export const getNotificationMarketingDetail = async (
+	req: Request,
+	res: Response,
+	next: NextFunction
+) => {
 	const { notifMarketingId } = req.params;
 
 	try {
@@ -207,15 +213,16 @@ export const getNotificationMarketingDetail = async (req: Request, res: Response
 			status: "success",
 			data: { notifMarketing: result }
 		});
-	} catch (error: any) {
-		res.status(error.statusCode || 500).json({
-			status: "error",
-			message: error.message
-		});
+	} catch (error: unknown) {
+		return next(error);
 	}
 };
 
-export const updateNotificationMarketing = async (req: Request, res: Response) => {
+export const updateNotificationMarketing = async (
+	req: Request,
+	res: Response,
+	next: NextFunction
+) => {
 	const {
 		title,
 		description,
@@ -288,15 +295,16 @@ export const updateNotificationMarketing = async (req: Request, res: Response) =
 			status: "success",
 			data: { updatedNotifMarketing: updatedNotifMarketingDetail }
 		});
-	} catch (error: any) {
-		res.status(error.statusCode || 500).json({
-			status: "error",
-			message: error.message
-		});
+	} catch (error: unknown) {
+		return next(error);
 	}
 };
 
-export const cancelNotificationMarketing = async (req: Request, res: Response) => {
+export const cancelNotificationMarketing = async (
+	req: Request,
+	res: Response,
+	next: NextFunction
+) => {
 	const { notifMarketingId } = req.params;
 
 	try {
@@ -320,15 +328,12 @@ export const cancelNotificationMarketing = async (req: Request, res: Response) =
 			status: "success",
 			data: { canceledNotifMarketingId: updatedNotifMarketing.id }
 		});
-	} catch (error: any) {
-		res.status(error.statusCode || 500).json({
-			status: "error",
-			message: error.message
-		});
+	} catch (error: unknown) {
+		return next(error);
 	}
 };
 
-export const getEmailsTemplate = async (_: Request, res: Response) => {
+export const getEmailsTemplate = async (_: Request, res: Response, next: NextFunction) => {
 	try {
 		const result = await marketingService.getEmailsTemplate();
 
@@ -342,15 +347,12 @@ export const getEmailsTemplate = async (_: Request, res: Response) => {
 			status: "success",
 			data: { emailsTemplate: structuredResult }
 		});
-	} catch (error: any) {
-		res.status(error.statusCode || 500).json({
-			status: "error",
-			message: error.message
-		});
+	} catch (error: unknown) {
+		return next(error);
 	}
 };
 
-export const getEmailMarketings = async (req: Request, res: Response) => {
+export const getEmailMarketings = async (req: Request, res: Response, next: NextFunction) => {
 	const { page = "1", q: searchQuery = "", scheduled = "false" } = req.query;
 
 	try {
@@ -378,15 +380,12 @@ export const getEmailMarketings = async (req: Request, res: Response) => {
 			...paginationData,
 			data: { emailMarketings }
 		});
-	} catch (error: any) {
-		res.status(error.statusCode || 500).json({
-			status: "error",
-			message: error.message
-		});
+	} catch (error: unknown) {
+		return next(error);
 	}
 };
 
-export const getEmailMarketingDetail = async (req: Request, res: Response) => {
+export const getEmailMarketingDetail = async (req: Request, res: Response, next: NextFunction) => {
 	const { emailMarketingId } = req.params;
 
 	try {
@@ -398,15 +397,12 @@ export const getEmailMarketingDetail = async (req: Request, res: Response) => {
 			status: "success",
 			data: { emailMarketing: result }
 		});
-	} catch (error: any) {
-		res.status(error.statusCode || 500).json({
-			status: "error",
-			message: error.message
-		});
+	} catch (error: unknown) {
+		return next(error);
 	}
 };
 
-export const createEmailMarketing = async (req: Request, res: Response) => {
+export const createEmailMarketing = async (req: Request, res: Response, next: NextFunction) => {
 	const {
 		title,
 		description,
@@ -540,15 +536,12 @@ export const createEmailMarketing = async (req: Request, res: Response) => {
 			status: "success",
 			data: { newEmailMarketing }
 		});
-	} catch (error: any) {
-		res.status(error.statusCode || 500).json({
-			status: "error",
-			message: error.message
-		});
+	} catch (error: unknown) {
+		return next(error);
 	}
 };
 
-export const updateEmailMarketing = async (req: Request, res: Response) => {
+export const updateEmailMarketing = async (req: Request, res: Response, next: NextFunction) => {
 	const {
 		title,
 		description,
@@ -627,15 +620,12 @@ export const updateEmailMarketing = async (req: Request, res: Response) => {
 			status: "success",
 			data: { updatedEmailMarketing: updatedEmailMarketingDetail }
 		});
-	} catch (error: any) {
-		res.status(error.statusCode || 500).json({
-			status: "error",
-			message: error.message
-		});
+	} catch (error: unknown) {
+		return next(error);
 	}
 };
 
-export const cancelEmailMarketing = async (req: Request, res: Response) => {
+export const cancelEmailMarketing = async (req: Request, res: Response, next: NextFunction) => {
 	const { emailMarketingId } = req.params;
 
 	try {
@@ -657,10 +647,7 @@ export const cancelEmailMarketing = async (req: Request, res: Response) => {
 			status: "success",
 			data: { canceledEmailMarketingId: updatedEmailMarketing.id }
 		});
-	} catch (error: any) {
-		res.status(error.statusCode || 500).json({
-			status: "error",
-			message: error.message
-		});
+	} catch (error: unknown) {
+		return next(error);
 	}
 };

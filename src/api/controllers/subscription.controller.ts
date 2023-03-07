@@ -1,5 +1,5 @@
 // Dependencies
-import { Request, Response } from "express";
+import { Request, Response, NextFunction } from "express";
 
 // Services
 import { subscriptionService } from "../services";
@@ -9,7 +9,7 @@ import { ErrorObj } from "../utils";
 
 // Types
 
-export const getPushSubscriptions = async (req: Request, res: Response) => {
+export const getPushSubscriptions = async (req: Request, res: Response, next: NextFunction) => {
 	const { page = "1", q: searchQuery = "" } = req.query;
 
 	try {
@@ -27,10 +27,7 @@ export const getPushSubscriptions = async (req: Request, res: Response) => {
 			...paginationData,
 			data: { subscriptions: subscriptions.rows }
 		});
-	} catch (error: any) {
-		res.status(error.statusCode || 500).json({
-			status: "error",
-			message: error.message
-		});
+	} catch (error: unknown) {
+		return next(error);
 	}
 };

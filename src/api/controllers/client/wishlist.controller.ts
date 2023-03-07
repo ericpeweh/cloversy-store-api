@@ -1,16 +1,13 @@
 // Dependencies
-import { Request, Response } from "express";
-
-// Types
-import { Address } from "../../interfaces";
+import { Request, Response, NextFunction } from "express";
 
 // Services
 import { wishlistService } from "../../services/client";
+
+// Utils
 import { ErrorObj } from "../../utils";
 
-// Types
-
-export const getUserWishlist = async (req: Request, res: Response) => {
+export const getUserWishlist = async (req: Request, res: Response, next: NextFunction) => {
 	const userId = req.user?.id;
 
 	try {
@@ -24,15 +21,12 @@ export const getUserWishlist = async (req: Request, res: Response) => {
 			status: "success",
 			data: { wishlist: result.rows }
 		});
-	} catch (error: any) {
-		res.status(400).json({
-			status: "error",
-			message: error.message
-		});
+	} catch (error: unknown) {
+		return next(error);
 	}
 };
 
-export const addProductToWishlist = async (req: Request, res: Response) => {
+export const addProductToWishlist = async (req: Request, res: Response, next: NextFunction) => {
 	const userId = req.user?.id;
 	const { productId } = req.params;
 
@@ -47,15 +41,16 @@ export const addProductToWishlist = async (req: Request, res: Response) => {
 			status: "success",
 			data: { wishlist: result.rows }
 		});
-	} catch (error: any) {
-		res.status(400).json({
-			status: "error",
-			message: error.message
-		});
+	} catch (error: unknown) {
+		return next(error);
 	}
 };
 
-export const deleteProductFromWishlist = async (req: Request, res: Response) => {
+export const deleteProductFromWishlist = async (
+	req: Request,
+	res: Response,
+	next: NextFunction
+) => {
 	const userId = req.user?.id;
 	const { productId } = req.params;
 
@@ -70,14 +65,11 @@ export const deleteProductFromWishlist = async (req: Request, res: Response) => 
 			status: "success",
 			data: { wishlist: result.rows }
 		});
-	} catch (error: any) {
-		res.status(400).json({
-			status: "error",
-			message: error.message
-		});
+	} catch (error: unknown) {
+		return next(error);
 	}
 };
-export const emptyWishlist = async (req: Request, res: Response) => {
+export const emptyWishlist = async (req: Request, res: Response, next: NextFunction) => {
 	const userId = req.user?.id;
 
 	try {
@@ -91,10 +83,7 @@ export const emptyWishlist = async (req: Request, res: Response) => {
 			status: "success",
 			data: { wishlist: result.rows }
 		});
-	} catch (error: any) {
-		res.status(400).json({
-			status: "error",
-			message: error.message
-		});
+	} catch (error: unknown) {
+		return next(error);
 	}
 };

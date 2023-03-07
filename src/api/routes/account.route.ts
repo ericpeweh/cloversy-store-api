@@ -4,7 +4,7 @@ import { Router } from "express";
 // Config
 import upload from "../../config/uploadFile";
 
-// Controller
+// Controller (client)
 import { userController } from "../controllers/client";
 
 const router = Router();

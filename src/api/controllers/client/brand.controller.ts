@@ -1,10 +1,10 @@
 // Dependencies
-import { Request, Response } from "express";
+import { Request, Response, NextFunction } from "express";
 
 // Services
 import { brandService } from "../../services/client";
 
-export const getAllBrands = async (_: Request, res: Response) => {
+export const getAllBrands = async (_: Request, res: Response, next: NextFunction) => {
 	try {
 		const { brandsResult } = await brandService.getAllBrands();
 
@@ -12,10 +12,7 @@ export const getAllBrands = async (_: Request, res: Response) => {
 			status: "success",
 			data: { brands: brandsResult.rows }
 		});
-	} catch (error: any) {
-		res.status(400).json({
-			status: "error",
-			message: error.message
-		});
+	} catch (error: unknown) {
+		return next(error);
 	}
 };

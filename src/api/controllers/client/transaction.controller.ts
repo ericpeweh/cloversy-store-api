@@ -1,5 +1,5 @@
 // Dependencies
-import { Response, Request } from "express";
+import { Response, Request, NextFunction } from "express";
 
 // Types
 import {
@@ -23,7 +23,7 @@ import {
 // Utils
 import { ErrorObj } from "../../utils";
 
-export const getUserTransactions = async (req: Request, res: Response) => {
+export const getUserTransactions = async (req: Request, res: Response, next: NextFunction) => {
 	const userId = req.user?.id;
 
 	try {
@@ -35,15 +35,12 @@ export const getUserTransactions = async (req: Request, res: Response) => {
 			status: "success",
 			data: { transactions }
 		});
-	} catch (error: any) {
-		res.status(error.statusCode || 500).json({
-			status: "error",
-			message: error.message
-		});
+	} catch (error: unknown) {
+		return next(error);
 	}
 };
 
-export const getSingleTransaction = async (req: Request, res: Response) => {
+export const getSingleTransaction = async (req: Request, res: Response, next: NextFunction) => {
 	const userId = req.user?.id;
 	const { transactionId } = req.params;
 
@@ -89,15 +86,12 @@ export const getSingleTransaction = async (req: Request, res: Response) => {
 			status: "success",
 			data: { transaction: { ...transaction, timeline } }
 		});
-	} catch (error: any) {
-		res.status(error.statusCode || 500).json({
-			status: "error",
-			message: error.message
-		});
+	} catch (error: unknown) {
+		return next(error);
 	}
 };
 
-export const createTransaction = async (req: Request, res: Response) => {
+export const createTransaction = async (req: Request, res: Response, next: NextFunction) => {
 	const user = req.user;
 	const {
 		voucher_code,
@@ -233,22 +227,21 @@ export const createTransaction = async (req: Request, res: Response) => {
 			data: { transaction }
 		});
 	} catch (error: any) {
-		let errorMessage;
-		console.log(error);
-
 		if (error?.ApiResponse?.status_code === "500") {
-			errorMessage =
+			const errorMessage =
 				"Transaksi gagal: Sistem sedang bermasalah, mohon coba kembali setelah beberapa saat.";
-		}
 
-		res.status(error.statusCode || 500).json({
-			status: "error",
-			message: errorMessage || error.message
-		});
+			res.status(error.statusCode || 500).json({
+				status: "error",
+				message: errorMessage
+			});
+		} else {
+			return next(error);
+		}
 	}
 };
 
-export const cancelTransaction = async (req: Request, res: Response) => {
+export const cancelTransaction = async (req: Request, res: Response, next: NextFunction) => {
 	const userId = req.user?.id;
 	const { transactionId } = req.params;
 
@@ -300,19 +293,20 @@ export const cancelTransaction = async (req: Request, res: Response) => {
 			data: { transactionId }
 		});
 	} catch (error: any) {
-		let errorMessage = "";
 		if (error?.httpStatusCode === "412") {
-			errorMessage = "Failed: transaction can't be canceled";
-		}
+			const errorMessage = "Failed: transaction can't be canceled";
 
-		res.status(error.statusCode || 500).json({
-			status: "error",
-			message: errorMessage || error.message
-		});
+			res.status(error.statusCode || 500).json({
+				status: "error",
+				message: errorMessage || error.message
+			});
+		} else {
+			return next(error);
+		}
 	}
 };
 
-export const reviewTransaction = async (req: Request, res: Response) => {
+export const reviewTransaction = async (req: Request, res: Response, next: NextFunction) => {
 	const { transactionId } = req.params;
 	const { reviews } = req.body;
 	const userId = req.user?.id;
@@ -401,10 +395,7 @@ export const reviewTransaction = async (req: Request, res: Response) => {
 			status: "success",
 			data: { transactionId }
 		});
-	} catch (error: any) {
-		res.status(error.statusCode || 500).json({
-			status: "error",
-			message: error.message
-		});
+	} catch (error: unknown) {
+		return next(error);
 	}
 };

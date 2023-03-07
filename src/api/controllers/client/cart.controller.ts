@@ -1,5 +1,5 @@
 // Dependencies
-import { Request, Response } from "express";
+import { Request, Response, NextFunction } from "express";
 import { nanoid } from "nanoid";
 
 // Types
@@ -7,6 +7,8 @@ import { CartItem, CartItemDetails } from "../../interfaces";
 
 // Services
 import { cartService } from "../../services/client";
+
+// Utils
 import { ErrorObj } from "../../utils";
 
 // Helper function
@@ -30,7 +32,7 @@ const getCartResultFromSession = async (
 	return cartResult;
 };
 
-export const getCartItems = async (req: Request, res: Response) => {
+export const getCartItems = async (req: Request, res: Response, next: NextFunction) => {
 	const userId = req.user?.id;
 
 	try {
@@ -58,15 +60,12 @@ export const getCartItems = async (req: Request, res: Response) => {
 			status: "success",
 			data: { cart, ...(userId && { sync }) }
 		});
-	} catch (error: any) {
-		res.status(400).json({
-			status: "error",
-			message: error.message
-		});
+	} catch (error: unknown) {
+		return next(error);
 	}
 };
 
-export const syncCartItems = async (req: Request, res: Response) => {
+export const syncCartItems = async (req: Request, res: Response, next: NextFunction) => {
 	const userId = req.user?.id;
 
 	try {
@@ -94,29 +93,23 @@ export const syncCartItems = async (req: Request, res: Response) => {
 				data: { cart, ...(userId && { sync: false }) }
 			});
 		}
-	} catch (error: any) {
-		res.status(400).json({
-			status: "error",
-			message: error.message
-		});
+	} catch (error: unknown) {
+		return next(error);
 	}
 };
-export const clearSessionCart = async (req: Request, res: Response) => {
+export const clearSessionCart = async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		req.session.cart = [];
 
 		return res.status(200).json({
 			status: "success"
 		});
-	} catch (error: any) {
-		res.status(400).json({
-			status: "error",
-			message: error.message
-		});
+	} catch (error: unknown) {
+		return next(error);
 	}
 };
 
-export const addProductToCart = async (req: Request, res: Response) => {
+export const addProductToCart = async (req: Request, res: Response, next: NextFunction) => {
 	const userId = req.user?.id;
 
 	const { product_id, quantity, size }: CartItem = req.body;
@@ -157,17 +150,12 @@ export const addProductToCart = async (req: Request, res: Response) => {
 			status: "success",
 			data: { cart: cartResult }
 		});
-	} catch (error: any) {
-		console.error(error.stack);
-
-		res.status(400).json({
-			status: "error",
-			message: error.message
-		});
+	} catch (error: unknown) {
+		return next(error);
 	}
 };
 
-export const updateCartItem = async (req: Request, res: Response) => {
+export const updateCartItem = async (req: Request, res: Response, next: NextFunction) => {
 	const userId = req.user?.id;
 
 	const { id: cartItemId, quantity }: CartItem = req.body;
@@ -206,15 +194,12 @@ export const updateCartItem = async (req: Request, res: Response) => {
 			status: "success",
 			data: { cart: cartResult }
 		});
-	} catch (error: any) {
-		res.status(400).json({
-			status: "error",
-			message: error.message
-		});
+	} catch (error: unknown) {
+		return next(error);
 	}
 };
 
-export const deleteCartItem = async (req: Request, res: Response) => {
+export const deleteCartItem = async (req: Request, res: Response, next: NextFunction) => {
 	const userId = req.user?.id;
 
 	const { id: cartItemId }: CartItem = req.body;
@@ -246,10 +231,7 @@ export const deleteCartItem = async (req: Request, res: Response) => {
 			status: "success",
 			data: { cart: cartResult }
 		});
-	} catch (error: any) {
-		res.status(400).json({
-			status: "error",
-			message: error.message
-		});
+	} catch (error: unknown) {
+		return next(error);
 	}
 };

@@ -1,5 +1,5 @@
 // Dependencies
-import { Request, Response } from "express";
+import { Request, Response, NextFunction } from "express";
 
 // Services
 import { voucherService } from "../../services/client";
@@ -9,7 +9,7 @@ import { ErrorObj } from "../../utils";
 
 // Types
 
-export const getUserVouchers = async (req: Request, res: Response) => {
+export const getUserVouchers = async (req: Request, res: Response, next: NextFunction) => {
 	const userId = req.user?.id;
 
 	try {
@@ -23,15 +23,12 @@ export const getUserVouchers = async (req: Request, res: Response) => {
 			status: "success",
 			data: { vouchers: result.rows }
 		});
-	} catch (error: any) {
-		res.status(400).json({
-			status: "error",
-			message: error.message
-		});
+	} catch (error: unknown) {
+		return next(error);
 	}
 };
 
-export const getSingleVoucher = async (req: Request, res: Response) => {
+export const getSingleVoucher = async (req: Request, res: Response, next: NextFunction) => {
 	const userId = req.user?.id;
 	const { voucherCode } = req.params;
 
@@ -52,10 +49,7 @@ export const getSingleVoucher = async (req: Request, res: Response) => {
 			status: "success",
 			data: { voucher: result }
 		});
-	} catch (error: any) {
-		res.status(400).json({
-			status: "error",
-			message: error.message
-		});
+	} catch (error: unknown) {
+		return next(error);
 	}
 };

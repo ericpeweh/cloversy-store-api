@@ -1,5 +1,5 @@
 // Dependencies
-import { Request, Response } from "express";
+import { Request, Response, NextFunction } from "express";
 
 // Services
 import { subscriptionService } from "../../services/client";
@@ -7,7 +7,7 @@ import { subscriptionService } from "../../services/client";
 // Utils
 import { ErrorObj } from "../../utils";
 
-export const subscribeToEmail = async (req: Request, res: Response) => {
+export const subscribeToEmail = async (req: Request, res: Response, next: NextFunction) => {
 	const { email } = req.body;
 
 	try {
@@ -21,15 +21,12 @@ export const subscribeToEmail = async (req: Request, res: Response) => {
 			status: "success",
 			data: { subscribedEmail }
 		});
-	} catch (error: any) {
-		res.status(400).json({
-			status: "error",
-			message: error.message
-		});
+	} catch (error: unknown) {
+		return next(error);
 	}
 };
 
-export const unsubscribeFromEmail = async (req: Request, res: Response) => {
+export const unsubscribeFromEmail = async (req: Request, res: Response, next: NextFunction) => {
 	const { email } = req.body;
 
 	try {
@@ -42,15 +39,12 @@ export const unsubscribeFromEmail = async (req: Request, res: Response) => {
 			status: "success",
 			data: { unsubscribedEmail }
 		});
-	} catch (error: any) {
-		res.status(400).json({
-			status: "error",
-			message: error.message
-		});
+	} catch (error: unknown) {
+		return next(error);
 	}
 };
 
-export const subscribeToPush = async (req: Request, res: Response) => {
+export const subscribeToPush = async (req: Request, res: Response, next: NextFunction) => {
 	const userId = req.user?.id;
 	const { token } = req.body;
 
@@ -67,15 +61,12 @@ export const subscribeToPush = async (req: Request, res: Response) => {
 				subscriptionId
 			}
 		});
-	} catch (error: any) {
-		res.status(400).json({
-			status: "error",
-			message: error.message
-		});
+	} catch (error: unknown) {
+		return next(error);
 	}
 };
 
-export const unsubscribeFromPush = async (req: Request, res: Response) => {
+export const unsubscribeFromPush = async (req: Request, res: Response, next: NextFunction) => {
 	const userId = req.user?.id;
 	const { subscriptionId } = req.body;
 
@@ -90,10 +81,7 @@ export const unsubscribeFromPush = async (req: Request, res: Response) => {
 			status: "success",
 			data: { unsubscribedId: subscriptionId }
 		});
-	} catch (error: any) {
-		res.status(400).json({
-			status: "error",
-			message: error.message
-		});
+	} catch (error: unknown) {
+		return next(error);
 	}
 };

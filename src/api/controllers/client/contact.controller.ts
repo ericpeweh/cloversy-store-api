@@ -1,14 +1,14 @@
 // Dependencies
-import { Request, Response } from "express";
-import { notificationService, userService } from "../../services";
+import { Request, Response, NextFunction } from "express";
 
 // Services
 import { contactService } from "../../services/client";
+import { notificationService, userService } from "../../services";
 
 // Utils
 import { ErrorObj } from "../../utils";
 
-export const createMessageWebForm = async (req: Request, res: Response) => {
+export const createMessageWebForm = async (req: Request, res: Response, next: NextFunction) => {
 	const { senderName, email, objective, title, message } = req.body;
 
 	try {
@@ -45,10 +45,7 @@ export const createMessageWebForm = async (req: Request, res: Response) => {
 			status: "success",
 			data: { message: "Message sent successfully!" }
 		});
-	} catch (error: any) {
-		res.status(400).json({
-			status: "error",
-			message: error.message
-		});
+	} catch (error: unknown) {
+		return next(error);
 	}
 };

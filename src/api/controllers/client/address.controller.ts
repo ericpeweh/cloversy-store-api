@@ -1,16 +1,16 @@
 // Dependencies
-import { Request, Response } from "express";
+import { Request, Response, NextFunction } from "express";
 
 // Types
 import { Address } from "../../interfaces";
 
 // Services
 import { addressService } from "../../services/client";
+
+// Utils
 import { ErrorObj } from "../../utils";
 
-// Types
-
-export const getAllUserAddress = async (req: Request, res: Response) => {
+export const getAllUserAddress = async (req: Request, res: Response, next: NextFunction) => {
 	const userId = req.user?.id;
 
 	try {
@@ -24,15 +24,12 @@ export const getAllUserAddress = async (req: Request, res: Response) => {
 			status: "success",
 			data: { address: result.rows }
 		});
-	} catch (error: any) {
-		res.status(400).json({
-			status: "error",
-			message: error.message
-		});
+	} catch (error: unknown) {
+		return next(error);
 	}
 };
 
-export const createAddress = async (req: Request, res: Response) => {
+export const createAddress = async (req: Request, res: Response, next: NextFunction) => {
 	const userId = req.user?.id;
 
 	try {
@@ -79,15 +76,12 @@ export const createAddress = async (req: Request, res: Response) => {
 			status: "success",
 			data: { newAddress: result.rows[0] }
 		});
-	} catch (error: any) {
-		res.status(400).json({
-			status: "error",
-			message: error.message
-		});
+	} catch (error: unknown) {
+		return next(error);
 	}
 };
 
-export const updateAddress = async (req: Request, res: Response) => {
+export const updateAddress = async (req: Request, res: Response, next: NextFunction) => {
 	const userId = req.user?.id;
 
 	try {
@@ -141,15 +135,12 @@ export const updateAddress = async (req: Request, res: Response) => {
 			status: "success",
 			data: { updatedAddress: result }
 		});
-	} catch (error: any) {
-		res.status(400).json({
-			status: "error",
-			message: error.message
-		});
+	} catch (error: unknown) {
+		return next(error);
 	}
 };
 
-export const deleteAddress = async (req: Request, res: Response) => {
+export const deleteAddress = async (req: Request, res: Response, next: NextFunction) => {
 	const userId = req.user?.id;
 
 	try {
@@ -164,10 +155,7 @@ export const deleteAddress = async (req: Request, res: Response) => {
 			status: "success",
 			data: { deletedAddress: result.rows[0] }
 		});
-	} catch (error: any) {
-		res.status(400).json({
-			status: "error",
-			message: error.message
-		});
+	} catch (error: unknown) {
+		return next(error);
 	}
 };

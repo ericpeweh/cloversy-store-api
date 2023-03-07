@@ -1,5 +1,5 @@
 // Dependencies
-import { Request, Response } from "express";
+import { Request, Response, NextFunction } from "express";
 
 // Services
 import { productService } from "../services";
@@ -9,7 +9,7 @@ import { ErrorObj } from "../utils";
 
 // Types
 
-export const getAllProducts = async (req: Request, res: Response) => {
+export const getAllProducts = async (req: Request, res: Response, next: NextFunction) => {
 	const {
 		status: productStatus = "",
 		brand: brandFilter = "",
@@ -48,15 +48,12 @@ export const getAllProducts = async (req: Request, res: Response) => {
 			...paginationData,
 			data: { products: products.rows }
 		});
-	} catch (error: any) {
-		res.status(400).json({
-			status: "error",
-			message: error.message
-		});
+	} catch (error: unknown) {
+		return next(error);
 	}
 };
 
-export const getSingleProductById = async (req: Request, res: Response) => {
+export const getSingleProductById = async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		const { productId } = req.params;
 		const {
@@ -103,15 +100,12 @@ export const getSingleProductById = async (req: Request, res: Response) => {
 				product: result
 			}
 		});
-	} catch (error: any) {
-		res.status(error.statusCode || 500).json({
-			status: "error",
-			message: error.message
-		});
+	} catch (error: unknown) {
+		return next(error);
 	}
 };
 
-export const createProduct = async (req: Request, res: Response) => {
+export const createProduct = async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		const {
 			title,
@@ -140,15 +134,12 @@ export const createProduct = async (req: Request, res: Response) => {
 			status: "success",
 			data: { newProduct: result }
 		});
-	} catch (error: any) {
-		res.status(400).json({
-			status: "error",
-			message: error.message
-		});
+	} catch (error: unknown) {
+		return next(error);
 	}
 };
 
-export const updateProduct = async (req: Request, res: Response) => {
+export const updateProduct = async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		const { productId } = req.params;
 		const {
@@ -196,15 +187,12 @@ export const updateProduct = async (req: Request, res: Response) => {
 			status: "success",
 			data: { updatedProduct: result }
 		});
-	} catch (error: any) {
-		res.status(400).json({
-			status: "error",
-			message: error.message
-		});
+	} catch (error: unknown) {
+		return next(error);
 	}
 };
 
-export const deleteProduct = async (req: Request, res: Response) => {
+export const deleteProduct = async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		const { productId } = req.params;
 
@@ -214,10 +202,7 @@ export const deleteProduct = async (req: Request, res: Response) => {
 			status: "success",
 			data: { deletedProductId: result.rows[0].id }
 		});
-	} catch (error: any) {
-		res.status(400).json({
-			status: "error",
-			message: error.message
-		});
+	} catch (error: unknown) {
+		return next(error);
 	}
 };

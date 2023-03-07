@@ -1,13 +1,13 @@
 // Dependencies
-import { Request, Response } from "express";
+import { Request, Response, NextFunction } from "express";
 
 // Services
 import { voucherService } from "../services";
+
+// Utils
 import { ErrorObj } from "../utils";
 
-// Types
-
-export const getAllVouchers = async (req: Request, res: Response) => {
+export const getAllVouchers = async (req: Request, res: Response, next: NextFunction) => {
 	const {
 		status: voucherStatus = "",
 		sortBy = "",
@@ -47,15 +47,14 @@ export const getAllVouchers = async (req: Request, res: Response) => {
 			...paginationData,
 			data: { vouchers }
 		});
-	} catch (error: any) {
-		res.status(400).json({
-			status: "error",
-			message: error.message
-		});
+	} catch (error: unknown) {
+		console.log(error);
+
+		return next(error);
 	}
 };
 
-export const getSingleVoucher = async (req: Request, res: Response) => {
+export const getSingleVoucher = async (req: Request, res: Response, next: NextFunction) => {
 	const { voucherCode } = req.params;
 	const { analytic_year: analyticYear = "" } = req.query;
 
@@ -75,15 +74,12 @@ export const getSingleVoucher = async (req: Request, res: Response) => {
 			status: "success",
 			data: { voucher: result }
 		});
-	} catch (error: any) {
-		res.status(400).json({
-			status: "error",
-			message: error.message
-		});
+	} catch (error: unknown) {
+		return next(error);
 	}
 };
 
-export const createVoucher = async (req: Request, res: Response) => {
+export const createVoucher = async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		const {
 			code,
@@ -116,15 +112,12 @@ export const createVoucher = async (req: Request, res: Response) => {
 			status: "success",
 			data: { newVoucher: result.rows[0] }
 		});
-	} catch (error: any) {
-		res.status(400).json({
-			status: "error",
-			message: error.message
-		});
+	} catch (error: unknown) {
+		return next(error);
 	}
 };
 
-export const updateVoucher = async (req: Request, res: Response) => {
+export const updateVoucher = async (req: Request, res: Response, next: NextFunction) => {
 	const { voucherCode } = req.params;
 
 	try {
@@ -163,10 +156,7 @@ export const updateVoucher = async (req: Request, res: Response) => {
 			status: "success",
 			data: { updatedVoucher: result.rows[0] }
 		});
-	} catch (error: any) {
-		res.status(400).json({
-			status: "error",
-			message: error.message
-		});
+	} catch (error: unknown) {
+		return next(error);
 	}
 };

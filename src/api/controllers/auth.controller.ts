@@ -1,6 +1,5 @@
 // Dependencies
-import { Response, Request } from "express";
-import axios from "axios";
+import { Response, Request, NextFunction } from "express";
 
 // Utils
 import { ErrorObj } from "../utils";
@@ -8,7 +7,7 @@ import { ErrorObj } from "../utils";
 // Services
 import { userService, authService } from "../services";
 
-export const authUser = async (req: Request, res: Response) => {
+export const authUser = async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		const accessToken = req.headers.authorization?.split(" ")[1];
 		const auth0UserData = await authService.getUserInfoAuth0(accessToken!);
@@ -26,15 +25,12 @@ export const authUser = async (req: Request, res: Response) => {
 			status: "success",
 			data: { user: userData }
 		});
-	} catch (error: any) {
-		res.status(error.statusCode || 500).json({
-			status: "error",
-			message: error.message
-		});
+	} catch (error: unknown) {
+		return next(error);
 	}
 };
 
-export const resetPassword = async (req: Request, res: Response) => {
+export const resetPassword = async (req: Request, res: Response, next: NextFunction) => {
 	const userEmail = req.user?.email;
 
 	try {
@@ -48,10 +44,7 @@ export const resetPassword = async (req: Request, res: Response) => {
 			status: "success",
 			data: { result }
 		});
-	} catch (error: any) {
-		res.status(error.statusCode || 500).json({
-			status: "error",
-			message: error.message
-		});
+	} catch (error: unknown) {
+		return next(error);
 	}
 };

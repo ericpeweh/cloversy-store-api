@@ -11,19 +11,21 @@ const generateUpdateQuery = (
 	let queryIndex = startIndex || 1;
 
 	// Set part
-	query += `UPDATE ${tableName} SET`;
-	const pairs = Object.entries(data);
-	pairs.forEach(([key, value]) => {
-		if (value !== undefined && !readOnly?.includes(key)) {
-			queryParams.push(value);
-			query += ` ${key} = $${queryIndex},`;
-			queryIndex += 1;
-		}
-	});
-	query = query.slice(0, -1); // remove comma
+	if (data && Object.keys(data).length > 0) {
+		query += `UPDATE ${tableName} SET`;
+		const pairs = Object.entries(data);
+		pairs.forEach(([key, value]) => {
+			if (value !== undefined && !readOnly?.includes(key)) {
+				queryParams.push(value);
+				query += ` ${key} = $${queryIndex},`;
+				queryIndex += 1;
+			}
+		});
+		query = query.slice(0, -1); // remove comma
+	}
 
 	// Where part (ex: id)
-	if (identifier) {
+	if (identifier && Object.keys(identifier).length > 0) {
 		query += ` WHERE`;
 		const identifierPairs = Object.entries(identifier);
 		identifierPairs.forEach(([key, value], index) => {

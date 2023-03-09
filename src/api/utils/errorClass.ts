@@ -22,11 +22,13 @@ class ErrorBase extends Error {
 export class ClientError extends ErrorBase {
 	constructor(message: string, code: number = 400, options?: { [key: string]: any }) {
 		super(message, code, options);
+		this.name = "ClientError";
 	}
 }
 
 export class ServerError extends ErrorBase {
 	constructor(message: string, code: number = 500, options?: { [key: string]: any }) {
 		super(message, code, options);
+		this.name = "ServerError";
 	}
 }

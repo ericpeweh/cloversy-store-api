@@ -6,12 +6,12 @@ import { ClientError } from "../utils/errorClass";
 
 const errorHandler = async (error: any, _: Request, res: Response, _1: NextFunction) => {
 	if (error.name === "UnauthorizedError") {
-		return res.status(error.status).json({
+		return res.status(error?.status || 401).json({
 			status: "error",
 			message: "Failed to authenticate / authorize on requested resource"
 		});
 	} else if (error instanceof ClientError) {
-		return res.status(400).json({
+		return res.status(error?.code || 400).json({
 			status: "error",
 			message:
 				error.message ||
@@ -19,7 +19,7 @@ const errorHandler = async (error: any, _: Request, res: Response, _1: NextFunct
 		});
 	} else {
 		// Handle all server error
-		return res.status(500).json({
+		return res.status(error?.code || 500).json({
 			status: "error",
 			message:
 				"An error occured on our server, please try again later. If error persists, please contact us for more information."

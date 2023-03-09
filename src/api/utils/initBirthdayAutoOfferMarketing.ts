@@ -20,7 +20,7 @@ const initBirthdayAutoOfferMarketing = () => {
 	console.log("Initialized birthday auto-offer system.");
 };
 
-const birthdayAutoOfferMarketingFn = async () => {
+export const birthdayAutoOfferMarketingFn = async () => {
 	// Get birthday users
 	const selectedUserIds = await marketingService.getSelectedBirthdayUsers();
 

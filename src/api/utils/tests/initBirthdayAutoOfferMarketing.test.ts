@@ -109,7 +109,7 @@ describe("initBirthdayAutoOfferMarketing", () => {
 				"active",
 				3,
 				"user",
-				"Birthday offer given by auto-offer system 2023-03-09"
+				`Birthday offer given by auto-offer system ${new Date().toISOString().slice(0, 10)}`
 			],
 			[1, 2, 3]
 		);

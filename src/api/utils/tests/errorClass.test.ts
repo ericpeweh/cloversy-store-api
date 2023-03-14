@@ -24,7 +24,7 @@ describe("ClientError", () => {
 
 	it("should have correct message", () => {
 		const errorMessage = "Client error!";
-		const error = new ServerError(errorMessage);
+		const error = new ClientError(errorMessage);
 		expect(error.message).toBe(errorMessage);
 	});
 });
@@ -51,8 +51,9 @@ describe("ServerError", () => {
 	});
 
 	it("should have correct message", () => {
-		const errorMessage = "Server error!";
-		const error = new ServerError(errorMessage);
-		expect(error.message).toBe(errorMessage);
+		const error = new ServerError();
+		expect(error.message).toBe(
+			"An error occured on our server, please try again later. If error persists, please contact us for more information."
+		);
 	});
 });

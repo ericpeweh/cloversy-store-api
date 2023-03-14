@@ -13,9 +13,7 @@ const errorHandler = async (error: any, _: Request, res: Response, _1: NextFunct
 	} else if (error instanceof ClientError) {
 		return res.status(error?.code || 400).json({
 			status: "error",
-			message:
-				error.message ||
-				"Something went wrong, make sure user is sending the correct input values, params, etc."
+			message: error.message
 		});
 	} else {
 		// Handle all server error

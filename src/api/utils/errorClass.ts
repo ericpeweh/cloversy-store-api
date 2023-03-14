@@ -1,11 +1,7 @@
 class ErrorBase extends Error {
 	code: number;
 
-	constructor(
-		message: string = "Something went wrong!",
-		code: number,
-		options: { [key: string]: any } = {}
-	) {
+	constructor(message: string, code: number, options: { [key: string]: any } = {}) {
 		super(message);
 		this.code = code;
 
@@ -20,15 +16,24 @@ class ErrorBase extends Error {
 }
 
 export class ClientError extends ErrorBase {
-	constructor(message: string, code: number = 400, options?: { [key: string]: any }) {
-		super(message, code, options);
+	constructor(message?: string, code: number = 400, options?: { [key: string]: any }) {
+		super(
+			message ||
+				"Something went wrong, make sure user is sending the correct input values, params, etc.",
+			code,
+			options
+		);
 		this.name = "ClientError";
 	}
 }
 
 export class ServerError extends ErrorBase {
-	constructor(message: string, code: number = 500, options?: { [key: string]: any }) {
-		super(message, code, options);
+	constructor(_?: string, code: number = 500, options?: { [key: string]: any }) {
+		super(
+			"An error occured on our server, please try again later. If error persists, please contact us for more information.",
+			code,
+			options
+		);
 		this.name = "ServerError";
 	}
 }

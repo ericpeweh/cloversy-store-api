@@ -39,7 +39,8 @@ jest.mock("../../services/auth.service.ts", () => ({
 // Mock userService
 jest.mock("../../services/client/user.service.ts", () => ({
 	...jest.requireActual("../../services/client/user.service.ts"),
-	changeUserProfilePicture: jest.fn()
+	changeUserProfilePicture: jest.fn(),
+	deleteUserProfilePicture: jest.fn()
 }));
 
 // Mock userRepo
@@ -244,9 +245,6 @@ describe("admin account", () => {
 
 		describe("given invalid file type data", () => {
 			it("should return a 400 status and updated user account details", async () => {
-				// Mock changeUserProfilePicture to return updated user
-				(userService.changeUserProfilePicture as jest.Mock).mockResolvedValueOnce(mockUser);
-
 				const res = await supertest(app)
 					.put("/admin/account/details/picture")
 					.attach("image", path.resolve(__dirname, "./assets/invalid-image.txt")); // sent non image file
@@ -259,15 +257,43 @@ describe("admin account", () => {
 		});
 	});
 
-	// describe("PUT /admin/account/details/picture", () => {
-	// 	afterEach(() => {
-	// 		jest.clearAllMocks();
-	// 	});
+	describe("DELETE /admin/account/details/picture", () => {
+		afterEach(() => {
+			jest.clearAllMocks();
+		});
 
-	// 	describe("given undefined or incorrect access token on authorization headers", () => {
-	// 		it("should return a 401 status and error message", async () => {
+		describe("send request to delete user profile", () => {
+			it("should return a 200 status and updated account details", async () => {
+				const mockUserWithoutProfilePicture = {
+					...mockUser,
+					profile_picture: null
+				};
 
-	// 		});
-	// 	});
-	// });
+				// Mock deleteUserProfilePicture service to return updated user profile details
+				(userService.deleteUserProfilePicture as jest.Mock).mockResolvedValueOnce(
+					mockUserWithoutProfilePicture
+				);
+
+				const res = await supertest(app).delete("/admin/account/details/picture");
+
+				expect(res.body).toEqual({
+					status: "success",
+					data: { updatedAccountDetails: mockUserWithoutProfilePicture }
+				});
+			});
+		});
+
+		describe("failed to delete user profile picture", () => {
+			it("should return a 500 status code and error message", async () => {
+				// Mock deleteUserProfilePicture service to throw error while deleting image
+				(userService.deleteUserProfilePicture as jest.Mock).mockRejectedValueOnce(
+					new ErrorObj.ServerError("Failed to delete image!")
+				);
+
+				const res = await supertest(app).delete("/admin/account/details/picture");
+
+				expect(res.body).toEqual(mockErrorBody);
+			});
+		});
+	});
 });

@@ -45,5 +45,5 @@ export const deleteUserProfilePicture = async (userEmail: string) => {
 
 	const userData = await db.query(imageQuery, [userEmail]);
 
-	return userData;
+	return userData.rows[0];
 };

@@ -33,13 +33,13 @@ const mockErrorBody = {
 // Mock authService
 jest.mock("../../services/auth.service.ts", () => ({
 	getUserInfoAuth0: jest.fn(),
-	resetPasswordAuth0: jest.fn().mockResolvedValue(mockAuth0User)
+	resetPasswordAuth0: jest.fn()
 }));
 
 // Mock userRepo
 jest.mock("../../data/user.data.ts", () => ({
-	getUserDataByEmail: jest.fn().mockResolvedValue(mockUser),
-	createNewUser: jest.fn().mockResolvedValue(mockUser)
+	getUserDataByEmail: jest.fn(),
+	createNewUser: jest.fn()
 }));
 
 // Mock middlewares
@@ -62,11 +62,11 @@ jest.mock("../../middlewares", () => ({
 import express, { Request, Response, NextFunction } from "express";
 import { Server } from "http";
 import supertest from "supertest";
+import { userRepo } from "../../data";
 import { isAuth, isAdmin, errorHandler, getUserData } from "../../middlewares";
 
 // Modules to test
 import authRouter from "../../routes/auth.route";
-import { userRepo } from "../../data";
 import { authService, userService } from "../../services";
 
 describe("admin auth", () => {
@@ -76,6 +76,13 @@ describe("admin auth", () => {
 	beforeAll(() => {
 		app.use("/admin/auth", isAuth, isAdmin, authRouter, errorHandler);
 		server = app.listen(6000);
+
+		// Mock user services
+		(userRepo.getUserDataByEmail as jest.Mock).mockResolvedValue(mockUser);
+		(userRepo.createNewUser as jest.Mock).mockResolvedValue(mockUser);
+
+		// Mock auth services
+		(authService.resetPasswordAuth0 as jest.Mock).mockResolvedValue(mockAuth0User);
 	});
 
 	afterAll(() => {
@@ -89,6 +96,9 @@ describe("admin auth", () => {
 
 		describe("given correct access token on authorization headers", () => {
 			it("should return a 200 status code and user data", async () => {
+				// Mock getUserInfoAuth0 service to return auth0 user info
+				(authService.getUserInfoAuth0 as jest.Mock).mockReturnValueOnce(mockAuth0User);
+
 				const res = await supertest(app)
 					.get("/admin/auth")
 					.set("Authorization", `Bearer ACCESS_TOKEN`);

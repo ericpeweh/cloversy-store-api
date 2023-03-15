@@ -67,7 +67,7 @@ export const deleteUserProfilePicture = async (req: Request, res: Response, next
 
 		res.status(200).json({
 			status: "success",
-			data: { updatedAccountDetails: result.rows[0] }
+			data: { updatedAccountDetails: result }
 		});
 	} catch (error: unknown) {
 		return next(error);

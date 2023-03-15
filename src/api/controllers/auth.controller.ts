@@ -11,6 +11,13 @@ export const authUser = async (req: Request, res: Response, next: NextFunction) 
 	try {
 		const accessToken = req.headers.authorization?.split(" ")[1];
 		const auth0UserData = await authService.getUserInfoAuth0(accessToken!);
+
+		// Throw unathorizaed error
+		if (auth0UserData === undefined) {
+			throw new ErrorObj.ClientError("Failed to authenticate user!", 401);
+		}
+
+		// Create user if user doesn't exist in DB
 		let userData = await userService.getUserDataByEmail(auth0UserData.email);
 
 		if (userData === undefined) {
@@ -25,7 +32,14 @@ export const authUser = async (req: Request, res: Response, next: NextFunction) 
 			status: "success",
 			data: { user: userData }
 		});
-	} catch (error: unknown) {
+	} catch (error: any) {
+		if (error.status === 401) {
+			return res.status(401).json({
+				status: "error",
+				message: error.message
+			});
+		}
+
 		return next(error);
 	}
 };

@@ -15,7 +15,7 @@ export const updateUserAccountDetails = async (
   `;
 	const userResult = await db.query(userQuery, [...updatedUserAccountDetailsData, userSub]);
 
-	return userResult;
+	return userResult.rows[0];
 };
 
 export const changeUserProfilePicture = async (
@@ -33,8 +33,9 @@ export const changeUserProfilePicture = async (
 		userEmail
 	]);
 
-	return userData;
+	return userData.rows[0];
 };
+
 export const deleteUserProfilePicture = async (userEmail: string) => {
 	const imageQuery = `UPDATE users
     SET profile_picture = NULL

@@ -16,6 +16,8 @@ const getUserData = async (req: JWTRequest, _: Response, next: NextFunction) => 
 		const user = await userService.getUserDataBySub(req.auth.sub);
 		if (user) {
 			req.user = user;
+		} else {
+			throw new ErrorObj.ServerError("Failed to get user data.");
 		}
 
 		return next();

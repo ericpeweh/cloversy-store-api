@@ -15,17 +15,21 @@ export const getUserInfoAuth0 = async (accessToken: string) => {
 };
 
 export const resetPasswordAuth0 = async (userEmail: string) => {
-	const response = await axios.post(
-		"https://dev-yinr7e34g2h7igf4.us.auth0.com/dbconnections/change_password",
-		{
-			client_id: process.env.AUTH0_CLIENTID,
-			email: userEmail,
-			connection: "Username-Password-Authentication"
-		},
-		{
-			headers: { "content-type": "application/json" }
-		}
-	);
-
-	return response.data;
+	try {
+		const response = await axios.post(
+			"https://dev-yinr7e34g2h7igf4.us.auth0.com/dbconnections/change_password",
+			{
+				client_id: process.env.AUTH0_CLIENTID,
+				// email: userEmail,
+				email: "-",
+				connection: "Username-Password-Authentication"
+			},
+			{
+				headers: { "content-type": "application/json" }
+			}
+		);
+		return response.data;
+	} catch (error) {
+		console.log(error);
+	}
 };

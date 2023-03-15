@@ -121,3 +121,5 @@ server.listen(5000, () => {
 	initScheduledNotifMarketings();
 	initScheduledEmailMarketings();
 });
+
+export default app;

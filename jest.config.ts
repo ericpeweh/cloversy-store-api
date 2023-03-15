@@ -7,7 +7,10 @@ const config: Config = {
 		"/src/config/corsObject.ts",
 		"/src/config/firebase-admin.json",
 		"/src/config/google-cloud.json"
-	]
+	],
+	moduleNameMapper: {
+		"\\.(jpg|jpeg|png)$": "identity-obj-proxy"
+	}
 };
 
 export default config;

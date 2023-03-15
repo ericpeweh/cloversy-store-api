@@ -19,7 +19,7 @@ export const getAllCustomers = async (page: string, searchQuery: string, statusQ
 export const getUserDataByEmail = async (userEmail: string) => {
 	const userData = await userRepo.getUserDataByEmail(userEmail);
 
-	return userData.rows[0];
+	return userData;
 };
 
 export const getUserDataBySub = async (userSub: string) => {

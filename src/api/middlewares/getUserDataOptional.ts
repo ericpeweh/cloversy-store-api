@@ -15,11 +15,8 @@ const getUserDataOptional = async (req: JWTRequest, res: Response, next: NextFun
 			req.user = user;
 		}
 		next();
-	} catch (error: any) {
-		return res.status(error.statusCode).json({
-			status: "error",
-			message: error.message
-		});
+	} catch (error: unknown) {
+		return next(error);
 	}
 };
 

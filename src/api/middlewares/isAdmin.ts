@@ -8,7 +8,7 @@ import { userService } from "../services";
 // Utils
 import { ErrorObj } from "../utils";
 
-const isAdmin = async (req: JWTRequest, res: Response, next: NextFunction) => {
+const isAdmin = async (req: JWTRequest, _: Response, next: NextFunction) => {
 	try {
 		if (req.auth === undefined) {
 			throw new ErrorObj.ServerError("Failed to check user authority, please try again.");
@@ -21,11 +21,8 @@ const isAdmin = async (req: JWTRequest, res: Response, next: NextFunction) => {
 		}
 
 		return next();
-	} catch (error: any) {
-		return res.status(error.statusCode).json({
-			status: "error",
-			message: error.message
-		});
+	} catch (error: unknown) {
+		return next(error);
 	}
 };
 

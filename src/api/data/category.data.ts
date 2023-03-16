@@ -38,7 +38,7 @@ export const getAllCategories = async (page: string, searchQuery: string, sortBy
 	const totalCategory = totalResult.rows[0].count;
 
 	return {
-		categories,
+		categories: categories.rows,
 		page: parseInt(page) || "all",
 		pageSize: categories.rowCount,
 		totalCount: parseInt(totalCategory),
@@ -55,7 +55,7 @@ export const createCategory = async (categoryData: Array<any>) => {
 
 	const result = await db.query(query, categoryData);
 
-	return result;
+	return result.rows[0];
 };
 
 export const updateCategory = async (updatedCategory: Array<string>, categoryId: string) => {
@@ -67,7 +67,7 @@ export const updateCategory = async (updatedCategory: Array<string>, categoryId:
 
 	const result = await db.query(query, [...updatedCategory, categoryId]);
 
-	return result;
+	return result.rows[0];
 };
 
 export const deleteCategory = async (categoryId: string) => {
@@ -76,5 +76,5 @@ export const deleteCategory = async (categoryId: string) => {
 
 	const result = await db.query(query, [categoryId]);
 
-	return result;
+	return result.rows[0];
 };

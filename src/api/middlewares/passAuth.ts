@@ -6,10 +6,7 @@ const passAuth = async (error: any, _: Request, res: Response, next: NextFunctio
 	if (error.name === "UnauthorizedError") {
 		next();
 	} else {
-		return res.status(500).json({
-			status: "error",
-			message: error.message
-		});
+		return next(error);
 	}
 };
 

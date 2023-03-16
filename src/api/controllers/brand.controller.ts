@@ -4,29 +4,20 @@ import { Request, Response, NextFunction } from "express";
 // Services
 import { brandService } from "../services";
 
-// Utils
-import { ErrorObj } from "../utils";
-
 export const getAllBrands = async (req: Request, res: Response, next: NextFunction) => {
 	const { page = "", q = "", sortBy = "id" } = req.query;
 
 	try {
-		if (typeof sortBy !== "string" || typeof q !== "string" || typeof page !== "string") {
-			throw new ErrorObj.ClientError(
-				"Query param 'page', 'q', and 'sortBy' has to be type of string"
-			);
-		}
-
-		if (!["product_amount", "a-z", "z-a", "id", ""].includes(sortBy)) {
-			throw new ErrorObj.ClientError("Query param 'sortBy' is not supported");
-		}
-
-		const { brands, ...paginationData } = await brandService.getAllBrands(page, q, sortBy);
+		const { brands, ...paginationData } = await brandService.getAllBrands(
+			page as string,
+			q as string,
+			sortBy as string
+		);
 
 		res.status(200).json({
 			status: "success",
 			...paginationData,
-			data: { brands: brands.rows }
+			data: { brands: brands }
 		});
 	} catch (error: unknown) {
 		return next(error);
@@ -41,9 +32,9 @@ export const createBrand = async (req: Request, res: Response, next: NextFunctio
 
 		const result = await brandService.createBrand(brandQueryData);
 
-		res.status(200).json({
+		res.status(201).json({
 			status: "success",
-			data: { newBrand: result.rows[0] }
+			data: { newBrand: result }
 		});
 	} catch (error: unknown) {
 		return next(error);
@@ -61,7 +52,7 @@ export const updateBrand = async (req: Request, res: Response, next: NextFunctio
 
 		res.status(200).json({
 			status: "success",
-			data: { updatedBrand: result.rows[0] }
+			data: { updatedBrand: result }
 		});
 	} catch (error: unknown) {
 		return next(error);
@@ -76,7 +67,7 @@ export const deleteBrand = async (req: Request, res: Response, next: NextFunctio
 
 		res.status(200).json({
 			status: "success",
-			data: { deletedBrand: result.rows[0] }
+			data: { deletedBrand: result }
 		});
 	} catch (error: unknown) {
 		return next(error);

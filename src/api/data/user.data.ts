@@ -56,7 +56,7 @@ export const getUserDataBySub = async (userSub: string) => {
 	const userQuery = "SELECT * FROM users WHERE sub = $1";
 	const userResult = await db.query(userQuery, [userSub]);
 
-	return userResult;
+	return userResult.rows[0];
 };
 
 export const getUserDataByEmail = async (userEmail: string) => {

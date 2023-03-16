@@ -38,7 +38,7 @@ export const getAllBrands = async (page: string, searchQuery: string, sortBy: st
 	const totalBrands = totalResult.rows[0].count;
 
 	return {
-		brands,
+		brands: brands.rows,
 		page: parseInt(page) || "all",
 		pageSize: brands.rowCount,
 		totalCount: parseInt(totalBrands),
@@ -54,7 +54,7 @@ export const createBrand = async (brandData: Array<any>) => {
 
 	const result = await db.query(query, brandData);
 
-	return result;
+	return result.rows[0];
 };
 
 export const updateBrand = async (updatedBrand: Array<string>, brandId: string) => {
@@ -65,7 +65,7 @@ export const updateBrand = async (updatedBrand: Array<string>, brandId: string) 
 
 	const result = await db.query(query, [...updatedBrand, brandId]);
 
-	return result;
+	return result.rows[0];
 };
 
 export const deleteBrand = async (brandId: string) => {
@@ -74,5 +74,5 @@ export const deleteBrand = async (brandId: string) => {
 
 	const result = await db.query(query, [brandId]);
 
-	return result;
+	return result.rows[0];
 };

@@ -8,10 +8,10 @@ import { userService } from "../services";
 // Utils
 import { ErrorObj } from "../utils";
 
-const isAdmin = async (req: JWTRequest, _: Response, next: NextFunction) => {
+const isAdmin = async (req: JWTRequest, res: Response, next: NextFunction) => {
 	try {
 		if (req.auth === undefined) {
-			throw new ErrorObj.ServerError("Failed to check user authority, please try again.");
+			throw new ErrorObj.ClientError("Failed to check user authority, please try again.", 401);
 		}
 		const user = await userService.getUserDataBySub(req.auth.sub);
 		const userRole = user.user_role;

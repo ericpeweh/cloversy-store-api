@@ -25,7 +25,7 @@ export const getUserDataByEmail = async (userEmail: string) => {
 export const getUserDataBySub = async (userSub: string) => {
 	const userData = await userRepo.getUserDataBySub(userSub);
 
-	return userData.rows[0];
+	return userData;
 };
 
 export const getUserDataById = async (userId: string) => {

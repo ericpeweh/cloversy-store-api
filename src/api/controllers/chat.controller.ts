@@ -15,13 +15,9 @@ export const getConversation = async (req: Request, res: Response, next: NextFun
 	try {
 		if (!userId) throw new ErrorObj.ClientError("Failed to identify user!", 403);
 
-		if (typeof currentCursor !== "string" || typeof conversationId !== "string") {
-			throw new ErrorObj.ClientError("Query params has to be type of string");
-		}
-
 		const { conversation, messages, paginationData } = await chatService.getConversation(
 			conversationId,
-			currentCursor,
+			currentCursor as string,
 			userId
 		);
 
@@ -42,12 +38,8 @@ export const getConversationList = async (req: Request, res: Response, next: Nex
 	try {
 		if (!userId) throw new ErrorObj.ClientError("Failed to identify user!", 403);
 
-		if (typeof page !== "string") {
-			throw new ErrorObj.ClientError("Query param has to be type of string");
-		}
-
 		const { conversations, ...paginationData } = await chatService.getConversationList(
-			page,
+			page as string,
 			userId
 		);
 

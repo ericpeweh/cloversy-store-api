@@ -35,3 +35,15 @@ export const mockPaginationData = {
 	totalCount: 100,
 	totalPages: 10
 };
+
+export const mockIdentifyUserErrorBody = {
+	message: "Failed to identify user!",
+	status: "error"
+};
+
+export const mockCursorData = {
+	nextCursor: 15,
+	currentCursor: 10,
+	maxCursor: 100,
+	minCursor: 1
+};

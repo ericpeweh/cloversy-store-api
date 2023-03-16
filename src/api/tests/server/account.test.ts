@@ -63,7 +63,7 @@ describe("admin account route", () => {
 		app.use(express.json());
 		app.use("/admin/account", isAuth, isAdmin, getUserData, accountRouter, errorHandler);
 
-		server = app.listen(6000);
+		server = app.listen();
 	});
 
 	afterAll(() => {

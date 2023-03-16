@@ -43,7 +43,6 @@ import express, { Request, Response, NextFunction } from "express";
 import supertest from "supertest";
 import { Server } from "http";
 import { isAuth, isAdmin, errorHandler } from "../../middlewares";
-import { brandService } from "../../services";
 import { brandRepo } from "../../data";
 
 // Module to test
@@ -58,7 +57,7 @@ describe("admin brand route", () => {
 		app.use(express.json());
 		app.use("/admin/brands", isAuth, isAdmin, brandRouter, errorHandler);
 
-		server = app.listen(6000);
+		server = app.listen();
 	});
 
 	afterAll(() => {

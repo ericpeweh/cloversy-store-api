@@ -46,7 +46,7 @@ describe("admin auth", () => {
 
 	beforeAll(() => {
 		app.use("/admin/auth", isAuth, isAdmin, authRouter, errorHandler);
-		server = app.listen(6000);
+		server = app.listen();
 
 		// Mock user services
 		(userRepo.getUserDataByEmail as jest.Mock).mockResolvedValue(mockUser);

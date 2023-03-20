@@ -8,10 +8,14 @@ import * as authController from "./auth.controller";
 import * as transactionController from "./transaction.controller";
 import * as reviewController from "./review.controller";
 import * as subscriptionController from "./subscription.controller";
-import * as marketingController from "./marketing.controller";
+import * as emailMarketingController from "./email.marketing.controller";
+import * as notifMarketingController from "./notif.marketing.controller";
 import * as notificationController from "./notification.controller";
 import * as dashboardController from "./dashboard.controller";
 import * as chatController from "./chat.controller";
+
+// Combine splited marketing controllers
+const marketingController = { ...emailMarketingController, ...notifMarketingController };
 
 export {
 	productController,

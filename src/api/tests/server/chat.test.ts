@@ -48,16 +48,12 @@ import express, { Request, Response, NextFunction } from "express";
 import { Server } from "http";
 import supertest from "supertest";
 import { isAuth, isAdmin, errorHandler, getUserData } from "../../middlewares";
-import { userService } from "../../services/client";
-import { updateUserAccountDetails } from "../../data/client/user.data";
 import { ErrorObj } from "../../utils";
-import path from "path";
 
 // Module to test
 import chatRouter from "../../routes/chat.route";
 import { Conversation } from "../../interfaces";
 import { chatRepo } from "../../data";
-import { chatService } from "../../services";
 
 describe("admin chat route", () => {
 	const app = express();

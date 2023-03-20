@@ -47,3 +47,69 @@ export const mockCursorData = {
 	maxCursor: 100,
 	minCursor: 1
 };
+
+export const mockDashboardData = {
+	salesTotal: 10000,
+	transactionCount: 1000,
+	productCount: 200,
+	customerCount: 4000,
+	reviewCount: 500,
+	activeVoucherCount: 10,
+	monthlySalesCount: [
+		{ month: "Jan", product_sales: 10 },
+		{ month: "Feb", product_sales: 15 },
+		{ month: "Mar", product_sales: 5 },
+		{ month: "Apr", product_sales: 8 },
+		{ month: "May", product_sales: 7 },
+		{ month: "Jun", product_sales: 9 },
+		{ month: "Jul", product_sales: 20 },
+		{ month: "Aug", product_sales: 18 },
+		{ month: "Sep", product_sales: 23 },
+		{ month: "Oct", product_sales: 6 },
+		{ month: "Nov", product_sales: 13 }
+	],
+	monthlyVisitorCount: [
+		{
+			dimensionValues: [
+				{
+					value: "02",
+					oneValue: "value"
+				}
+			],
+			metricValues: [
+				{
+					value: "1525",
+					oneValue: "value"
+				}
+			]
+		},
+		{
+			dimensionValues: [
+				{
+					value: "03",
+					oneValue: "value"
+				}
+			],
+			metricValues: [
+				{
+					value: "641",
+					oneValue: "value"
+				}
+			]
+		},
+		{
+			dimensionValues: [
+				{
+					value: "01",
+					oneValue: "value"
+				}
+			],
+			metricValues: [
+				{
+					value: "35",
+					oneValue: "value"
+				}
+			]
+		}
+	]
+};

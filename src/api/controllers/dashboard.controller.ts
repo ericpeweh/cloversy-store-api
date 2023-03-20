@@ -4,9 +4,6 @@ import { Request, Response, NextFunction } from "express";
 // Services
 import { dashboardService } from "../services";
 
-// Utils
-import { ErrorObj } from "../utils";
-
 export const getDashboardData = async (req: Request, res: Response, next: NextFunction) => {
 	const {
 		sales_analytic_year: salesAnalyticYear = "",
@@ -14,19 +11,6 @@ export const getDashboardData = async (req: Request, res: Response, next: NextFu
 	} = req.query;
 
 	try {
-		if (typeof salesAnalyticYear !== "string" || typeof visitorAnalyticYear !== "string") {
-			throw new ErrorObj.ClientError("Query params has to be type of string");
-		}
-
-		if (
-			salesAnalyticYear &&
-			salesAnalyticYear.length !== 4 &&
-			visitorAnalyticYear &&
-			visitorAnalyticYear.length !== 4
-		) {
-			throw new ErrorObj.ClientError(`Invalid query params`);
-		}
-
 		let salesYearFilter = salesAnalyticYear;
 		if (!salesAnalyticYear) {
 			salesYearFilter = new Date().getFullYear().toString();
@@ -37,13 +21,18 @@ export const getDashboardData = async (req: Request, res: Response, next: NextFu
 			visitorYearFilter = new Date().getFullYear().toString();
 		}
 
-		const result = await dashboardService.getDashboardData(salesYearFilter, visitorYearFilter);
+		const result = await dashboardService.getDashboardData(
+			salesYearFilter as string,
+			visitorYearFilter as string
+		);
 
 		res.status(200).json({
 			status: "success",
 			data: result
 		});
 	} catch (error: unknown) {
+		console.log(error);
+
 		return next(error);
 	}
 };

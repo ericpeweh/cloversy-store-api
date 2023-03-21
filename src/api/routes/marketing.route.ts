@@ -10,7 +10,9 @@ const router = Router();
 import validate from "../middlewares/validate";
 import { marketingSchema } from "../validations/schemas";
 
-// Notification marketing
+/* ===================================
+  NOTIFICATION MARKETINGS
+=================================== */
 router.get(
 	"/notifications",
 	validate(marketingSchema.getNotifMarketingsQuerySchema, "query"),
@@ -41,12 +43,39 @@ router.put(
 	marketingController.updateNotificationMarketing
 );
 
-// Email marekting
+/* ===================================
+  EMAIL MARKETINGS
+=================================== */
 router.get("/emails/template", marketingController.getEmailsTemplate);
-router.get("/emails", marketingController.getEmailMarketings);
-router.get("/emails/:emailMarketingId", marketingController.getEmailMarketingDetail);
-router.post("/emails", marketingController.createEmailMarketing);
-router.post("/emails/:emailMarketingId/cancel", marketingController.cancelEmailMarketing);
-router.put("/emails/:emailMarketingId", marketingController.updateEmailMarketing);
+
+router.get(
+	"/emails",
+	validate(marketingSchema.getEmailMarketingsQuerySchema, "query"),
+	marketingController.getEmailMarketings
+);
+
+router.get(
+	"/emails/:emailMarketingId",
+	validate(marketingSchema.getEmailMarketingDetailsParamsSchema, "params"),
+	marketingController.getEmailMarketingDetail
+);
+
+router.post(
+	"/emails",
+	validate(marketingSchema.createEmailMarketingBodySchema, "body"),
+	marketingController.createEmailMarketing
+);
+
+router.post(
+	"/emails/:emailMarketingId/cancel",
+	validate(marketingSchema.cancelEmailMarketingParamsSchema, "params"),
+	marketingController.cancelEmailMarketing
+);
+
+router.put(
+	"/emails/:emailMarketingId",
+	validate(marketingSchema.updateEmailMarketingBodySchema, "body"),
+	marketingController.updateEmailMarketing
+);
 
 export default router;

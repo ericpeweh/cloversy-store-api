@@ -538,7 +538,7 @@ describe("notification marketing route", () => {
 		});
 	});
 
-	describe("PUT /admin/marketing/notifications/:notificationId", () => {
+	describe("PUT /admin/marketing/notifications/:notifMarketingId", () => {
 		afterEach(() => {
 			jest.clearAllMocks();
 		});

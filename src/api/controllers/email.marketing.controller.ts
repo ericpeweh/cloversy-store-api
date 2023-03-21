@@ -33,23 +33,10 @@ export const getEmailMarketings = async (req: Request, res: Response, next: Next
 	const { page = "1", q: searchQuery = "", scheduled = "false" } = req.query;
 
 	try {
-		if (
-			typeof page !== "string" ||
-			typeof searchQuery !== "string" ||
-			typeof scheduled !== "string"
-		) {
-			throw new ErrorObj.ClientError("Query params has to be type of string");
-		}
-
-		if (scheduled !== "true" && scheduled !== "false")
-			throw new ErrorObj.ClientError(
-				"Query param of 'scheduled' should be either 'true' or 'false'"
-			);
-
 		const { emailMarketings, ...paginationData } = await marketingService.getEmailMarketings(
-			page,
-			searchQuery,
-			scheduled
+			page as string,
+			searchQuery as string,
+			scheduled as "true" | "false"
 		);
 
 		res.status(200).json({
@@ -66,8 +53,6 @@ export const getEmailMarketingDetail = async (req: Request, res: Response, next:
 	const { emailMarketingId } = req.params;
 
 	try {
-		if (!emailMarketingId) throw new ErrorObj.ClientError("Invalid email marketing id!");
-
 		const result = await marketingService.getEmailMarketingDetail(emailMarketingId);
 
 		res.status(200).json({
@@ -103,18 +88,6 @@ export const createEmailMarketing = async (req: Request, res: Response, next: Ne
 	};
 
 	try {
-		if (sendTo !== "selected") {
-			throw new ErrorObj.ClientError("Invalid marketing targets data!");
-		}
-
-		if (selectedUserIds.length === 0) {
-			throw new ErrorObj.ClientError("Selected users can't be empty");
-		}
-
-		if (selectedUserIds.length > 100) {
-			throw new ErrorObj.ClientError("Maximum selected users exceeded (max 100 users).");
-		}
-
 		const targets = await userService.getUserEmailAndNameByIds(selectedUserIds);
 
 		// Check email template exist & it params
@@ -147,6 +120,7 @@ export const createEmailMarketing = async (req: Request, res: Response, next: Ne
 		// Handle direct and scheduled email marketing
 		let emailResult;
 		let directNotifSent: boolean = false;
+
 		if (!scheduled) {
 			// Send email directly
 			emailResult = await marketingService.sendEmails(emailObject);
@@ -209,11 +183,13 @@ export const createEmailMarketing = async (req: Request, res: Response, next: Ne
 			});
 		}
 
-		res.status(200).json({
+		res.status(201).json({
 			status: "success",
 			data: { newEmailMarketing }
 		});
 	} catch (error: unknown) {
+		console.log(error);
+
 		return next(error);
 	}
 };
@@ -232,8 +208,6 @@ export const updateEmailMarketing = async (req: Request, res: Response, next: Ne
 	const { emailMarketingId } = req.params;
 
 	try {
-		if (!emailMarketingId) throw new ErrorObj.ClientError("Invalid notification marketing id!");
-
 		const emailMarketingItem = await marketingService.getEmailMarketingDetail(emailMarketingId);
 
 		// Check email template exist & it params
@@ -306,8 +280,6 @@ export const cancelEmailMarketing = async (req: Request, res: Response, next: Ne
 	const { emailMarketingId } = req.params;
 
 	try {
-		if (!emailMarketingId) throw new ErrorObj.ClientError("Invalid email marketing id!");
-
 		// Get notif marketing item & check if exist
 		const emailMarketingItem = await marketingService.getEmailMarketingDetail(emailMarketingId);
 

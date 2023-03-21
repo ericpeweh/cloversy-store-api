@@ -407,7 +407,10 @@ export const getEmailMarketingDetail = async (emailMarketingId: string | number)
 	const result = await db.query(emailMarketingTargetQuery, [emailMarketingId]);
 	const emailMarketingTargets = result.rows;
 
-	return { emailMarketingResult, selectedUsers: emailMarketingTargets };
+	return {
+		emailMarketingResult: emailMarketingResult.rows[0],
+		selectedUsers: emailMarketingTargets
+	};
 };
 
 export const createEmailMarketing = async (
@@ -449,7 +452,7 @@ export const createEmailMarketing = async (
 			JSON.stringify(emailResult?.failedEmails + "")
 		];
 
-		const emailMarketingResult: QueryResult<NotifMarketingItem> = await client.query(
+		const emailMarketingResult: QueryResult<EmailMarketingItem> = await client.query(
 			emailMarketingQuery,
 			emailMarketingParams
 		);

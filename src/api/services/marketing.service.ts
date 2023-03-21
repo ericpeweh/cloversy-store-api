@@ -223,9 +223,13 @@ export const getEmailsTemplate = async () => {
 export const getSingleEmailTemplate = async (templateId: number | string) => {
 	if (!templateId) throw new ErrorObj.ClientError("Invalid email template id!");
 
-	const template: EmailTemplate = await sendinblue.getSmtpTemplate(templateId);
+	try {
+		const template: EmailTemplate = await sendinblue.getSmtpTemplate(templateId);
 
-	return template;
+		return template;
+	} catch (error) {
+		throw new ErrorObj.ClientError(`Failed to find email template with id of '${templateId}'`, 404);
+	}
 };
 
 export const getEmailMarketings = async (
@@ -243,7 +247,7 @@ export const getEmailMarketingDetail = async (emailMarketingId: string) => {
 		emailMarketingId
 	);
 
-	return { ...emailMarketingResult.rows[0], selectedUsers };
+	return { ...emailMarketingResult, selectedUsers };
 };
 
 export const sendEmails = async (email: EmailObject): Promise<SendEmailResult> => {
@@ -317,8 +321,7 @@ export const scheduleEmailMarketing = async (
 	options?: { reschedule?: boolean }
 ) => {
 	const { emailMarketingResult } = await marketingRepo.getEmailMarketingDetail(emailMarketingId);
-	const { email_subject, scheduled, notification_code, params, template_id } =
-		emailMarketingResult.rows[0];
+	const { email_subject, scheduled, notification_code, params, template_id } = emailMarketingResult;
 
 	if (scheduled) {
 		const emailParams = params;

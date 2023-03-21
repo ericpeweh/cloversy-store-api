@@ -188,8 +188,6 @@ export const createEmailMarketing = async (req: Request, res: Response, next: Ne
 			data: { newEmailMarketing }
 		});
 	} catch (error: unknown) {
-		console.log(error);
-
 		return next(error);
 	}
 };

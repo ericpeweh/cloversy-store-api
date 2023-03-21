@@ -11,20 +11,10 @@ export const getAllCustomers = async (req: Request, res: Response, next: NextFun
 	const { page = "1", q: searchQuery = "", status: statusQuery = "" } = req.query;
 
 	try {
-		if (
-			typeof searchQuery !== "string" ||
-			typeof statusQuery !== "string" ||
-			typeof page !== "string"
-		) {
-			throw new ErrorObj.ClientError(
-				"Query param 'page', 'q' and 'status' has to be type of string"
-			);
-		}
-
 		const { customers, ...paginationData } = await userService.getAllCustomers(
-			page,
-			searchQuery,
-			statusQuery
+			page as string,
+			searchQuery as string,
+			statusQuery as string
 		);
 
 		res.status(200).json({
@@ -41,10 +31,6 @@ export const getSingleCustomer = async (req: Request, res: Response, next: NextF
 	const { userId } = req.params;
 
 	try {
-		if (isNaN(parseInt(userId))) {
-			throw new ErrorObj.ClientError("userId must be number");
-		}
-
 		const result = await userService.getUserDataById(userId);
 
 		if (result === undefined) {
@@ -64,10 +50,6 @@ export const getSingleCustomerOrders = async (req: Request, res: Response, next:
 	const { userId } = req.params;
 
 	try {
-		if (isNaN(parseInt(userId))) {
-			throw new ErrorObj.ClientError("userId must be number");
-		}
-
 		const result = await userService.getUserDataById(userId);
 
 		if (result === undefined) {

@@ -4,11 +4,6 @@ import { Request, Response, NextFunction } from "express";
 // Services
 import { productService } from "../services";
 
-// Utils
-import { ErrorObj } from "../utils";
-
-// Types
-
 export const getAllProducts = async (req: Request, res: Response, next: NextFunction) => {
 	const {
 		status: productStatus = "",
@@ -19,28 +14,12 @@ export const getAllProducts = async (req: Request, res: Response, next: NextFunc
 	} = req.query;
 
 	try {
-		if (
-			typeof sortBy !== "string" ||
-			typeof q !== "string" ||
-			typeof page !== "string" ||
-			typeof productStatus !== "string" ||
-			typeof brandFilter !== "string"
-		) {
-			throw new ErrorObj.ClientError(
-				"Query param 'page', 'q', 'status', and 'sortBy' has to be type of string"
-			);
-		}
-
-		if (!["low-to-high", "high-to-low", "rating", "popularity", "id", ""].includes(sortBy)) {
-			throw new ErrorObj.ClientError("Query param 'sortBy' is not supported");
-		}
-
 		const { products, ...paginationData } = await productService.getAllProducts(
-			page,
-			q,
-			sortBy,
-			productStatus,
-			brandFilter
+			page as string,
+			q as string,
+			sortBy as string,
+			productStatus as string,
+			brandFilter as string
 		);
 
 		res.status(200).json({
@@ -61,23 +40,6 @@ export const getSingleProductById = async (req: Request, res: Response, next: Ne
 			visitor_analytic_year: visitorAnalyticYear = ""
 		} = req.query;
 
-		if (
-			typeof productId !== "string" ||
-			typeof salesAnalyticYear !== "string" ||
-			typeof visitorAnalyticYear !== "string"
-		) {
-			throw new ErrorObj.ClientError("Query params has to be type of string");
-		}
-
-		if (
-			salesAnalyticYear &&
-			salesAnalyticYear.length !== 4 &&
-			visitorAnalyticYear &&
-			visitorAnalyticYear.length !== 4
-		) {
-			throw new ErrorObj.ClientError(`Invalid query params`);
-		}
-
 		let salesYearFilter = salesAnalyticYear;
 		if (!salesAnalyticYear) {
 			salesYearFilter = new Date().getFullYear().toString();
@@ -90,8 +52,8 @@ export const getSingleProductById = async (req: Request, res: Response, next: Ne
 
 		const result = await productService.getSingleProduct(
 			productId,
-			salesYearFilter,
-			visitorYearFilter
+			salesYearFilter as string,
+			visitorYearFilter as string
 		);
 
 		res.status(200).json({
@@ -151,11 +113,11 @@ export const updateProduct = async (req: Request, res: Response, next: NextFunct
 			brand_id,
 			description,
 			slug,
-			tags = "",
-			sizes = "",
-			removedTags = "",
-			removedSizes = "",
-			removedImages = ""
+			tags = [],
+			sizes = [],
+			removedTags = [],
+			removedSizes = [],
+			removedImages = []
 		} = req.body;
 		const images = req.files as Express.Multer.File[];
 

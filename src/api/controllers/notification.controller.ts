@@ -17,19 +17,11 @@ export const getAllNotifications = async (req: Request, res: Response, next: Nex
 	try {
 		if (!userId) throw new ErrorObj.ClientError("Failed to identify user!", 403);
 
-		if (typeof type !== "string" || typeof page !== "string" || typeof itemsLimit !== "string") {
-			throw new ErrorObj.ClientError("Query params has to be type of string");
-		}
-
-		if (!["transaction", "marketing", "message", "system", ""].includes(type)) {
-			throw new ErrorObj.ClientError(`Query params 'type' of '${type}' is not supported`);
-		}
-
 		const { notifications, notRead, ...paginationData } =
 			await notificationService.getAllNotifications(
 				type as NotificationTypeFilter,
-				page,
-				itemsLimit,
+				page as string,
+				itemsLimit as string,
 				userId
 			);
 
@@ -49,7 +41,6 @@ export const readNotification = async (req: Request, res: Response, next: NextFu
 
 	try {
 		if (!userId) throw new ErrorObj.ClientError("Failed to identify user!", 403);
-		if (!notificationId) throw new ErrorObj.ClientError("Invalid notification id!");
 
 		// Check notification exist
 		await notificationService.getNotificationItem(notificationId);

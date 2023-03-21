@@ -126,7 +126,7 @@ jest.mock("../../utils/scheduler.ts", () => ({
 }));
 
 // Mock console.log
-// jest.spyOn(global.console, "log").mockImplementation(() => {});
+jest.spyOn(global.console, "log").mockImplementation(() => {});
 
 // Dependencies
 import express, { Request, Response, NextFunction } from "express";

@@ -29,34 +29,13 @@ export const getTransactions = async (req: Request, res: Response, next: NextFun
 			limit: itemsLimit = "12"
 		} = req.query;
 
-		if (
-			typeof userId !== "string" ||
-			typeof transactionStatus !== "string" ||
-			typeof searchQuery !== "string" ||
-			typeof sortBy !== "string" ||
-			typeof page !== "string" ||
-			typeof itemsLimit !== "string"
-		) {
-			throw new ErrorObj.ClientError("Query params has to be type of string");
-		}
-
-		if (!["pending", "process", "sent", "success", "cancel", ""].includes(transactionStatus)) {
-			throw new ErrorObj.ClientError(
-				`Query params 'status' of '${transactionStatus}' is not supported`
-			);
-		}
-
-		if (!["low-to-high", "high-to-low", "order_status", "created_at", "id", ""].includes(sortBy)) {
-			throw new ErrorObj.ClientError(`Query params 'sortBy' of '${sortBy}' is not supported`);
-		}
-
 		const { transactions, ...paginationData } = await transactionService.getTransactions(
-			userId,
-			transactionStatus,
-			searchQuery,
-			sortBy,
-			page,
-			itemsLimit
+			userId as string,
+			transactionStatus as string,
+			searchQuery as string,
+			sortBy as string,
+			page as string,
+			itemsLimit as string
 		);
 
 		res.status(200).json({
@@ -74,9 +53,6 @@ export const getSingleTransaction = async (req: Request, res: Response, next: Ne
 	const { transactionId } = req.params;
 
 	try {
-		if (!transactionId || transactionId.length !== 10)
-			throw new ErrorObj.ClientError("Invalid transaction id!");
-
 		const transactionData = await transactionService.getSingleTransaction(transactionId);
 		const { timeline: timelineData, ...transaction } = transactionData;
 
@@ -142,9 +118,6 @@ export const updateTransaction = async (req: Request, res: Response, next: NextF
 	} = req.body;
 
 	try {
-		if (!transactionId || transactionId.length !== 10)
-			throw new ErrorObj.ClientError("Invalid transaction id!");
-
 		const updatedTransactionData = {
 			order_note: orderNote,
 			customer_note: customerNote,
@@ -175,12 +148,6 @@ export const changeTransactionStatus = async (req: Request, res: Response, next:
 	const { orderStatus } = req.body;
 
 	try {
-		if (!transactionId || transactionId.length !== 10)
-			throw new ErrorObj.ClientError("Invalid transaction id!");
-
-		if (!orderStatus || !["pending", "process", "sent", "success", "cancel"].includes(orderStatus))
-			throw new ErrorObj.ClientError("Invalid order status!");
-
 		// Check transasction exist and its status
 		const transaction = await transactionService.getTransactionItem(transactionId);
 

@@ -7,7 +7,8 @@ const config: Config = {
 		"/src/api/middlewares/isAuth.ts",
 		"/src/config/corsObject.ts",
 		"/src/config/firebase-admin.json",
-		"/src/config/google-cloud.json"
+		"/src/config/google-cloud.json",
+		"/src/api/data/*"
 	],
 	moduleNameMapper: {
 		"\\.(jpg|jpeg|png)$": "identity-obj-proxy"

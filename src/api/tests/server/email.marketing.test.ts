@@ -1,5 +1,5 @@
 // Mocks
-import { mockErrorBody, mockAuth0User, mockPaginationData } from "./helpers/mockVariables";
+import { mockAuth0User, mockPaginationData } from "./helpers/mockVariables";
 
 // Mock middlewares
 jest.mock("../../middlewares", () => ({
@@ -12,6 +12,9 @@ jest.mock("../../middlewares", () => ({
 		return next();
 	})
 }));
+
+// Mock console.log
+jest.spyOn(global.console, "log").mockImplementation(() => {});
 
 const newEmailMarketing = {
 	title: "NEW_EMAIL_MARKETING",
@@ -661,8 +664,6 @@ describe("notification marketing route", () => {
 				const res = await supertest(app)
 					.put("/admin/marketing/emails/1")
 					.send(updatedEmailMarketing);
-
-				console.log(res.body);
 
 				const updatedEmailMarketingData = {
 					title: updatedEmailMarketing.title,

@@ -31,8 +31,6 @@ export const getDashboardData = async (req: Request, res: Response, next: NextFu
 			data: result
 		});
 	} catch (error: unknown) {
-		console.log(error);
-
 		return next(error);
 	}
 };

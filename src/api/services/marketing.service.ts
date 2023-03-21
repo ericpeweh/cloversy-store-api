@@ -106,7 +106,7 @@ export const getNotificationMarketingDetail = async (notifMarketingId: string) =
 	const { notifMarketingResult, selectedUsers } =
 		await marketingRepo.getNotificationMarketingDetail(notifMarketingId);
 
-	return { ...notifMarketingResult.rows[0], selectedUsers };
+	return { ...notifMarketingResult, selectedUsers };
 };
 
 export const getNotifMarketingTargetUserIds = async (notifMarketingId: string | number) => {
@@ -132,7 +132,7 @@ export const scheduleNotifMarketingNotification = async (
 		action_title,
 		notification_code,
 		send_to
-	} = notifMarketingResult.rows[0];
+	} = notifMarketingResult;
 
 	if (scheduled) {
 		// Build message

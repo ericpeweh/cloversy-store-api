@@ -290,7 +290,10 @@ export const getNotificationMarketingDetail = async (notifMarketingId: string | 
 	const result = await db.query(notifMarketingTargetQuery, [notifMarketingId]);
 	const notifMarketingTargets = result.rows;
 
-	return { notifMarketingResult, selectedUsers: notifMarketingTargets };
+	return {
+		notifMarketingResult: notifMarketingResult.rows[0],
+		selectedUsers: notifMarketingTargets
+	};
 };
 
 export const getNotifMarketingTargetUserIds = async (notifMarketingId: string | number) => {

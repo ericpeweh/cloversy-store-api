@@ -47,10 +47,6 @@ export const createNotificationMarketing = async (
 	};
 
 	try {
-		if (!["all", "selected"].includes(sendTo)) {
-			throw new ErrorObj.ClientError("Invalid marketing targets data!");
-		}
-
 		if (sendTo === "selected" && selectedUserIds.length === 0) {
 			throw new ErrorObj.ClientError(
 				"Selected users can't be empty if sendTo is set to 'selected'."
@@ -148,7 +144,7 @@ export const createNotificationMarketing = async (
 			});
 		}
 
-		res.status(200).json({
+		res.status(201).json({
 			status: "success",
 			data: { newNotifMarketing }
 		});
@@ -165,23 +161,10 @@ export const getNotificationMarketings = async (
 	const { page = "1", q: searchQuery = "", scheduled = "false" } = req.query;
 
 	try {
-		if (
-			typeof page !== "string" ||
-			typeof searchQuery !== "string" ||
-			typeof scheduled !== "string"
-		) {
-			throw new ErrorObj.ClientError("Query params has to be type of string");
-		}
-
-		if (scheduled !== "true" && scheduled !== "false")
-			throw new ErrorObj.ClientError(
-				"Query param of 'scheduled' should be either 'true' or 'false'"
-			);
-
 		const { notifMarketings, ...paginationData } = await marketingService.getNotificationMarketings(
-			page,
-			searchQuery,
-			scheduled
+			page as string,
+			searchQuery as string,
+			scheduled as "true" | "false"
 		);
 
 		res.status(200).json({
@@ -202,8 +185,6 @@ export const getNotificationMarketingDetail = async (
 	const { notifMarketingId } = req.params;
 
 	try {
-		if (!notifMarketingId) throw new ErrorObj.ClientError("Invalid notification marketing id!");
-
 		const result = await marketingService.getNotificationMarketingDetail(notifMarketingId);
 
 		res.status(200).json({
@@ -238,8 +219,6 @@ export const updateNotificationMarketing = async (
 	const { notifMarketingId } = req.params;
 
 	try {
-		if (!notifMarketingId) throw new ErrorObj.ClientError("Invalid notification marketing id!");
-
 		const notificationMarketingItem = await marketingService.getNotificationMarketingDetail(
 			notifMarketingId
 		);
@@ -305,8 +284,6 @@ export const cancelNotificationMarketing = async (
 	const { notifMarketingId } = req.params;
 
 	try {
-		if (!notifMarketingId) throw new ErrorObj.ClientError("Invalid notification marketing id!");
-
 		// Get notif marketing item & check if exist
 		const notificationMarketingItem = await marketingService.getNotificationMarketingDetail(
 			notifMarketingId

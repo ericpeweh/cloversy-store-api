@@ -16,7 +16,7 @@ import { productSchema } from "../validations/schemas";
 // Routing
 router.get(
 	"/",
-	validate(productSchema.getNotifMarketingsQuerySchema, "query"),
+	validate(productSchema.getAllProductsQuerySchema, "query"),
 	productController.getAllProducts
 );
 

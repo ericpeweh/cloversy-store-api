@@ -7,8 +7,6 @@ import { productService } from "../../services/client";
 // Utils
 import { ErrorObj } from "../../utils";
 
-// Types
-
 export const getAllProducts = async (req: Request, res: Response, next: NextFunction) => {
 	const {
 		brand: brandFilter = "",
@@ -20,30 +18,13 @@ export const getAllProducts = async (req: Request, res: Response, next: NextFunc
 	} = req.query;
 
 	try {
-		if (
-			typeof sortBy !== "string" ||
-			typeof q !== "string" ||
-			typeof page !== "string" ||
-			typeof brandFilter !== "string" ||
-			typeof count !== "string" ||
-			typeof priceFilter !== "string"
-		) {
-			throw new ErrorObj.ClientError(
-				"Query param 'page', 'q', 'brand', 'count', 'price', and 'sortBy' has to be type of string"
-			);
-		}
-
-		if (!["low-to-high", "high-to-low", "rating", "popularity", "id", ""].includes(sortBy)) {
-			throw new ErrorObj.ClientError("Query param 'sortBy' is not supported");
-		}
-
 		const { products, priceRange } = await productService.getAllProducts(
-			page,
-			q,
-			sortBy,
-			brandFilter,
-			count,
-			priceFilter
+			page as string,
+			q as string,
+			sortBy as string,
+			brandFilter as string,
+			count as string,
+			priceFilter as string
 		);
 		const { products: productsData, ...paginationData } = products;
 
@@ -63,11 +44,6 @@ export const getAllProducts = async (req: Request, res: Response, next: NextFunc
 export const getSingleProductBySlug = async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		const { productSlug } = req.params;
-
-		if (typeof productSlug !== "string") {
-			throw new ErrorObj.ClientError("Query param 'id' has to be type of string");
-		}
-
 		const { productResult, recommendationsResult, productReviews } =
 			await productService.getSingleProductBySlug(productSlug);
 

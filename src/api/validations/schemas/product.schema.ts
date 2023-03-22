@@ -1,8 +1,7 @@
 // Dependencies
 import Joi from "joi";
 
-export const getNotifMarketingsQuerySchema = Joi.object({
-	status: Joi.string().valid("active", "disabled", "").allow("").optional(),
+const getAllProductsBaseSchema = {
 	brand: Joi.string().allow("").pattern(/^\d+$/).optional().messages({
 		"string.pattern.base": "Please provide a valid 'brand' id."
 	}),
@@ -14,12 +13,35 @@ export const getNotifMarketingsQuerySchema = Joi.object({
 		"string.pattern.base": "Please provide a valid 'page'."
 	}),
 	q: Joi.string().allow("").optional()
+};
+
+export const getAllProductsQuerySchema = Joi.object({
+	...getAllProductsBaseSchema,
+	status: Joi.string().valid("active", "disabled", "").allow("").optional()
+});
+
+export const getAllProductsClientQuerySchema = Joi.object({
+	...getAllProductsBaseSchema,
+	count: Joi.string().allow("").pattern(/^\d+$/).optional().messages({
+		"string.pattern.base": "Please provide a valid products 'count'."
+	}),
+	price: Joi.string()
+		.allow("")
+		.pattern(/(\d+\.\d+)/)
+		.optional()
+		.messages({
+			"string.pattern.base": "Please provide a valid 'price' filter."
+		})
 });
 
 export const getSingleProductByIdParamsSchema = Joi.object({
 	productId: Joi.string().pattern(/^\d+$/).required().messages({
 		"string.pattern.base": "Please provide a valid 'productId'."
 	})
+});
+
+export const getSingleProductBySlugParamsSchema = Joi.object({
+	productSlug: Joi.string().required()
 });
 
 export const getSingleProductByIdQuerySchema = Joi.object({

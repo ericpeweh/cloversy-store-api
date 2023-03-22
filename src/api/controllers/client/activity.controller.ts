@@ -31,8 +31,6 @@ export const trackUserLastSeenProduct = async (req: Request, res: Response, next
 	try {
 		if (!userId) throw new ErrorObj.ClientError("Failed to identify user!", 403);
 
-		if (!productId) throw new ErrorObj.ClientError("Invalid product id!", 404);
-
 		const lastSeenProductId = await productService.trackUserLastSeenProduct(productId, userId);
 
 		res.status(200).json({

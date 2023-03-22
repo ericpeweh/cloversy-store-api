@@ -123,14 +123,6 @@ export const addProductToCart = async (req: Request, res: Response, next: NextFu
 	let cartResult: CartItemDetails[] = [];
 
 	try {
-		if (!product_id || isNaN(+quantity) || isNaN(+size)) {
-			throw new ErrorObj.ClientError("Cart data not valid, please provide a valid data.");
-		}
-
-		if (+quantity === 0) {
-			throw new ErrorObj.ClientError("Quantity should not be 0.");
-		}
-
 		if (!userId) {
 			const currentCart = req.session.cart || [];
 
@@ -161,14 +153,6 @@ export const updateCartItem = async (req: Request, res: Response, next: NextFunc
 	const { id: cartItemId, quantity }: CartItem = req.body;
 
 	try {
-		if (!cartItemId || isNaN(+quantity)) {
-			throw new ErrorObj.ClientError("Cart data not valid, please provide a valid data.");
-		}
-
-		if (+quantity === 0) {
-			throw new ErrorObj.ClientError("Quantity should not be 0.");
-		}
-
 		let cartResult: CartItemDetails[];
 		if (!userId) {
 			// Edit product in session cart
@@ -207,10 +191,6 @@ export const deleteCartItem = async (req: Request, res: Response, next: NextFunc
 	let cartResult: CartItemDetails[];
 
 	try {
-		if (!cartItemId) {
-			throw new ErrorObj.ClientError("Invalid cart item id!");
-		}
-
 		if (!userId) {
 			// Edit product in session cart
 			const currentCart = req.session.cart || [];

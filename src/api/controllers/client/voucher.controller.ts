@@ -33,12 +33,6 @@ export const getSingleVoucher = async (req: Request, res: Response, next: NextFu
 	const { voucherCode } = req.params;
 
 	try {
-		if (typeof voucherCode !== "string") {
-			throw new ErrorObj.ClientError("Query param 'voucherCode' has to be type of string");
-		}
-
-		if (voucherCode?.length !== 10) throw new ErrorObj.ClientError("Invalid voucher code!");
-
 		if (!userId) {
 			throw new ErrorObj.ClientError("Failed to identity user!");
 		}

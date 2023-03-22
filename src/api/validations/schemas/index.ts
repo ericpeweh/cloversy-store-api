@@ -12,6 +12,10 @@ import * as subscriptionSchema from "./subscription.schema";
 import * as transactionSchema from "./transaction.schema";
 import * as userSchema from "./user.schema";
 import * as voucherSchema from "./voucher.schema";
+import * as activitySchema from "./activity.schema";
+import * as cartSchema from "./cart.schema";
+import * as contactSchema from "./contact.schema";
+import * as dataSchema from "./data.schema";
 
 export {
 	accountSchema,
@@ -26,5 +30,9 @@ export {
 	subscriptionSchema,
 	transactionSchema,
 	userSchema,
-	voucherSchema
+	voucherSchema,
+	activitySchema,
+	cartSchema,
+	contactSchema,
+	dataSchema
 };

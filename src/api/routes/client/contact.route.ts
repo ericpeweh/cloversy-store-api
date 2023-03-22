@@ -6,7 +6,15 @@ import { contactController } from "../../controllers/client";
 
 const router = Router();
 
+// Validations
+import validate from "../../middlewares/validate";
+import { contactSchema } from "../../validations/schemas";
+
 // Routing
-router.post("/message", contactController.createMessageWebForm);
+router.post(
+	"/message",
+	validate(contactSchema.postCreateMessageWebFormBodySchema, "body"),
+	contactController.createMessageWebForm
+);
 
 export default router;

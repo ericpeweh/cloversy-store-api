@@ -11,10 +11,6 @@ export const subscribeToEmail = async (req: Request, res: Response, next: NextFu
 	const { email } = req.body;
 
 	try {
-		// Add email validation later with JOI
-
-		if (!email) throw new ErrorObj.ClientError("Invalid email!");
-
 		const subscribedEmail = await subscriptionService.subscribeToEmail(email);
 
 		res.status(200).json({
@@ -51,8 +47,6 @@ export const subscribeToPush = async (req: Request, res: Response, next: NextFun
 	try {
 		if (!userId) throw new ErrorObj.ClientError("Failed to identify user!");
 
-		if (!token) throw new ErrorObj.ClientError("Invalid token!");
-
 		const subscriptionId = await subscriptionService.subscribeToPush(token, userId.toString());
 
 		res.status(200).json({
@@ -72,8 +66,6 @@ export const unsubscribeFromPush = async (req: Request, res: Response, next: Nex
 
 	try {
 		if (!userId) throw new ErrorObj.ClientError("Failed to identify user!");
-
-		if (!subscriptionId) throw new ErrorObj.ClientError("Invalid subscription id!");
 
 		await subscriptionService.unsubscribeFromPush(+subscriptionId, userId.toString());
 

@@ -5,22 +5,10 @@ import { Request, Response, NextFunction } from "express";
 import { contactService } from "../../services/client";
 import { notificationService, userService } from "../../services";
 
-// Utils
-import { ErrorObj } from "../../utils";
-
 export const createMessageWebForm = async (req: Request, res: Response, next: NextFunction) => {
 	const { senderName, email, objective, title, message } = req.body;
 
 	try {
-		if (!senderName || !email || !objective || !title || !message)
-			throw new ErrorObj.ClientError("Invalid message format");
-
-		if (!["Produk", "Website / Store", "Partnership", "Lainnya"].includes(objective))
-			throw new ErrorObj.ClientError("Invalid objective!");
-
-		if (message.length > 1000)
-			throw new ErrorObj.ClientError("Message too long, max 1000 characters");
-
 		const newMessage = {
 			senderName,
 			email,

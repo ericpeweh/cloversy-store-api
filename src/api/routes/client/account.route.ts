@@ -29,14 +29,41 @@ router.delete("/details/picture", userController.deleteUserProfilePicture);
 
 // Address Routing
 router.get("/address", addressController.getAllUserAddress);
-router.post("/address", addressController.createAddress);
-router.put("/address/:addressId", addressController.updateAddress);
-router.delete("/address/:addressId", addressController.deleteAddress);
+
+router.post(
+	"/address",
+	validate(accountSchema.createAddressBodySchema, "body"),
+	addressController.createAddress
+);
+
+router.put(
+	"/address/:addressId",
+	validate(accountSchema.updateAddressParamsSchema, "params"),
+	validate(accountSchema.updateAddressBodySchema, "body"),
+	addressController.updateAddress
+);
+
+router.delete(
+	"/address/:addressId",
+	validate(accountSchema.deleteAddressParamsSchema, "params"),
+	addressController.deleteAddress
+);
 
 // Wishlist Routing
 router.get("/wishlist", wishlistController.getUserWishlist);
-router.post("/wishlist/:productId", wishlistController.addProductToWishlist);
-router.delete("/wishlist/:productId", wishlistController.deleteProductFromWishlist);
+
+router.post(
+	"/wishlist/:productId",
+	validate(accountSchema.postAddProductToWishlistParamsSchema, "params"),
+	wishlistController.addProductToWishlist
+);
+
+router.delete(
+	"/wishlist/:productId",
+	validate(accountSchema.deleteProductFromWishlistParamsSchema, "params"),
+	wishlistController.deleteProductFromWishlist
+);
+
 router.delete("/wishlist", wishlistController.emptyWishlist);
 
 export default router;

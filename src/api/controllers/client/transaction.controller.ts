@@ -45,9 +45,6 @@ export const getSingleTransaction = async (req: Request, res: Response, next: Ne
 	const { transactionId } = req.params;
 
 	try {
-		if (!transactionId || transactionId.length !== 10)
-			throw new ErrorObj.ClientError("Invalid transaction id!");
-
 		if (!userId) throw new ErrorObj.ClientError("Failed to identify user!");
 
 		const transactionData = await transactionService.getSingleTransaction(userId, transactionId);
@@ -106,17 +103,6 @@ export const createTransaction = async (req: Request, res: Response, next: NextF
 		if (!user) {
 			throw new ErrorObj.ClientError("Failed to identify user!", 401);
 		}
-
-		if (!address_id || !shipping_courier || !payment_method) {
-			throw new ErrorObj.ClientError("Invalid transaction data!");
-		}
-
-		if (!["gopay", "bni", "mandiri", "permata", "bri"].includes(payment_method)) {
-			throw new ErrorObj.ClientError("Invalid payment method!");
-		}
-
-		if (voucher_code && voucher_code?.length !== 10)
-			throw new ErrorObj.ClientError("Invalid voucher code!");
 
 		const userCartItems = (await cartService.getDBCartItemsDetails(user.id)).rows;
 
@@ -248,9 +234,6 @@ export const cancelTransaction = async (req: Request, res: Response, next: NextF
 	try {
 		if (!userId) throw new ErrorObj.ClientError("Failed to identify user!");
 
-		if (!transactionId || transactionId.length !== 10)
-			throw new ErrorObj.ClientError("Invalid transaction id!");
-
 		// Check transaction exist and its status
 		const transaction = await transactionService.getTransactionItem(transactionId);
 
@@ -314,23 +297,8 @@ export const reviewTransaction = async (req: Request, res: Response, next: NextF
 	try {
 		if (!userId) throw new ErrorObj.ClientError("Failed to identify user!");
 
-		if (!transactionId || transactionId.length !== 10) {
-			throw new ErrorObj.ClientError("Invalid transaction id!", 404);
-		}
-
 		if (!reviews || !(reviews instanceof Array))
 			throw new ErrorObj.ClientError("Invalid reviews data!");
-
-		const isValidReviews = reviews.every(
-			review =>
-				review.hasOwnProperty("rating") &&
-				review.hasOwnProperty("review") &&
-				[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].includes(+review?.rating) &&
-				review?.review.length >= 0 &&
-				review?.review.length <= 200
-		);
-
-		if (!isValidReviews) throw new ErrorObj.ClientError("Invalid reviews data!");
 
 		const transaction = await transactionService.getSingleTransaction(userId, transactionId);
 

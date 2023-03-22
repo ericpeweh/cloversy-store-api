@@ -6,7 +6,15 @@ import { chatController } from "../../controllers/client";
 
 const router = Router();
 
+// Validations
+import validate from "../../middlewares/validate";
+import { chatSchema } from "../../validations/schemas";
+
 // Routing
-router.get("/", chatController.getConversation);
+router.get(
+	"/",
+	validate(chatSchema.getConversationQuerySchema, "query"),
+	chatController.getConversation
+);
 
 export default router;

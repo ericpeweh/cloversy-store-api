@@ -7,3 +7,19 @@ export const getPushSubscriptionsQuerySchema = Joi.object({
 	}),
 	q: Joi.string().allow("").optional()
 });
+
+export const postSubscribeToEmailBodySchema = Joi.object({
+	email: Joi.string().email().required()
+});
+
+export const deleteUnsubscribeFromEmailBodySchema = Joi.object({
+	email: Joi.string().email().required()
+});
+
+export const postSubscribeToPushBodySchema = Joi.object({
+	token: Joi.string().required()
+});
+
+export const deleteUnsubscribeFromPushBodySchema = Joi.object({
+	subscriptionId: Joi.string().required()
+});

@@ -9,10 +9,37 @@ import { getUserData, isAuth } from "../../middlewares";
 
 const router = Router();
 
+// Validations
+import validate from "../../middlewares/validate";
+import { subscriptionSchema } from "../../validations/schemas";
+
 // Routing
-router.post("/email", subscriptionController.subscribeToEmail);
-router.delete("/email", subscriptionController.unsubscribeFromEmail);
-router.post("/push", isAuth, getUserData, subscriptionController.subscribeToPush);
-router.delete("/push", isAuth, getUserData, subscriptionController.unsubscribeFromPush);
+router.post(
+	"/email",
+	validate(subscriptionSchema.postSubscribeToEmailBodySchema, "body"),
+	subscriptionController.subscribeToEmail
+);
+
+router.delete(
+	"/email",
+	validate(subscriptionSchema.deleteUnsubscribeFromEmailBodySchema, "body"),
+	subscriptionController.unsubscribeFromEmail
+);
+
+router.post(
+	"/push",
+	isAuth,
+	getUserData,
+	validate(subscriptionSchema.postSubscribeToPushBodySchema, "body"),
+	subscriptionController.subscribeToPush
+);
+
+router.delete(
+	"/push",
+	isAuth,
+	getUserData,
+	validate(subscriptionSchema.deleteUnsubscribeFromPushBodySchema, "body"),
+	subscriptionController.unsubscribeFromPush
+);
 
 export default router;

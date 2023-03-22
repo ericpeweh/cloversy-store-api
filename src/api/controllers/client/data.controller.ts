@@ -26,11 +26,7 @@ export const getCitiesByProvinceId = async (req: Request, res: Response, next: N
 	const { province: provinceId } = req.query;
 
 	try {
-		if (typeof provinceId !== "string") {
-			throw new ErrorObj.ClientError("Invalid province id");
-		}
-
-		const cities = await dataService.getCitiesByProvinceId(provinceId);
+		const cities = await dataService.getCitiesByProvinceId(provinceId as string);
 
 		res.status(200).json({
 			status: "success",
@@ -47,11 +43,7 @@ export const getSubdistrictByCityId = async (req: Request, res: Response, next: 
 	const { city: cityId } = req.query;
 
 	try {
-		if (typeof cityId !== "string") {
-			throw new ErrorObj.ClientError("Invalid city id");
-		}
-
-		const subdistricts = await dataService.getSubdistrictByCityId(cityId);
+		const subdistricts = await dataService.getSubdistrictByCityId(cityId as string);
 
 		res.status(200).json({
 			status: "success",
@@ -73,10 +65,6 @@ export const getShippingCostBySubdistrict = async (
 	const { addressId } = req.body;
 
 	try {
-		if (isNaN(+addressId)) {
-			throw new ErrorObj.ClientError("Invalid address id");
-		}
-
 		if (!userId) {
 			throw new ErrorObj.ClientError("Failed to identity user!");
 		}

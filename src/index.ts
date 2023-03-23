@@ -1,5 +1,5 @@
 // Dependencies
-import express, { Express, Response } from "express";
+import express, { Express, Response, Request } from "express";
 import { createServer } from "http";
 import dotenv from "dotenv";
 import cors from "cors";
@@ -62,7 +62,7 @@ app.use(
 );
 
 // Routing
-app.get("/", (res: Response) => {
+app.get("/", (_: Request, res: Response) => {
 	res.send("<h1>Cloversy Store API</h1>");
 });
 

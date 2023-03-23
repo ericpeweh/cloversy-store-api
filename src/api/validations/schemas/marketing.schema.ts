@@ -21,7 +21,7 @@ export const getNotifMarketingDetailsParamsSchema = Joi.object({
 const basePostNotifMarketingBodySchema = {
 	title: Joi.string().required(),
 	description: Joi.string().allow("").optional(),
-	scheduled: Joi.date().iso().optional(),
+	scheduled: Joi.date().iso().allow(null).optional(),
 	selectedUserIds: Joi.array().items(Joi.string(), Joi.number()),
 	message_title: Joi.string().required(),
 	message_body: Joi.string().required(),

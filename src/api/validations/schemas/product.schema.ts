@@ -27,7 +27,7 @@ export const getAllProductsClientQuerySchema = Joi.object({
 	}),
 	price: Joi.string()
 		.allow("")
-		.pattern(/(\d+\.\d+)/)
+		.pattern(/(\d+\,\d+)/)
 		.optional()
 		.messages({
 			"string.pattern.base": "Please provide a valid 'price' filter."

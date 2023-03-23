@@ -2,9 +2,7 @@
 import Joi from "joi";
 
 export const postAddProductToCartBodySchema = Joi.object({
-	product_id: Joi.string().pattern(/^\d+$/).required().messages({
-		"string.pattern.base": "Please provide a valid 'product_id'."
-	}),
+	product_id: Joi.number().required(),
 	quantity: Joi.number().min(1).required(),
 	size: Joi.string()
 		.pattern(/(\d*\.?\d+)/)
@@ -15,9 +13,7 @@ export const postAddProductToCartBodySchema = Joi.object({
 });
 
 const baseCartItemIdSchema = {
-	id: Joi.string().pattern(/^\d+$/).required().messages({
-		"string.pattern.base": "Please provide a valid 'id' for cart item."
-	})
+	id: Joi.number()
 };
 
 export const patchUpdateCartItemBodySchema = Joi.object({

@@ -63,7 +63,7 @@ app.use(
 
 // Routing
 app.get("/", (_: Request, res: Response) => {
-	res.send("<h1>Cloversy Store API</h1>");
+	res.status(200).send("<h1>Cloversy Store API</h1>");
 });
 
 app.use("/auth", isAuth, getUserData, router.authRouter);

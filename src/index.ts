@@ -66,7 +66,7 @@ app.get("/", (_: Request, res: Response) => {
 	res.status(200).send("<h1>Cloversy Store API</h1>");
 });
 
-app.use("/auth", isAuth, getUserData, router.authRouter);
+app.use("/auth", isAuth, router.authRouter);
 
 // Backend-to-backend (Midtrans notifications)
 app.use("/midtrans", clientRouter.midtransRouter);

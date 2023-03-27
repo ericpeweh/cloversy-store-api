@@ -5,7 +5,7 @@ import dotenv from "dotenv";
 dotenv.config();
 
 export const getUserInfoAuth0 = async (accessToken: string) => {
-	const response = await axios.get("https://dev-yinr7e34g2h7igf4.us.auth0.com/userinfo", {
+	const response = await axios.get("https://cloversyid.jp.auth0.com/userinfo", {
 		headers: {
 			Authorization: `Bearer ${accessToken}`
 		}
@@ -17,11 +17,11 @@ export const getUserInfoAuth0 = async (accessToken: string) => {
 export const resetPasswordAuth0 = async (userEmail: string) => {
 	try {
 		const response = await axios.post(
-			"https://dev-yinr7e34g2h7igf4.us.auth0.com/dbconnections/change_password",
+			"https://cloversyid.jp.auth0.com/dbconnections/change_password",
 			{
 				client_id: process.env.AUTH0_CLIENTID,
-				// email: userEmail,
-				email: "-",
+				email: userEmail,
+				// email: "-",
 				connection: "Username-Password-Authentication"
 			},
 			{

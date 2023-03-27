@@ -72,8 +72,18 @@ const baseModifyProductBodySchema = {
 	brand_id: Joi.number().required(),
 	description: Joi.string().allow("").optional(),
 	slug: Joi.string().max(100).required(),
-	tags: Joi.array().items(Joi.string()).min(1),
-	sizes: Joi.array().items(Joi.string()).min(1)
+	tags: Joi.string()
+		.pattern(/^[a-zA-Z]+(,[a-zA-Z]+)*$/) // match for tags: hello,world,test
+		.optional()
+		.messages({
+			"string.pattern.base": "Please provide a valid product 'tags'."
+		}),
+	sizes: Joi.string()
+		.pattern(/^\d+(\.\d+)?(,\d+(\.\d+)?)*$/) // match for sizes: 36,37,37.5,40,41.5
+		.optional()
+		.messages({
+			"string.pattern.base": "Please provide a valid product 'sizes'."
+		})
 };
 
 export const createProductBodySchema = Joi.object({ ...baseModifyProductBodySchema });

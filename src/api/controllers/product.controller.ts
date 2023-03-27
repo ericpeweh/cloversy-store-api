@@ -78,8 +78,8 @@ export const createProduct = async (req: Request, res: Response, next: NextFunct
 			brand_id,
 			description,
 			slug,
-			tags = [],
-			sizes = []
+			tags = "",
+			sizes = ""
 		} = req.body;
 		const images = req.files as Express.Multer.File[];
 

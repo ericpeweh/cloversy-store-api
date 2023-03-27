@@ -14,6 +14,7 @@ const getUserData = async (req: JWTRequest, _: Response, next: NextFunction) => 
 			throw new ErrorObj.ServerError("Failed to check user authority, please try again.");
 		}
 		const user = await userService.getUserDataBySub(req.auth.sub);
+
 		if (user) {
 			req.user = user;
 		} else {

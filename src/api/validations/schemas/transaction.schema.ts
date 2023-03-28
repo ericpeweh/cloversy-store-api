@@ -51,6 +51,7 @@ export const postReviewTransactionParamsSchema = Joi.object({
 export const postReviewTransactionBodySchema = Joi.object({
 	reviews: Joi.array().items(
 		Joi.object({
+			product_id: Joi.number().required(),
 			rating: Joi.number().min(1).max(10).required(),
 			review: Joi.string().max(200).required()
 		}).required()

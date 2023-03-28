@@ -248,12 +248,7 @@ export const cancelTransaction = async (req: Request, res: Response, next: NextF
 		if (!isAuthorized) throw new ErrorObj.ClientError("You're not authorized", 403);
 
 		// Handle cancel transaction
-		let voucher: Voucher | undefined = undefined;
-		if (transaction.voucher_code) {
-			voucher = await voucherService.getVoucherItem(transaction.voucher_code);
-		}
-
-		await transactionService.cancelTransaction(transactionId, voucher, transaction);
+		await transactionService.cancelTransaction(transactionId, transaction);
 
 		// Notify user about canceled transaction
 		const userTokens = await notificationService.getUserNotificationTokens([userId]);

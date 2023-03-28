@@ -302,11 +302,7 @@ export const getTransactionItem = async (transactionId: string) => {
 	return transaction;
 };
 
-export const cancelTransaction = async (
-	transactionId: string,
-	voucher: Voucher | undefined,
-	transaction: Transaction
-) => {
+export const cancelTransaction = async (transactionId: string, transaction: Transaction) => {
 	const paymentObj = await coreAPI.transaction.cancel(transactionId);
 
 	const orderStatus: TransactionStatus = "cancel";
@@ -318,7 +314,7 @@ export const cancelTransaction = async (
 		paymentStatus,
 		null,
 		paymentObj,
-		voucher,
+		undefined,
 		transaction
 	);
 };

@@ -26,7 +26,8 @@ const modifyAddressBodySchema = {
 		.phoneNumber({ defaultCountry: "ID", strict: true })
 		.regex(/^08\d{8,11}$/)
 		.messages({
-			"object.regex": "Invalid phone number!"
+			"object.regex": "Nomor kontak tidak valid!",
+			"string.pattern.base": "Format kontak tidak valid, mohon masukkan dalam format 0812xxxxxxxx."
 		}),
 	address: Joi.string().required(),
 	is_default: Joi.boolean().required(),

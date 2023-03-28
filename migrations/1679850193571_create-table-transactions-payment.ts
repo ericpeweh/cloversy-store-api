@@ -17,6 +17,9 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
 		payment_status_modified: {
 			type: "TIMESTAMP",
 			default: pgm.func("CURRENT_TIMESTAMP")
+		},
+		payment_object: {
+			type: "JSON"
 		}
 	});
 }

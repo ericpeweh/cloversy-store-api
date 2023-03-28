@@ -71,9 +71,13 @@ const baseModifyProductBodySchema = {
 	category_id: Joi.number().required(),
 	brand_id: Joi.number().required(),
 	description: Joi.string().allow("").optional(),
-	slug: Joi.string().max(100).required(),
+	slug: Joi.string().max(100).required()
+};
+
+export const createProductBodySchema = Joi.object({
+	...baseModifyProductBodySchema,
 	tags: Joi.string()
-		.pattern(/^[a-zA-Z]+(,[a-zA-Z]+)*$/) // match for tags: hello,world,test
+		.pattern(/^[a-zA-Z0-9]+(,[a-zA-Z0-9]+)*$/) // match for tags: hello,world,test
 		.optional()
 		.messages({
 			"string.pattern.base": "Please provide a valid product 'tags'."
@@ -84,9 +88,7 @@ const baseModifyProductBodySchema = {
 		.messages({
 			"string.pattern.base": "Please provide a valid product 'sizes'."
 		})
-};
-
-export const createProductBodySchema = Joi.object({ ...baseModifyProductBodySchema });
+});
 
 export const createProductRequestSchema = Joi.object({
 	files: Joi.array()
@@ -103,9 +105,35 @@ export const updateProductParamsSchema = Joi.object({
 
 export const updateProductBodySchema = Joi.object({
 	...baseModifyProductBodySchema,
-	removedTags: Joi.array().items(Joi.string()),
-	removedSizes: Joi.array().items(Joi.string()),
-	removedImages: Joi.array().items(Joi.string())
+	tags: Joi.string()
+		.pattern(/^[a-zA-Z0-9]+(,[a-zA-Z0-9]+)*$/) // match for tags: hello,world,test
+		.optional()
+		.allow("")
+		.messages({
+			"string.pattern.base": "Please provide a valid product 'tags'."
+		}),
+	sizes: Joi.string()
+		.pattern(/^\d+(\.\d+)?(,\d+(\.\d+)?)*$/) // match for sizes: 36,37,37.5,40,41.5
+		.optional()
+		.allow("")
+		.messages({
+			"string.pattern.base": "Please provide a valid product 'sizes'."
+		}),
+	removedTags: Joi.string()
+		.pattern(/^[a-zA-Z0-9]+(,[a-zA-Z0-9]+)*$/) // match for tags: hello,world,test
+		.optional()
+		.allow("")
+		.messages({
+			"string.pattern.base": "Please provide a valid product 'tags'."
+		}),
+	removedSizes: Joi.string()
+		.pattern(/^\d+(\.\d+)?(,\d+(\.\d+)?)*$/) // match for sizes: 36,37,37.5,40,41.5
+		.optional()
+		.allow("")
+		.messages({
+			"string.pattern.base": "Please provide a valid product 'sizes'."
+		}),
+	removedImages: Joi.string().optional().allow("")
 });
 
 export const updateProductRequestSchema = Joi.object({

@@ -73,7 +73,7 @@ const initScheduledNotifMarketings = async () => {
 				title: "Marketing notifikasi terjadwal telah dikirim",
 				description: `Marketing notifikasi #${notification_code} berhasil dikirim.`,
 				category_id: 2, // = marketing category
-				action_link: `http://localhost:3001/marketing/notification/${notifMarketing.id}`
+				action_link: `https://admin.cloversy.id/marketing/notification/${notifMarketing.id}`
 			};
 			await notificationService.storeNotification(adminUserIds, notificationItem);
 

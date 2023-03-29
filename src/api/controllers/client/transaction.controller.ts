@@ -170,7 +170,7 @@ export const createTransaction = async (req: Request, res: Response, next: NextF
 				title: "Berhasil membuat pesanan",
 				body: `Pesanan #${newTranactionId} telah dibuat, menunggu pembayaran.`,
 				actionTitle: "Bayar sekarang",
-				actionLink: `http://localhost:3000/account/orders/${newTranactionId}/payment`,
+				actionLink: `https://cloversy.id/account/orders/${newTranactionId}/payment`,
 				deeplinkUrl: `id.cloversyid.cloversystoremobile://orders/payment?transactionId=${newTranactionId}`
 			};
 
@@ -183,7 +183,7 @@ export const createTransaction = async (req: Request, res: Response, next: NextF
 			title: "Pesanan baru telah dibuat",
 			body: `Pesanan #${newTranactionId} telah dibuat, menunggu pembayaran.`,
 			actionTitle: "Detail transaksi",
-			actionLink: `http://localhost:3001/orders/${newTranactionId}`
+			actionLink: `https://admin.cloversy.id/orders/${newTranactionId}`
 		};
 
 		if (adminTokens) {
@@ -257,7 +257,7 @@ export const cancelTransaction = async (req: Request, res: Response, next: NextF
 				title: "Pesanan telah dibatalkan",
 				body: `Pesanan #${transaction.id} telah anda dibatalkan.`,
 				actionTitle: "Detail transaksi",
-				actionLink: `http://localhost:3000/account/orders/${transaction.id}`,
+				actionLink: `https://cloversy.id/account/orders/${transaction.id}`,
 				deeplinkUrl: `id.cloversyid.cloversystoremobile://orders/${transaction.id}/details`
 			};
 
@@ -334,7 +334,7 @@ export const reviewTransaction = async (req: Request, res: Response, next: NextF
 			title: `Review baru diterima #${transaction.id}`,
 			body: `Konsumen telah meninggalkan ulasan baru untuk transaksi #${transaction.id}, silahkan cek review.`,
 			actionTitle: "Lihat review",
-			actionLink: `http://localhost:3001/orders/${transaction.id}`
+			actionLink: `https://admin.cloversy.id/orders/${transaction.id}`
 		};
 
 		const adminTokens = await notificationService.getAdminNotificationTokens();

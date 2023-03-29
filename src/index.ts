@@ -48,13 +48,14 @@ app.use(
 		secret: process.env.SESSION_SECRET!,
 		cookie: {
 			maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
-			sameSite: "lax",
+			sameSite: "none",
 			secure: process.env.NODE_ENV === "production"
 		},
 		store: new (sessionStore(session))({
 			pool: db.pool,
 			tableName: "cart_session"
 		}),
+		proxy: process.env.NODE_ENV === "production",
 		resave: true,
 		saveUninitialized: true
 	})

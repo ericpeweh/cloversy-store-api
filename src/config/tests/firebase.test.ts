@@ -13,7 +13,7 @@ describe("fcm", () => {
 		expect(process.env.FIREBASE_ADMIN_KEY_PATH!).toBeDefined();
 		expect(process.env.FIREBASE_ADMIN_KEY_PATH!).toBe("/src/config/firebase-admin.json");
 
-		const filePath = path.join(process.cwd(), process.env.FIREBASE_ADMIN_KEY_PATH!);
+		const filePath = path.join(__dirname, process.env.FIREBASE_ADMIN_KEY_PATH!);
 		expect(fs.existsSync(filePath)).toBe(true);
 	});
 

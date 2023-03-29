@@ -7,7 +7,7 @@ dotenv.config();
 
 // Initialization
 const storage = new Storage({
-	keyFilename: path.join(process.cwd(), process.env.GOOGLE_CLOUD_KEY_PATH!),
+	keyFilename: path.join(__dirname, process.env.GOOGLE_CLOUD_KEY_PATH!),
 	projectId: process.env.GOOGLE_CLOUD_PROJECT_ID
 });
 const bucket = storage.bucket(process.env.GOOGLE_CLOUD_BUCKET_NAME!);

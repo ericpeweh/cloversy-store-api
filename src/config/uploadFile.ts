@@ -7,7 +7,7 @@ import { ErrorObj } from "../api/utils";
 
 const createMulterMiddleware = () => {
 	return multer({
-		dest: path.join(process.cwd(), "/uploads"),
+		dest: path.join(__dirname, "/uploads"),
 		limits: {
 			fileSize: 10 * 1024 * 1024
 		},

@@ -10,7 +10,7 @@ describe("googleAnalytics", () => {
 		expect(process.env.GOOGLE_CLOUD_KEY_PATH!).toBeDefined();
 		expect(process.env.GOOGLE_CLOUD_KEY_PATH!).toBe("/src/config/google-cloud.json");
 
-		const filePath = path.join(process.cwd(), process.env.GOOGLE_CLOUD_KEY_PATH!);
+		const filePath = path.join(__dirname, process.env.GOOGLE_CLOUD_KEY_PATH!);
 		expect(fs.existsSync(filePath)).toBe(true);
 	});
 

@@ -143,7 +143,7 @@ export const createEmailMarketing = async (req: Request, res: Response, next: Ne
 				title: "Marketing email direct telah dikirim",
 				description: `Marketing email #${newEmailMarketing.notification_code} berhasil dikirim.`,
 				category_id: 2, // = marketing category
-				action_link: `http://localhost:3001/marketing/email/${newEmailMarketing.id}`
+				action_link: `https://admin.cloversy.id/marketing/email/${newEmailMarketing.id}`
 			};
 			await notificationService.storeNotification(adminUserIds, notificationItem);
 		}
@@ -173,7 +173,7 @@ export const createEmailMarketing = async (req: Request, res: Response, next: Ne
 					title: "Marketing email terjadwal telah dikirim",
 					description: `Marketing email #${newEmailMarketing.notification_code} berhasil dikirim.`,
 					category_id: 2, // = marketing category
-					action_link: `http://localhost:3001/marketing/email/${newEmailMarketing.id}`
+					action_link: `https://admin.cloversy.id/marketing/email/${newEmailMarketing.id}`
 				};
 				await notificationService.storeNotification(adminUserIds, notificationItem);
 

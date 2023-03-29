@@ -195,7 +195,7 @@ export const scheduleNotifMarketingNotification = async (
 					title: "Marketing notifikasi terjadwal telah dikirim",
 					description: `Marketing notifikasi #${notification_code} berhasil dikirim.`,
 					category_id: 2, // = marketing category
-					action_link: `http://localhost:3001/marketing/notification/${notifMarketingId}`
+					action_link: `https://admin.cloversy.id/marketing/notification/${notifMarketingId}`
 				};
 				await notificationService.storeNotification(adminUserIds, notificationItem);
 
@@ -375,7 +375,7 @@ export const scheduleEmailMarketing = async (
 					title: "Marketing email terjadwal telah dikirim",
 					description: `Marketing email #${notification_code} berhasil dikirim.`,
 					category_id: 2, // = marketing category
-					action_link: `http://localhost:3001/marketing/email/${emailMarketingId}`
+					action_link: `https://admin.cloversy.id/marketing/email/${emailMarketingId}`
 				};
 				await notificationService.storeNotification(adminUserIds, notificationItem);
 

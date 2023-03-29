@@ -41,7 +41,7 @@ const port = process.env.PORT;
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cors(corsObject));
-// app.set("trust proxy", 1);
+app.set("trust proxy", 1);
 
 app.use(
 	session({
@@ -49,8 +49,7 @@ app.use(
 		cookie: {
 			maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
 			sameSite: "lax",
-			secure: false
-			// secure: process.env.NODE_ENV === "production"
+			secure: process.env.NODE_ENV === "production"
 		},
 		store: new (sessionStore(session))({
 			pool: db.pool,

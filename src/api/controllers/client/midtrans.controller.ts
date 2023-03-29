@@ -45,7 +45,7 @@ export const handleNotifications = async (req: Request, res: Response, next: Nex
 				title: "Pembayaran trannsaksi bermasalah",
 				body: `Pesanan #${order_id} mengalami masalah saat melakukan pembayaran, menunggu konfirmasi admin.`,
 				actionTitle: "Detail transaksi",
-				actionLink: `http://localhost:3001/orders/${order_id}`
+				actionLink: `https://admin.cloversy.id/orders/${order_id}`
 			};
 
 			if (adminTokens) {
@@ -105,7 +105,7 @@ export const handleNotifications = async (req: Request, res: Response, next: Nex
 						title: "Pesanan dibatalkan otomatis",
 						body: `Pesanan #${order_id} telah dibatalkan otomatis oleh sistem dikarenakan pembayaran telah kadaluarsa.`,
 						actionTitle: "Detail transaksi",
-						actionLink: `http://localhost:3000/account/orders/${order_id}`,
+						actionLink: `https://cloversy.id/account/orders/${order_id}`,
 						deeplinkUrl: `id.cloversyid.cloversystoremobile://orders/${transaction.id}/details`
 					};
 
@@ -122,7 +122,7 @@ export const handleNotifications = async (req: Request, res: Response, next: Nex
 						title: "Pesanan dibatalkan karena bermasalah",
 						body: `Pesanan #${order_id} telah dibatalkan karena bermasalah saat pembayaran.`,
 						actionTitle: "Detail transaksi",
-						actionLink: `http://localhost:3001/orders/${order_id}`
+						actionLink: `https://admin.cloversy.id/orders/${order_id}`
 					};
 
 					await notificationService.sendNotifications(message, adminTokens, {
@@ -148,7 +148,7 @@ export const handleNotifications = async (req: Request, res: Response, next: Nex
 					title: `Info transaksi #${order_id}`,
 					body: `Pembayaran transaksi berhasil diterima, pesanan akan segera diproses.`,
 					actionTitle: "Detail transaksi",
-					actionLink: `http://localhost:3000/account/orders/${order_id}`,
+					actionLink: `https://cloversy.id/account/orders/${order_id}`,
 					deeplinkUrl: `id.cloversyid.cloversystoremobile://orders/${transaction.id}/details`
 				};
 
@@ -161,7 +161,7 @@ export const handleNotifications = async (req: Request, res: Response, next: Nex
 				title: `Info transaksi #${order_id}`,
 				body: `Pembayaran transaksi berhasil, transaksi siap diproses.`,
 				actionTitle: "Detail transaksi",
-				actionLink: `http://localhost:3001/orders/${order_id}`
+				actionLink: `https://admin.cloversy.id/orders/${order_id}`
 			};
 
 			if (adminTokens) {

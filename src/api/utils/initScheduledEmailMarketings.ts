@@ -58,7 +58,7 @@ const initScheduledEmailMarketings = async () => {
 				title: "Marketing email terjadwal telah dikirim",
 				description: `Marketing email #${notification_code} berhasil dikirim.`,
 				category_id: 2, // = marketing category
-				action_link: `http://localhost:3001/marketing/email/${emailMarketing.id}`
+				action_link: `https://admin.cloversy.id/marketing/email/${emailMarketing.id}`
 			};
 			await notificationService.storeNotification(adminUserIds, notificationItem);
 

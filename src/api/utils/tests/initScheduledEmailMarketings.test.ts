@@ -129,13 +129,13 @@ describe("initScheduledEmailMarketings", () => {
 			title: "Marketing email terjadwal telah dikirim",
 			description: `Marketing email #NOTIF_CODE_1 berhasil dikirim.`,
 			category_id: 2, // = marketing category
-			action_link: `http://localhost:3001/marketing/email/1`
+			action_link: `https://admin.cloversy.id/marketing/email/1`
 		});
 		expect(notificationService.storeNotification).toHaveBeenNthCalledWith(2, [4, 5, 6], {
 			title: "Marketing email terjadwal telah dikirim",
 			description: `Marketing email #NOTIF_CODE_2 berhasil dikirim.`,
 			category_id: 2, // = marketing category
-			action_link: `http://localhost:3001/marketing/email/2`
+			action_link: `https://admin.cloversy.id/marketing/email/2`
 		});
 	});
 });

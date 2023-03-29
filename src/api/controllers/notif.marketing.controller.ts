@@ -100,7 +100,7 @@ export const createNotificationMarketing = async (
 				title: "Marketing notifikasi direct telah dikirim",
 				description: `Marketing notifikasi #${newNotifMarketing.notification_code} berhasil dikirim.`,
 				category_id: 2, // = marketing category
-				action_link: `http://localhost:3001/marketing/notification/${newNotifMarketing.id}`
+				action_link: `https://admin.cloversy.id/marketing/notification/${newNotifMarketing.id}`
 			};
 			await notificationService.storeNotification(adminUserIds, notificationItem);
 		}
@@ -134,7 +134,7 @@ export const createNotificationMarketing = async (
 					title: "Marketing notifikasi terjadwal telah dikirim",
 					description: `Marketing notifikasi #${newNotifMarketing.notification_code} berhasil dikirim.`,
 					category_id: 2, // = marketing category
-					action_link: `http://localhost:3001/marketing/notification/${newNotifMarketing.id}`
+					action_link: `https://admin.cloversy.id/marketing/notification/${newNotifMarketing.id}`
 				};
 				await notificationService.storeNotification(adminUserIds, notificationItem);
 

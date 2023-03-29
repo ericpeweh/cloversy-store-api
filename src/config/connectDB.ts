@@ -8,14 +8,20 @@ const pool = new Pool({
 	connectionString: process.env.DATABASE_URL
 });
 
-pool.on("connect", () => {
+const onConnect = () => {
 	console.log("Database pool connected");
-});
+};
 
-pool.on("error", err => {
+const onError = (err: Error) => {
 	console.error("Database pool error: ", err);
-});
+};
+
+pool.on("connect", onConnect);
+pool.on("error", onError);
 
 export default {
-	query: (text: string, params: Array<any> = []) => pool.query(text, params)
+	query: (text: string, params: Array<any> = []) => pool.query(text, params),
+	pool,
+	onConnect,
+	onError
 };

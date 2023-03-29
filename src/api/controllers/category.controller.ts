@@ -1,28 +1,30 @@
 // Dependencies
-import { Request, Response } from "express";
+import { Request, Response, NextFunction } from "express";
 
 // Services
-import categoryService from "../services/category.service";
+import { categoryService } from "../services";
 
-// Types
+export const getAllCategories = async (req: Request, res: Response, next: NextFunction) => {
+	const { page = "", q = "", sortBy = "id" } = req.query;
 
-export const getAllCategories = async (req: Request, res: Response) => {
 	try {
-		const result = await categoryService.getAllCategories();
+		const { categories, ...paginationData } = await categoryService.getAllCategories(
+			page as string,
+			q as string,
+			sortBy as string
+		);
 
 		res.status(200).json({
 			status: "success",
-			data: { categories: result.rows }
+			...paginationData,
+			data: { categories }
 		});
-	} catch (error: any) {
-		res.status(400).json({
-			status: "error",
-			message: error.message
-		});
+	} catch (error: unknown) {
+		return next(error);
 	}
 };
 
-export const createCategory = async (req: Request, res: Response) => {
+export const createCategory = async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		const { name, description, identifier } = req.body;
 
@@ -30,19 +32,16 @@ export const createCategory = async (req: Request, res: Response) => {
 
 		const result = await categoryService.createCategory(categoryQueryData);
 
-		res.status(200).json({
+		res.status(201).json({
 			status: "success",
-			data: { newCategory: result.rows[0] }
+			data: { newCategory: result }
 		});
-	} catch (error: any) {
-		res.status(400).json({
-			status: "error",
-			message: error.message
-		});
+	} catch (error: unknown) {
+		return next(error);
 	}
 };
 
-export const updateCategory = async (req: Request, res: Response) => {
+export const updateCategory = async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		const { categoryId } = req.params;
 		const { name, description, identifier } = req.body;
@@ -53,17 +52,14 @@ export const updateCategory = async (req: Request, res: Response) => {
 
 		res.status(200).json({
 			status: "success",
-			data: { updatedCategory: result.rows[0] }
+			data: { updatedCategory: result }
 		});
-	} catch (error: any) {
-		res.status(400).json({
-			status: "error",
-			message: error.message
-		});
+	} catch (error: unknown) {
+		return next(error);
 	}
 };
 
-export const deleteCategory = async (req: Request, res: Response) => {
+export const deleteCategory = async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		const { categoryId } = req.params;
 
@@ -71,12 +67,9 @@ export const deleteCategory = async (req: Request, res: Response) => {
 
 		res.status(200).json({
 			status: "success",
-			data: { deletedCategory: result.rows[0] }
+			data: { deletedCategory: result }
 		});
-	} catch (error: any) {
-		res.status(400).json({
-			status: "error",
-			message: error.message
-		});
+	} catch (error: unknown) {
+		return next(error);
 	}
 };

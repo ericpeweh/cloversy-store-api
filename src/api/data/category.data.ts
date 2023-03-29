@@ -1,14 +1,52 @@
 // Config
 import db from "../../config/connectDB";
 
-const getAllCategories = async () => {
-	const query = "SELECT * FROM category";
-	const categories = await db.query(query);
+export const getAllCategories = async (page: string, searchQuery: string, sortBy: string) => {
+	let paramsIndex = 0;
+	const params = [];
+	const limit = 10;
+	const offset = parseInt(page) * limit - limit;
 
-	return categories;
+	let query = `SELECT *,
+    (SELECT 
+      COUNT(*) FROM product p 
+      WHERE p.category_id = c.id
+    ) AS product_amount 
+    FROM category c`;
+	let totalQuery = `SELECT COUNT(id) FROM category`;
+
+	if (searchQuery) {
+		query += ` WHERE name iLIKE $${paramsIndex + 1}`;
+		totalQuery += ` WHERE name iLIKE $1`;
+		paramsIndex += 1;
+		params.push(`%${searchQuery}%`);
+	}
+
+	if (sortBy) {
+		const sorter = sortBy === "a-z" || sortBy === "z-a" ? "name" : sortBy;
+		const sortType = sortBy === "a-z" ? "ASC" : "DESC";
+
+		query += ` ORDER BY ${sorter} ${sortType}`;
+	}
+
+	if (page) {
+		query += ` LIMIT ${limit} OFFSET ${offset}`;
+	}
+
+	const categories = await db.query(query, params);
+	const totalResult = await db.query(totalQuery, params);
+	const totalCategory = totalResult.rows[0].count;
+
+	return {
+		categories: categories.rows,
+		page: parseInt(page) || "all",
+		pageSize: categories.rowCount,
+		totalCount: parseInt(totalCategory),
+		totalPages: Math.ceil(totalCategory / limit)
+	};
 };
 
-const createCategory = async (categoryData: Array<any>) => {
+export const createCategory = async (categoryData: Array<any>) => {
 	const query = `INSERT INTO category(
     name,
     description,
@@ -17,10 +55,10 @@ const createCategory = async (categoryData: Array<any>) => {
 
 	const result = await db.query(query, categoryData);
 
-	return result;
+	return result.rows[0];
 };
 
-const updateCategory = async (updatedCategory: Array<string>, categoryId: string) => {
+export const updateCategory = async (updatedCategory: Array<string>, categoryId: string) => {
 	const query = `UPDATE category
     SET name = $1,  
     description = $2,
@@ -29,16 +67,14 @@ const updateCategory = async (updatedCategory: Array<string>, categoryId: string
 
 	const result = await db.query(query, [...updatedCategory, categoryId]);
 
-	return result;
+	return result.rows[0];
 };
 
-const deleteCategory = async (categoryId: string) => {
+export const deleteCategory = async (categoryId: string) => {
 	const query = `DELETE FROM category
     WHERE id = $1 RETURNING *`;
 
 	const result = await db.query(query, [categoryId]);
 
-	return result;
+	return result.rows[0];
 };
-
-export { getAllCategories, createCategory, updateCategory, deleteCategory };

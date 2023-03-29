@@ -6,7 +6,7 @@ import path from "path";
 dotenv.config();
 
 // Initialization
-const serviceAccount = path.join(process.cwd(), process.env.FIREBASE_ADMIN_KEY_PATH!);
+const serviceAccount = path.join(__dirname, process.env.FIREBASE_ADMIN_KEY_PATH!);
 
 const app = admin.initializeApp({
 	credential: admin.credential.cert(serviceAccount)

@@ -34,7 +34,6 @@ export const getSingleVoucherQuerySchema = Joi.object({
 });
 
 const baseModifyVoucherBodySchema = {
-	code: Joi.string().length(10).required(),
 	title: Joi.string().max(255).required(),
 	expiry_date: Joi.date().iso().allow("").optional(),
 	status: Joi.string().valid("active", "disabled").required(),
@@ -46,7 +45,10 @@ const baseModifyVoucherBodySchema = {
 	selectedUserIds: Joi.array().items(Joi.number(), Joi.string())
 };
 
-export const createVoucherBodySchema = Joi.object({ ...baseModifyVoucherBodySchema });
+export const createVoucherBodySchema = Joi.object({
+	code: Joi.string().length(10).required(),
+	...baseModifyVoucherBodySchema
+});
 
 export const updateVoucherParamsSchema = Joi.object({ ...baseVoucherCodeValidationSchema });
 

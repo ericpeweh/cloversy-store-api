@@ -337,25 +337,24 @@ export const updateTransaction = async (
 		}
 
 		// Update voucher data based on type
-		let voucherQuery: string | undefined = undefined;
-		let voucherParams: string[] = [];
-		if (transaction && voucher && voucher?.voucher_scope === "user") {
-			voucherQuery = `INSERT INTO voucher_dist 
-        (user_id, voucher_code)
-      VALUES ($1, $2)`;
-			voucherParams = [transaction.user_id, voucher.code];
-		}
+		if (transaction && voucher) {
+			// Decrement voucher usage count
+			const voucherQuery = `UPDATE voucher 
+          SET current_usage = current_usage - 1
+        WHERE code = $1`;
+			const voucherParams = [voucher.code];
 
-		if (transaction && voucher && voucher?.voucher_scope === "global") {
-			voucherQuery = `UPDATE voucher 
-        SET current_usage = current_usage - 1
-      WHERE code = $1`;
-			voucherParams = [voucher.code];
-		}
-
-		if (voucherQuery && voucherParams.length !== 0) {
-			// Refund voucher to user (order is canceled / expired)
 			await client.query(voucherQuery, voucherParams);
+
+			// Refund voucher to user if voucher scope is "user"
+			if (voucher.voucher_scope === "user") {
+				const voucherDistQuery = `INSERT INTO voucher_dist 
+            (user_id, voucher_code)
+          VALUES ($1, $2)`;
+				const voucherDistParams = [transaction.user_id, voucher.code];
+
+				await client.query(voucherDistQuery, voucherDistParams);
+			}
 		}
 
 		await client.query("COMMIT");

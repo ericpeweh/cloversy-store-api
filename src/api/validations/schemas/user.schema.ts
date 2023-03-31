@@ -25,16 +25,22 @@ export const getSingleCustomerOrdersParamsSchema = Joi.object({ ...baseUserIdVal
 export const putUpdateUserDataParamsSchema = Joi.object({ ...baseUserIdValidationSchema });
 
 export const putUpdateUserDataBodySchema = Joi.object({
-	full_name: Joi.string().max(100).required(),
+	full_name: Joi.string().max(100).optional(),
 	contact: Joi.string()
 		.phoneNumber({ defaultCountry: "ID", strict: true })
 		.regex(/^08\d{8,11}$/)
 		.messages({
 			"object.regex": "Invalid phone number!"
-		}),
+		})
+		.optional(),
 	profile_picture: Joi.string().allow("").optional(),
-	user_status: Joi.string().valid("active", "banned").required(),
-	credits: Joi.string().allow("").pattern(/^\d+$/).optional().messages({
-		"string.pattern.base": "Please provide a valid 'credits'."
-	})
+	user_status: Joi.string().valid("active", "banned").optional(),
+	credits: Joi.string()
+		.allow("")
+		.pattern(/^\d+$/)
+		.optional()
+		.messages({
+			"string.pattern.base": "Please provide a valid 'credits'."
+		})
+		.optional()
 });

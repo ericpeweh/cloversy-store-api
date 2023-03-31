@@ -65,7 +65,7 @@ export const getEmailMarketingDetailsParamsSchema = Joi.object({
 const basePostEmailMarketingBodySchema = {
 	title: Joi.string().required(),
 	description: Joi.string().allow("").optional(),
-	scheduled: Joi.date().iso().optional(),
+	scheduled: Joi.date().iso().allow(null).optional(),
 	selectedUserIds: Joi.array().items(Joi.string(), Joi.number()).max(100).min(1).messages({
 		"array.min": "Selected users can't be empty",
 		"array.max": "Maximum selected users exceeded (max 100 users)."

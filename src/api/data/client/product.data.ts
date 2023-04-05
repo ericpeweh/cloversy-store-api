@@ -82,6 +82,12 @@ export const getAllProducts = async (
 		const sortType = sortBy === "low-to-high" ? "ASC" : "DESC";
 
 		query += ` ORDER BY ${sorter} ${sortType} NULLS LAST`;
+
+		if (sortBy === "popularity" || sortBy === "rating") {
+			// Double sort (sort by 'popularity' | 'rating' then 'id')
+			// To prevent double product occurence with pagination
+			query += " ,id";
+		}
 	}
 
 	if (page) {

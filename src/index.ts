@@ -5,6 +5,7 @@ import dotenv from "dotenv";
 import cors from "cors";
 import session from "express-session";
 import sessionStore from "connect-pg-simple";
+import helmet from "helmet";
 
 // Configs
 import db from "./config/connectDB";
@@ -40,6 +41,7 @@ const port = process.env.PORT;
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+app.use(helmet());
 app.use(cors(corsObject));
 app.set("trust proxy", 1);
 

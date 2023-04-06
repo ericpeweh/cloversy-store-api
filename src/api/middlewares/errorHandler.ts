@@ -5,6 +5,7 @@ import { Response, NextFunction, Request } from "express";
 import { ClientError } from "../utils/errorClass";
 
 const errorHandler = async (error: any, _: Request, res: Response, _1: NextFunction) => {
+	console.error("ERROR OCCURED: ", error);
 	if (error.name === "UnauthorizedError") {
 		const isValidStatusCode = !isNaN(error?.status);
 		return res.status(isValidStatusCode ? error?.status : 401).json({

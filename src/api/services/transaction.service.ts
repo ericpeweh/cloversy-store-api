@@ -83,8 +83,8 @@ export const getSingleTransaction = async (transactionId: string) => {
 				payment.payment_status === "cancel"
 					? ""
 					: isPermataBank
-					? paymentObj?.permata_va_number
-					: paymentObj?.va_numbers[0]?.va_number
+						? paymentObj?.permata_va_number
+						: paymentObj?.va_numbers[0]?.va_number
 		};
 	}
 

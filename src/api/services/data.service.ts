@@ -1,3 +1,4 @@
+/* eslint-disable no-useless-catch */
 // Data
 import axios from "axios";
 import dotenv from "dotenv";

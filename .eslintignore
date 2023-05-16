@@ -1,0 +1,7 @@
+# Ignore directories
+.github
+.vscode
+dist
+coverage
+migrations
+uploads

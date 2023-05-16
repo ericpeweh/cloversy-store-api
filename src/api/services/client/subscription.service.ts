@@ -21,7 +21,7 @@ export const subscribeToPush = async (token: string, userId: string) => {
 };
 
 export const unsubscribeFromPush = async (subscriptionId: number, userId: string) => {
-	const subscription = await subscriptionRepo.getSingleUserSubscription(subscriptionId, userId);
+	const subscription = await subscriptionRepo.getSingleUserSubscription(subscriptionId);
 
 	if (!subscription) throw new ErrorObj.ClientError("Subscription not found!", 404);
 

@@ -34,8 +34,8 @@ export const addProductToSessionCart = (
 		updatedCart = currentCart.map(item => {
 			return item.product_id === product_id
 				? {
-						...item,
-						quantity: (item?.quantity ? item.quantity : 0) + +quantity
+					...item,
+					quantity: (item?.quantity ? item.quantity : 0) + +quantity
 				  }
 				: item;
 		});
@@ -94,8 +94,8 @@ export const updateCartItemInCartSession = (
 	const updatedCart: Partial<CartItem>[] = currentCart.map(item => {
 		return item.id === cartItemId
 			? {
-					...item,
-					quantity
+				...item,
+				quantity
 			  }
 			: item;
 	});

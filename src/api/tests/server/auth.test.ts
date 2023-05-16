@@ -72,7 +72,7 @@ describe("admin auth", () => {
 
 				const res = await supertest(app)
 					.get("/admin/auth")
-					.set("Authorization", `Bearer ACCESS_TOKEN`);
+					.set("Authorization", "Bearer ACCESS_TOKEN");
 
 				expect(res.body).toEqual({
 					status: "success",

@@ -21,6 +21,7 @@ const _responseSender = (req: Request, res: Response) => {
 	res.status(200).json({ user: req.user });
 };
 
+/* eslint-disable @typescript-eslint/no-unused-vars */
 const _errorHandler = (_1: any, _2: Request, res: Response, _3: NextFunction) => {
 	return res.status(500).json({
 		status: "error",

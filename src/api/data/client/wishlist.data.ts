@@ -29,14 +29,14 @@ export const getWishlistProducts = async (userId: string) => {
 };
 
 export const getWishlistData = async (userId: string) => {
-	const query = `SELECT * FROM wishlist WHERE user_id = $1 ORDER BY id DESC`;
+	const query = "SELECT * FROM wishlist WHERE user_id = $1 ORDER BY id DESC";
 	const result = await db.query(query, [userId]);
 
 	return result;
 };
 
 export const checkProductIsWishlisted = async (productId: string, userId: string) => {
-	const query = `SELECT id FROM wishlist WHERE user_id = $1 AND product_id = $2`;
+	const query = "SELECT id FROM wishlist WHERE user_id = $1 AND product_id = $2";
 	const result = await db.query(query, [userId, productId]);
 
 	return result.rows.length !== 0;
@@ -53,13 +53,13 @@ export const addProductToWishlist = async (productId: string, userId: string) =>
 };
 
 export const deleteProductFromWishlist = async (productId: string, userId: string) => {
-	const query = `DELETE FROM wishlist WHERE user_id = $1 AND product_id = $2`;
+	const query = "DELETE FROM wishlist WHERE user_id = $1 AND product_id = $2";
 	const result = await db.query(query, [userId, productId]);
 
 	return result;
 };
 export const emptyWishlist = async (userId: string) => {
-	const query = `DELETE FROM wishlist WHERE user_id = $1`;
+	const query = "DELETE FROM wishlist WHERE user_id = $1";
 	const result = await db.query(query, [userId]);
 
 	return result;

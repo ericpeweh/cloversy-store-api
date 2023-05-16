@@ -34,7 +34,7 @@ export const createAddress = async (
 	userId: string
 ) => {
 	if (isDefault) {
-		const setDefaultQuery = `UPDATE address SET is_default = false WHERE user_id = $1`;
+		const setDefaultQuery = "UPDATE address SET is_default = false WHERE user_id = $1";
 
 		await db.query(setDefaultQuery, [userId]);
 	}
@@ -68,7 +68,7 @@ export const updateAddress = async (
 	const { updatedAddressData, addressId, userId } = updateProductData;
 
 	if (isDefault) {
-		const setDefaultQuery = `UPDATE address SET is_default = false WHERE user_id = $1`;
+		const setDefaultQuery = "UPDATE address SET is_default = false WHERE user_id = $1";
 
 		await db.query(setDefaultQuery, [userId]);
 	}
@@ -77,7 +77,7 @@ export const updateAddress = async (
 		"address",
 		updatedAddressData,
 		{ id: addressId, user_id: userId },
-		` RETURNING *`
+		" RETURNING *"
 	);
 
 	const addressResult = await db.query(addressQuery, productParams);
@@ -94,7 +94,7 @@ export const deleteAddress = async (addressId: string, userId: number) => {
 };
 
 export const getAddressById = async (addressId: string) => {
-	const addressQuery = `SELECT * FROM address WHERE id = $1`;
+	const addressQuery = "SELECT * FROM address WHERE id = $1";
 
 	const addressResult = await db.query(addressQuery, [addressId]);
 

@@ -11,7 +11,7 @@ import { getLocalTime } from "../../utils";
 export const subscribeToEmail = async (email: string) => {
 	// Reset id sequence to current biggest id
 	await db.query(
-		`SELECT setval(pg_get_serial_sequence('email_subscription', 'id'), MAX(id)) FROM email_subscription`
+		"SELECT setval(pg_get_serial_sequence('email_subscription', 'id'), MAX(id)) FROM email_subscription"
 	);
 
 	const emailQuery = `INSERT INTO email_subscription 
@@ -36,7 +36,7 @@ export const unsubscribeFromEmail = async (email: string) => {
 export const subscribeToPush = async (token: string, userId: string) => {
 	// Reset id sequence to current biggest id
 	await db.query(
-		`SELECT setval(pg_get_serial_sequence('notification_subscription', 'id'), MAX(id)) FROM notification_subscription`
+		"SELECT setval(pg_get_serial_sequence('notification_subscription', 'id'), MAX(id)) FROM notification_subscription"
 	);
 
 	const pushQuery = `INSERT INTO notification_subscription 
@@ -62,7 +62,7 @@ export const unsubscribeFromPush = async (subscriptionId: number) => {
 	await db.query(pushQuery, [subscriptionId]);
 };
 
-export const getSingleUserSubscription = async (subscriptionId: number, userId: string) => {
+export const getSingleUserSubscription = async (subscriptionId: number) => {
 	const pushQuery = `SELECT * FROM notification_subscription
     WHERE id = $1`;
 

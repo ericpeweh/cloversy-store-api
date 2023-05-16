@@ -7,38 +7,26 @@ export const getAllVouchers = async (
 	page: string,
 	itemsLimit: string
 ) => {
-	try {
-		const result = await voucherRepo.getAllVouchers(voucherStatus, sortBy, page, itemsLimit);
+	const result = await voucherRepo.getAllVouchers(voucherStatus, sortBy, page, itemsLimit);
 
-		return result;
-	} catch (error) {
-		throw error;
-	}
+	return result;
 };
 
 export const getSingleVoucher = async (voucherCode: string, analyticYear: string) => {
-	try {
-		const { voucherResult, selectedUsers, analytics } = await voucherRepo.getSingleVoucher(
-			voucherCode,
-			analyticYear
-		);
+	const { voucherResult, selectedUsers, analytics } = await voucherRepo.getSingleVoucher(
+		voucherCode,
+		analyticYear
+	);
 
-		return selectedUsers.length > 0
-			? { ...voucherResult.rows[0], selectedUsers, analytics }
-			: { ...voucherResult.rows[0], analytics };
-	} catch (error) {
-		throw error;
-	}
+	return selectedUsers.length > 0
+		? { ...voucherResult.rows[0], selectedUsers, analytics }
+		: { ...voucherResult.rows[0], analytics };
 };
 
 export const createVoucher = async (voucherData: any[], selectedUserIds: string[] | number[]) => {
-	try {
-		const newVoucher = await voucherRepo.createVoucher(voucherData, selectedUserIds);
+	const newVoucher = await voucherRepo.createVoucher(voucherData, selectedUserIds);
 
-		return newVoucher;
-	} catch (error) {
-		throw error;
-	}
+	return newVoucher;
 };
 
 export const updateVoucher = async (
@@ -47,18 +35,14 @@ export const updateVoucher = async (
 	removedUserIds: string[] | number[],
 	code: string
 ) => {
-	try {
-		const updatedVoucher = await voucherRepo.updateVoucher(
-			updatedVoucherData,
-			selectedUserIds,
-			removedUserIds,
-			code
-		);
+	const updatedVoucher = await voucherRepo.updateVoucher(
+		updatedVoucherData,
+		selectedUserIds,
+		removedUserIds,
+		code
+	);
 
-		return updatedVoucher;
-	} catch (error) {
-		throw error;
-	}
+	return updatedVoucher;
 };
 
 export const getVoucherItem = async (voucherCode: string) => {

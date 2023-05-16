@@ -1,3 +1,4 @@
+/* eslint-disable no-useless-catch */
 // Data
 import axios, { AxiosResponse } from "axios";
 import dotenv from "dotenv";
@@ -18,31 +19,27 @@ dotenv.config();
 const RAJA_ONGKIR_BASE_URL = "https://pro.rajaongkir.com/api";
 
 export const getAllProvinces = async () => {
-	try {
-		// Check cached data
-		const cacheKey = "DATA_PROVINCES";
-		if (dataCache.has(cacheKey)) {
-			return dataCache.get(cacheKey);
-		}
-
-		const response = await axios.get<{ rajaongkir: { results: Object[] } }>(
-			`${RAJA_ONGKIR_BASE_URL}/province`,
-			{
-				headers: {
-					key: process.env.RAJA_ONGKIR_API_KEY
-				}
-			}
-		);
-
-		// Cache data
-		if (response.status === 200) {
-			dataCache.set(cacheKey, response.data.rajaongkir.results);
-		}
-
-		return response.data.rajaongkir.results;
-	} catch (error: any) {
-		throw error;
+	// Check cached data
+	const cacheKey = "DATA_PROVINCES";
+	if (dataCache.has(cacheKey)) {
+		return dataCache.get(cacheKey);
 	}
+
+	const response = await axios.get<{ rajaongkir: { results: object[] } }>(
+		`${RAJA_ONGKIR_BASE_URL}/province`,
+		{
+			headers: {
+				key: process.env.RAJA_ONGKIR_API_KEY
+			}
+		}
+	);
+
+	// Cache data
+	if (response.status === 200) {
+		dataCache.set(cacheKey, response.data.rajaongkir.results);
+	}
+
+	return response.data.rajaongkir.results;
 };
 
 export const getCitiesByProvinceId = async (provinceId: string) => {
@@ -53,7 +50,7 @@ export const getCitiesByProvinceId = async (provinceId: string) => {
 			return dataCache.get(cacheKey);
 		}
 
-		const response = await axios.get<{ rajaongkir: { results: Object[] } }>(
+		const response = await axios.get<{ rajaongkir: { results: object[] } }>(
 			`${RAJA_ONGKIR_BASE_URL}/city?province=${provinceId}`,
 			{
 				headers: {
@@ -81,7 +78,7 @@ export const getSubdistrictByCityId = async (cityId: string) => {
 			return dataCache.get(cacheKey);
 		}
 
-		const response = await axios.get<{ rajaongkir: { results: Object[] } }>(
+		const response = await axios.get<{ rajaongkir: { results: object[] } }>(
 			`${RAJA_ONGKIR_BASE_URL}/subdistrict?city=${cityId}`,
 			{
 				headers: {

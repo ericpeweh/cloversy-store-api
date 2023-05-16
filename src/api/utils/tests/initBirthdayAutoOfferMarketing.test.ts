@@ -145,11 +145,11 @@ describe("initBirthdayAutoOfferMarketing", () => {
 		// Assert store notification was called with expected args
 		expect(notificationService.storeNotification).toHaveBeenCalledWith([4, 5, 6], {
 			title: "Penawaran otomatis ulang tahun telah dikirim",
-			description: `Berhasil mengirim ke 3 dari 3 pengguna.`,
+			description: "Berhasil mengirim ke 3 dari 3 pengguna.",
 			category_id: 2, // = marketing category,
 			action_link: null
 		});
 
-		expect(console.log).toHaveBeenCalledWith(`Birthday auto-offers sent to 3 users.`);
+		expect(console.log).toHaveBeenCalledWith("Birthday auto-offers sent to 3 users.");
 	});
 });

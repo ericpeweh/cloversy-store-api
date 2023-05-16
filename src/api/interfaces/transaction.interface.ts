@@ -228,7 +228,7 @@ export interface ClientTransactionDetails extends Transaction {
 }
 
 export interface UpdateTransactionDataArgs {
-	updatedTransactionData: Object;
+	updatedTransactionData: object;
 	transactionId: string;
 	timelineObj: string;
 	shippingTrackingCode: string;

@@ -1,3 +1,4 @@
+/* eslint-disable no-useless-catch */
 // Dependencies
 import dotenv from "dotenv";
 
@@ -97,7 +98,7 @@ export const chargeTransaction = async (
 			...(paymentType === "gopay" && {
 				gopay: {
 					enable_callback: true,
-					callback_url: `id.cloversyid.cloversystoremobile://orders/payment`
+					callback_url: "id.cloversyid.cloversystoremobile://orders/payment"
 				}
 			}),
 			item_details: [
@@ -109,6 +110,7 @@ export const chargeTransaction = async (
 					brand: cartItem.brand_id + "",
 					category: cartItem.category_id + ""
 				})),
+				/* eslint-disable indent */
 				...(selectedVoucher
 					? [
 							{

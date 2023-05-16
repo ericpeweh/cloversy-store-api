@@ -19,9 +19,9 @@ export const getAllVouchers = async (
 	const limit = itemsLimit ? +itemsLimit : 12;
 	const offset = parseInt(page) * limit - limit;
 
-	let voucherQuery = `SELECT * FROM voucher`;
+	let voucherQuery = "SELECT * FROM voucher";
 
-	let totalQuery = `SELECT COUNT(code) FROM voucher`;
+	let totalQuery = "SELECT COUNT(code) FROM voucher";
 
 	if (voucherStatus) {
 		voucherQuery += ` WHERE status = $${paramsIndex + 1}`;
@@ -35,7 +35,7 @@ export const getAllVouchers = async (
 	}
 
 	if (sortBy === "id") {
-		voucherQuery += ` ORDER BY created_at DESC`;
+		voucherQuery += " ORDER BY created_at DESC";
 	}
 
 	if (page) {
@@ -55,7 +55,7 @@ export const getAllVouchers = async (
 };
 
 export const getSingleVoucher = async (voucherCode: string, analyticYear: string) => {
-	const voucherQuery = `SELECT * FROM voucher WHERE code = $1`;
+	const voucherQuery = "SELECT * FROM voucher WHERE code = $1";
 
 	const voucherResult = await db.query(voucherQuery, [voucherCode]);
 
@@ -181,7 +181,7 @@ export const updateVoucher = async (
 		const isVoucherGlobalScoped = voucherResult.rows[0].voucher_scope === "global";
 
 		if (isVoucherGlobalScoped) {
-			const voucherDistRemoveQuery = `DELETE FROM voucher_dist WHERE voucher_code = $1`;
+			const voucherDistRemoveQuery = "DELETE FROM voucher_dist WHERE voucher_code = $1";
 
 			await client.query(voucherDistRemoveQuery, [code]);
 		}
@@ -218,7 +218,7 @@ export const updateVoucher = async (
 };
 
 export const getVoucherItem = async (voucherCode: string) => {
-	const voucherQuery = `SELECT * FROM voucher WHERE code = $1`;
+	const voucherQuery = "SELECT * FROM voucher WHERE code = $1";
 
 	const voucherResult: QueryResult<Voucher> = await db.query(voucherQuery, [voucherCode]);
 

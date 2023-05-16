@@ -208,7 +208,7 @@ export const createProduct = async (productData: Array<any>, tags: string[], siz
 };
 
 export const getProductImages = async (productId: string) => {
-	const imageQuery = `SELECT url FROM product_image WHERE product_id = $1`;
+	const imageQuery = "SELECT url FROM product_image WHERE product_id = $1";
 
 	const imagesResult = await db.query(imageQuery, [productId]);
 
@@ -239,7 +239,7 @@ export const removeProductImagesWithUrl = async (
 	productId: string,
 	imagesUrlToDelete: string[]
 ) => {
-	const imageQuery = `DELETE FROM product_image WHERE product_id = $1 AND url = ANY ($2)`;
+	const imageQuery = "DELETE FROM product_image WHERE product_id = $1 AND url = ANY ($2)";
 
 	const result = await db.query(imageQuery, [productId, imagesUrlToDelete]);
 
@@ -258,7 +258,7 @@ export const updateProduct = async (updateProductData: UpdateProductDataArgs) =>
 			"product",
 			updatedProductData,
 			{ id: productId },
-			` RETURNING *`
+			" RETURNING *"
 		);
 
 		const productResult = await db.query(productQuery, productParams);
@@ -288,12 +288,12 @@ export const updateProduct = async (updateProductData: UpdateProductDataArgs) =>
 		});
 
 		removedTags.forEach(async tag => {
-			const tagQuery = `DELETE FROM product_tag WHERE tag = $1 AND product_id = $2`;
+			const tagQuery = "DELETE FROM product_tag WHERE tag = $1 AND product_id = $2";
 			await client.query(tagQuery, [tag, productId]);
 		});
 
 		removedSizes.forEach(async size => {
-			const sizeQuery = `DELETE FROM product_size WHERE size = $1 AND product_id = $2`;
+			const sizeQuery = "DELETE FROM product_size WHERE size = $1 AND product_id = $2";
 			await client.query(sizeQuery, [size, productId]);
 		});
 
@@ -323,13 +323,13 @@ export const deleteProduct = async (productId: string) => {
 	try {
 		await client.query("BEGIN");
 
-		const tagQuery = `DELETE FROM product_tag WHERE product_id = $1`;
+		const tagQuery = "DELETE FROM product_tag WHERE product_id = $1";
 		await client.query(tagQuery, [productId]);
 
-		const sizeQuery = `DELETE FROM product_size WHERE product_id = $1`;
+		const sizeQuery = "DELETE FROM product_size WHERE product_id = $1";
 		await client.query(sizeQuery, [productId]);
 
-		const productQuery = `DELETE FROM product WHERE id = $1 RETURNING id`;
+		const productQuery = "DELETE FROM product WHERE id = $1 RETURNING id";
 		const productResult = await client.query(productQuery, [productId]);
 
 		await client.query("COMMIT");
@@ -343,7 +343,7 @@ export const deleteProduct = async (productId: string) => {
 };
 
 export const getProductCount = async () => {
-	const productQuery = `SELECT COUNT(id) AS product_count FROM product`;
+	const productQuery = "SELECT COUNT(id) AS product_count FROM product";
 
 	const productResult = await db.query(productQuery);
 

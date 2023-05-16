@@ -328,7 +328,7 @@ describe("notification marketing route", () => {
 				jest
 					.spyOn(marketingService, "getSingleEmailTemplate")
 					.mockRejectedValueOnce(
-						new ErrorObj.ClientError(`Failed to find email template with id of '1'`, 404)
+						new ErrorObj.ClientError("Failed to find email template with id of '1'", 404)
 					);
 
 				const res = await supertest(app)
@@ -595,6 +595,7 @@ describe("notification marketing route", () => {
 					.spyOn(marketingService, "scheduleEmailMarketing")
 					.mockImplementationOnce(() => jest.fn() as any);
 
+				/* eslint-disable @typescript-eslint/no-unused-vars */
 				const { sendTo: _, ...newEmailMarketingData } = newEmailMarketing;
 				const updatedEmailMarketing = { ...newEmailMarketingData, removedUserIds: [3, 4, 5] };
 				const res = await supertest(app)
@@ -658,12 +659,11 @@ describe("notification marketing route", () => {
 					.spyOn(marketingService, "scheduleEmailMarketing")
 					.mockImplementationOnce(() => jest.fn() as any);
 
+				/* @typescript-eslint/no-unused-vars */
 				const { sendTo: _, ...newEmailMarketingData } = newEmailMarketing;
 				const updatedEmailMarketing = { ...newEmailMarketingData, removedUserIds: [3, 4, 5] };
 
-				const res = await supertest(app)
-					.put("/admin/marketing/emails/1")
-					.send(updatedEmailMarketing);
+				await supertest(app).put("/admin/marketing/emails/1").send(updatedEmailMarketing);
 
 				const updatedEmailMarketingData = {
 					title: updatedEmailMarketing.title,

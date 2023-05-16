@@ -1,3 +1,4 @@
+/* eslint-disable no-useless-escape */
 // Dependencies
 import Joi from "joi";
 

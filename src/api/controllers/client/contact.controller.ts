@@ -23,7 +23,7 @@ export const createMessageWebForm = async (req: Request, res: Response, next: Ne
 		const adminUserIds = await userService.getAllAdminUserIds();
 		const notificationItem = {
 			title: "Pesan baru 'Contact Us' diterima",
-			description: `Silahkan cek pesan untuk melihat detail.`,
+			description: "Silahkan cek pesan untuk melihat detail.",
 			category_id: 3, // = message category
 			action_link: `/contact-us/${newMessageId}`
 		};

@@ -16,7 +16,7 @@ class ErrorBase extends Error {
 }
 
 export class ClientError extends ErrorBase {
-	constructor(message?: string, code: number = 400, options?: { [key: string]: any }) {
+	constructor(message?: string, code = 400, options?: { [key: string]: any }) {
 		super(
 			message ||
 				"Something went wrong, make sure user is sending the correct input values, params, etc.",
@@ -28,7 +28,7 @@ export class ClientError extends ErrorBase {
 }
 
 export class ServerError extends ErrorBase {
-	constructor(_?: string, code: number = 500, options?: { [key: string]: any }) {
+	constructor(_?: string, code = 500, options?: { [key: string]: any }) {
 		super(
 			"An error occured on our server, please try again later. If error persists, please contact us for more information.",
 			code,

@@ -25,8 +25,8 @@ export const getPushSubscriptions = async (page: string, searchQuery: string) =>
   JOIN users u ON ns.user_id = u.id`;
 
 	// Filter for user only (no admin)
-	query += ` WHERE u.user_role = 'user'`;
-	totalQuery += ` WHERE u.user_role = 'user'`;
+	query += " WHERE u.user_role = 'user'";
+	totalQuery += " WHERE u.user_role = 'user'";
 
 	if (searchQuery) {
 		const searchPart = ` WHERE (u.email iLIKE $${paramsIndex} OR u.full_name iLIKE $${paramsIndex})`;
@@ -37,7 +37,7 @@ export const getPushSubscriptions = async (page: string, searchQuery: string) =>
 		params.push(`%${searchQuery}%`);
 	}
 
-	query += ` ORDER BY ns.user_id DESC`;
+	query += " ORDER BY ns.user_id DESC";
 	query += ` LIMIT ${limit} OFFSET ${offset}`;
 
 	const subscriptions: QueryResult<PushSubscriptionItem> = await db.query(query, params);

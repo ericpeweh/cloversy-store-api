@@ -13,11 +13,11 @@ export const getAllBrands = async (page: string, searchQuery: string, sortBy: st
       WHERE p.brand_id = b.id
     ) AS product_amount  
     FROM brand b`;
-	let totalQuery = `SELECT COUNT(id) FROM brand`;
+	let totalQuery = "SELECT COUNT(id) FROM brand";
 
 	if (searchQuery) {
 		query += ` WHERE name iLIKE $${paramsIndex + 1}`;
-		totalQuery += ` WHERE name iLIKE $1`;
+		totalQuery += " WHERE name iLIKE $1";
 		paramsIndex += 1;
 		params.push(`%${searchQuery}%`);
 	}

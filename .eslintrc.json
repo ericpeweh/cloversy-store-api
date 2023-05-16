@@ -4,16 +4,18 @@
 		"commonjs": true,
 		"es2021": true
 	},
-	"extends": "standard-with-typescript",
+	"extends": ["eslint:recommended", "plugin:@typescript-eslint/recommended", "prettier"],
 	"overrides": [],
 	"parserOptions": {
 		"ecmaVersion": "latest"
 	},
-
 	"rules": {
 		"quotes": [2, "double"],
 		"no-tabs": "off",
 		"indent": ["warn", "tab"],
-		"semi": "off"
+		"semi": "off",
+		"@typescript-eslint/no-non-null-assertion": "off",
+		"@typescript-eslint/no-empty-function": "off",
+		"@typescript-eslint/no-explicit-any": "off"
 	}
 }

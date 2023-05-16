@@ -6,7 +6,7 @@ dotenv.config();
 
 const sendinblueClient = sendinblueSDK.ApiClient.instance;
 
-let apiKey = sendinblueClient.authentications["api-key"];
+const apiKey = sendinblueClient.authentications["api-key"];
 apiKey.apiKey = process.env.SENDINBLUE_API_KEY;
 
 const sendinblue = new sendinblueSDK.TransactionalEmailsApi();

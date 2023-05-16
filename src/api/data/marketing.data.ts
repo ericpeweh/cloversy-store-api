@@ -132,7 +132,8 @@ export const updateNotificationMarketing = async (
 			(currentNotifMarketing.send_to === "all" && updatedNotifMarketing.send_to === "all")
 		) {
 			// Delete all notification marketing target
-			const notifMarketingDeleteQuery = `DELETE FROM notification_marketing_target WHERE notification_marketing_id = $1`;
+			const notifMarketingDeleteQuery =
+				"DELETE FROM notification_marketing_target WHERE notification_marketing_id = $1";
 
 			await client.query(notifMarketingDeleteQuery, [notifMarketingId]);
 
@@ -206,7 +207,7 @@ export const getNotificationMarketings = async (
     )
   FROM notification_marketing nm
   `;
-	let totalQuery = `SELECT COUNT(id) FROM notification_marketing nm`;
+	let totalQuery = "SELECT COUNT(id) FROM notification_marketing nm";
 
 	if (searchQuery) {
 		const searchPart = ` WHERE (
@@ -237,7 +238,7 @@ export const getNotificationMarketings = async (
 	}
 
 	// Sort by id (last created first)
-	notifMarketingQuery += ` ORDER BY nm.id DESC`;
+	notifMarketingQuery += " ORDER BY nm.id DESC";
 
 	if (page) {
 		notifMarketingQuery += ` LIMIT ${limit} OFFSET ${offset}`;
@@ -325,7 +326,7 @@ export const getEmailMarketings = async (
     )
   FROM email_marketing em
   `;
-	let totalQuery = `SELECT COUNT(id) FROM email_marketing em`;
+	let totalQuery = "SELECT COUNT(id) FROM email_marketing em";
 
 	if (searchQuery) {
 		const searchPart = ` WHERE (
@@ -356,7 +357,7 @@ export const getEmailMarketings = async (
 	}
 
 	// Sort by id (last created first)
-	emailMarketingQuery += ` ORDER BY em.id DESC`;
+	emailMarketingQuery += " ORDER BY em.id DESC";
 
 	if (page) {
 		emailMarketingQuery += ` LIMIT ${limit} OFFSET ${offset}`;
@@ -427,6 +428,7 @@ export const createEmailMarketing = async (
 		await client.query("BEGIN");
 
 		// Delete automatically added params field
+		/* eslint-disable  @typescript-eslint/no-unused-vars */
 		const { email_subject: _, full_name: _1, ...emailParams } = params;
 
 		// Create email marketing record
@@ -480,7 +482,7 @@ export const createEmailMarketing = async (
 };
 
 export const getSingleEmailMarketing = async (emailMarketingId: number | string) => {
-	const emailQuery = `SELECT * FROM email_marketing WHERE id = $1`;
+	const emailQuery = "SELECT * FROM email_marketing WHERE id = $1";
 
 	const emailResult: QueryResult<EmailMarketingItem> = await db.query(emailQuery, [
 		emailMarketingId

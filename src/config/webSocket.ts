@@ -60,7 +60,7 @@ export const onNewMessageHandler = (
 			{
 				title: "Pesan baru telah masuk",
 				body: `${user.full_name}: ${message}`,
-				deeplinkUrl: `account/livechat`
+				deeplinkUrl: "account/livechat"
 			},
 			notificationTokens
 		);
@@ -100,7 +100,8 @@ export const onDisconnectHandler = (
 	};
 };
 
-export const wrap = (middleware: Function) => (socket: { request: Object }, next: Function) =>
+/* eslint-disable @typescript-eslint/ban-types */
+export const wrap = (middleware: Function) => (socket: { request: object }, next: Function) =>
 	middleware(socket.request, {}, next);
 
 export const onConnectionHandler = (io: Server, activeUsers: Partial<User>[]) => {
@@ -152,7 +153,7 @@ const initWebSocket = (server: HTTPServer) => {
 	io.use(wrap(isAuth));
 	io.use(wrap(getUserData));
 
-	let activeUsers: Partial<User>[] = [];
+	const activeUsers: Partial<User>[] = [];
 
 	io.on("connection", onConnectionHandler(io, activeUsers));
 

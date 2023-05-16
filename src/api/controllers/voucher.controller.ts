@@ -4,9 +4,6 @@ import { Request, Response, NextFunction } from "express";
 // Services
 import { voucherService } from "../services";
 
-// Utils
-import { ErrorObj } from "../utils";
-
 export const getAllVouchers = async (req: Request, res: Response, next: NextFunction) => {
 	const {
 		status: voucherStatus = "",

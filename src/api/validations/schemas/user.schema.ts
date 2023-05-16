@@ -35,12 +35,10 @@ export const putUpdateUserDataBodySchema = Joi.object({
 		.optional(),
 	profile_picture: Joi.string().allow("").optional(),
 	user_status: Joi.string().valid("active", "banned").optional(),
-	credits: Joi.string()
-		.allow("")
-		.pattern(/^\d+$/)
-		.optional()
-		.messages({
-			"string.pattern.base": "Please provide a valid 'credits'."
-		})
-		.optional()
+	prev_status: Joi.when("user_status", {
+		is: Joi.exist(),
+		then: Joi.string().valid("active", "banned").required(),
+		otherwise: Joi.forbidden()
+	}),
+	credits: Joi.number().optional()
 });

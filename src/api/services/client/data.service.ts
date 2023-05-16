@@ -1,3 +1,4 @@
+/* eslint-disable no-useless-catch */
 // Data
 import axios, { AxiosResponse } from "axios";
 import dotenv from "dotenv";
@@ -10,30 +11,46 @@ import {
 	RajaOngkirWaybillResponse
 } from "../../interfaces";
 
+// Config
+import dataCache from "../../../config/dataCache";
+
 dotenv.config();
 
 const RAJA_ONGKIR_BASE_URL = "https://pro.rajaongkir.com/api";
 
 export const getAllProvinces = async () => {
-	try {
-		const response = await axios.get<{ rajaongkir: { results: Object[] } }>(
-			`${RAJA_ONGKIR_BASE_URL}/province`,
-			{
-				headers: {
-					key: process.env.RAJA_ONGKIR_API_KEY
-				}
-			}
-		);
-
-		return response.data.rajaongkir.results;
-	} catch (error: any) {
-		throw error;
+	// Check cached data
+	const cacheKey = "DATA_PROVINCES";
+	if (dataCache.has(cacheKey)) {
+		return dataCache.get(cacheKey);
 	}
+
+	const response = await axios.get<{ rajaongkir: { results: object[] } }>(
+		`${RAJA_ONGKIR_BASE_URL}/province`,
+		{
+			headers: {
+				key: process.env.RAJA_ONGKIR_API_KEY
+			}
+		}
+	);
+
+	// Cache data
+	if (response.status === 200) {
+		dataCache.set(cacheKey, response.data.rajaongkir.results);
+	}
+
+	return response.data.rajaongkir.results;
 };
 
 export const getCitiesByProvinceId = async (provinceId: string) => {
 	try {
-		const response = await axios.get<{ rajaongkir: { results: Object[] } }>(
+		// Check cached data
+		const cacheKey = `DATA_CITIES_PROVINCE_ID_${provinceId}`;
+		if (dataCache.has(cacheKey)) {
+			return dataCache.get(cacheKey);
+		}
+
+		const response = await axios.get<{ rajaongkir: { results: object[] } }>(
 			`${RAJA_ONGKIR_BASE_URL}/city?province=${provinceId}`,
 			{
 				headers: {
@@ -42,22 +59,38 @@ export const getCitiesByProvinceId = async (provinceId: string) => {
 			}
 		);
 
+		// Cache data
+		if (response.status === 200) {
+			dataCache.set(cacheKey, response.data.rajaongkir.results);
+		}
+
 		return response.data.rajaongkir.results;
 	} catch (error: any) {
 		throw error;
 	}
 };
 
-export const getSubdistrictByCityId = async (subdistrictId: string) => {
+export const getSubdistrictByCityId = async (cityId: string) => {
 	try {
-		const response = await axios.get<{ rajaongkir: { results: Object[] } }>(
-			`${RAJA_ONGKIR_BASE_URL}/subdistrict?city=${subdistrictId}`,
+		// Check cached data
+		const cacheKey = `DATA_SUBDISTRICTS_CITY_ID_${cityId}`;
+		if (dataCache.has(cacheKey)) {
+			return dataCache.get(cacheKey);
+		}
+
+		const response = await axios.get<{ rajaongkir: { results: object[] } }>(
+			`${RAJA_ONGKIR_BASE_URL}/subdistrict?city=${cityId}`,
 			{
 				headers: {
 					key: process.env.RAJA_ONGKIR_API_KEY
 				}
 			}
 		);
+
+		// Cache data
+		if (response.status === 200) {
+			dataCache.set(cacheKey, response.data.rajaongkir.results);
+		}
 
 		return response.data.rajaongkir.results;
 	} catch (error: any) {

@@ -22,7 +22,7 @@ const _responseSender = (req: Request, res: Response) => {
 };
 
 // Dependencies
-import express, { NextFunction, Request, response, Response } from "express";
+import express, { NextFunction, Request, Response } from "express";
 import request from "supertest";
 import getUserDataOptional from "../getUserDataOptional";
 import { userService } from "../../services";

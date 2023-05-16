@@ -26,7 +26,7 @@ const mockSocket = {
 };
 
 const mockIO = {
-	on: jest.fn((event: string, handler: Function) => {
+	on: jest.fn((event: string, handler: (socket: unknown) => void) => {
 		if (event === "connection") {
 			handler(mockSocket);
 		}

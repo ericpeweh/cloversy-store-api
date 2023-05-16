@@ -82,6 +82,12 @@ export const getAllProducts = async (
 		const sortType = sortBy === "low-to-high" ? "ASC" : "DESC";
 
 		query += ` ORDER BY ${sorter} ${sortType} NULLS LAST`;
+
+		if (sortBy === "popularity" || sortBy === "rating") {
+			// Double sort (sort by 'popularity' | 'rating' then 'id')
+			// To prevent double product occurence with pagination
+			query += " ,id";
+		}
 	}
 
 	if (page) {
@@ -172,7 +178,7 @@ export const getProductRecommendations = async (productTags: string[], productId
 };
 
 export const getProductImages = async (productId: string) => {
-	const imageQuery = `SELECT url FROM product_image WHERE product_id = $1`;
+	const imageQuery = "SELECT url FROM product_image WHERE product_id = $1";
 
 	const imagesResult = await db.query(imageQuery, [productId]);
 
@@ -191,7 +197,7 @@ export const getProductsPriceRange = async () => {
 };
 
 export const checkProductExistById = async (productId: string) => {
-	const productQuery = `SELECT id FROM product WHERE id = $1`;
+	const productQuery = "SELECT id FROM product WHERE id = $1";
 
 	const productResult = await db.query(productQuery, [productId]);
 
@@ -223,7 +229,7 @@ export const getUserLastSeenProducts = async (userId: string) => {
 export const trackUserLastSeenProduct = async (productId: string, userId: string) => {
 	// Reset id sequence to current biggest id
 	await db.query(
-		`SELECT setval(pg_get_serial_sequence('product_last_seen', 'id'), MAX(id)) FROM product_last_seen;`
+		"SELECT setval(pg_get_serial_sequence('product_last_seen', 'id'), MAX(id)) FROM product_last_seen;"
 	);
 
 	const productSeenQuery = `INSERT INTO product_last_seen 

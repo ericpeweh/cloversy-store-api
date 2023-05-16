@@ -109,7 +109,7 @@ export const getAllReviews = async (
 	}
 
 	if (sortBy === "status") {
-		reviewsQuery += ` ORDER BY r.status ASC`;
+		reviewsQuery += " ORDER BY r.status ASC";
 	}
 
 	if (["id", "rating", "created_at"].includes(sortBy)) {
@@ -168,7 +168,7 @@ export const updateReview = async (
 };
 
 export const getReviewCount = async () => {
-	const reviewQuery = `SELECT COUNT(id) AS review_count FROM review`;
+	const reviewQuery = "SELECT COUNT(id) AS review_count FROM review";
 
 	const reviewResult = await db.query(reviewQuery);
 

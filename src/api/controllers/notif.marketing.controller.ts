@@ -73,7 +73,7 @@ export const createNotificationMarketing = async (
 		if (action_title) notificationMessage.actionTitle = action_title;
 
 		let notificationResult;
-		let directNotifSent: boolean = false;
+		let directNotifSent = false;
 		if (!scheduled) {
 			// Send notification directly
 			notificationResult = await notificationService.sendNotifications(
@@ -84,7 +84,7 @@ export const createNotificationMarketing = async (
 
 			directNotifSent = true;
 
-			console.log(`Direct notification marketing successfully sent.`);
+			console.log("Direct notification marketing successfully sent.");
 		}
 
 		const newNotifMarketing = await marketingService.createNotificationMarketing(

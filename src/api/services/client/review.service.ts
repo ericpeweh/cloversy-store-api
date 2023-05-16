@@ -1,11 +1,8 @@
 // Data
-import { reviewRepo, transactionRepo } from "../../data/client";
+import { reviewRepo } from "../../data/client";
 
 // Types
 import { ReviewRequestItem } from "../../interfaces";
-
-// utils
-import { ErrorObj } from "../../utils";
 
 export const getProductReviews = async (productId: string) => {
 	const reviews = await reviewRepo.getProductReviews(productId);

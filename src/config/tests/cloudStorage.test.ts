@@ -26,7 +26,7 @@ describe("cloudStorage", () => {
 		(Storage as unknown as jest.Mock).mockClear();
 
 		storage = new Storage({
-			keyFilename: path.join(__dirname, process.env.GOOGLE_CLOUD_KEY_PATH!),
+			keyFilename: path.join(__dirname, "../", process.env.GOOGLE_CLOUD_KEY_PATH!),
 			projectId: process.env.GOOGLE_CLOUD_PROJECT_ID
 		});
 		cloudBucket = storage.bucket(process.env.GOOGLE_CLOUD_BUCKET_NAME!);
@@ -45,7 +45,7 @@ describe("cloudStorage", () => {
 		expect(dotenv.config).toHaveBeenCalled();
 		expect(Storage).toHaveBeenCalledTimes(1);
 		expect(Storage).toHaveBeenCalledWith({
-			keyFilename: path.join(__dirname, process.env.GOOGLE_CLOUD_KEY_PATH!),
+			keyFilename: path.join(__dirname, "../", process.env.GOOGLE_CLOUD_KEY_PATH!),
 			projectId: process.env.GOOGLE_CLOUD_PROJECT_ID
 		});
 	});

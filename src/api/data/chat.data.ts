@@ -31,7 +31,7 @@ export const addConversationParticipants = async (conversationId: number, userId
 };
 
 export const checkUserHaveCreatedConversation = async (userId: number) => {
-	const conversationsQuery = `SELECT id FROM conversations WHERE created_by = $1`;
+	const conversationsQuery = "SELECT id FROM conversations WHERE created_by = $1";
 
 	const result = await db.query(conversationsQuery, [userId]);
 
@@ -196,7 +196,7 @@ export const getConversationList = async (page: string, userId: string) => {
     ) latest ON TRUE
     ORDER BY unread_message DESC
   `;
-	let totalQuery = `SELECT COUNT(id) FROM conversations`;
+	const totalQuery = "SELECT COUNT(id) FROM conversations";
 
 	if (page) {
 		query += ` LIMIT ${limit} OFFSET ${offset}`;

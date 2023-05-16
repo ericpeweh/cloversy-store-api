@@ -4,7 +4,9 @@ import { Response, NextFunction, Request } from "express";
 // Utils
 import { ClientError } from "../utils/errorClass";
 
+/* eslint-disable @typescript-eslint/no-unused-vars */
 const errorHandler = async (error: any, _: Request, res: Response, _1: NextFunction) => {
+	// console.error("ERROR OCCURED: ", error);
 	if (error.name === "UnauthorizedError") {
 		const isValidStatusCode = !isNaN(error?.status);
 		return res.status(isValidStatusCode ? error?.status : 401).json({

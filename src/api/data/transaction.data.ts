@@ -85,7 +85,7 @@ export const getTransactions = async (
 };
 
 export const getTransactionItem = async (transactionId: string) => {
-	const transactionQuery = `SELECT * FROM transactions WHERE id = $1`;
+	const transactionQuery = "SELECT * FROM transactions WHERE id = $1";
 
 	const transactionResult: QueryResult<Transaction> = await db.query(transactionQuery, [
 		transactionId
@@ -196,13 +196,13 @@ export const updateTransaction = async (updateTransactionData: UpdateTransaction
 		let timelineResult;
 		if (timelineObj) {
 			timelineResult = await client.query(
-				`UPDATE transactions_timeline SET timeline_object = $1 WHERE transaction_id = $2 RETURNING *`,
+				"UPDATE transactions_timeline SET timeline_object = $1 WHERE transaction_id = $2 RETURNING *",
 				[timelineObj, transactionId]
 			);
 		}
 
 		await client.query(
-			`UPDATE transactions_shipping SET shipping_tracking_code = $1 WHERE transaction_id = $2`,
+			"UPDATE transactions_shipping SET shipping_tracking_code = $1 WHERE transaction_id = $2",
 			[shippingTrackingCode, transactionId]
 		);
 
@@ -302,7 +302,7 @@ export const getSalesTotal = async () => {
 };
 
 export const getTransactionCount = async () => {
-	const transactionQuery = `SELECT COUNT(id) AS transaction_count FROM transactions`;
+	const transactionQuery = "SELECT COUNT(id) AS transaction_count FROM transactions";
 
 	const transactionResult = await db.query(transactionQuery);
 

@@ -9,10 +9,10 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
   WITH (OIDS=FALSE);`);
 
 	pgm.sql(
-		`ALTER TABLE cart_session ADD CONSTRAINT "session_pkey" PRIMARY KEY ("sid") NOT DEFERRABLE INITIALLY IMMEDIATE;`
+		"ALTER TABLE cart_session ADD CONSTRAINT \"session_pkey\" PRIMARY KEY (\"sid\") NOT DEFERRABLE INITIALLY IMMEDIATE;"
 	);
 
-	pgm.sql(`CREATE INDEX "IDX_session_expire" ON "cart_session" ("expire");`);
+	pgm.sql("CREATE INDEX \"IDX_session_expire\" ON \"cart_session\" (\"expire\");");
 }
 
 export async function down(pgm: MigrationBuilder): Promise<void> {

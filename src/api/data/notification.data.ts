@@ -47,7 +47,7 @@ export const getAllNotifications = async (
 		paramsIndex += 1;
 	}
 
-	notificationQuery += ` ORDER BY n.created_at DESC`;
+	notificationQuery += " ORDER BY n.created_at DESC";
 
 	if (page) {
 		notificationQuery += ` LIMIT ${limit} OFFSET ${offset}`;
@@ -69,13 +69,13 @@ export const getAllNotifications = async (
 };
 
 export const removeNotificationTokens = async (tokens: string[]) => {
-	const notificationQuery = `DELETE FROM notification_subscription WHERE token = ANY ($1)`;
+	const notificationQuery = "DELETE FROM notification_subscription WHERE token = ANY ($1)";
 
 	await db.query(notificationQuery, [tokens]);
 };
 
 export const getSingleNotificationMarketing = async (notifMarketingId: number | string) => {
-	const notificationQuery = `SELECT * FROM notification_marketing WHERE id = $1`;
+	const notificationQuery = "SELECT * FROM notification_marketing WHERE id = $1";
 
 	const notificationResult: QueryResult<NotifMarketingItem> = await db.query(notificationQuery, [
 		notifMarketingId
@@ -150,7 +150,7 @@ export const storeNotification = async (
       title, description, user_id, category_id, action_link
     ) VALUES ($1, $2, $3, $4, $5) RETURNING *`;
 
-		let newNotifications: NotificationItem[] = [];
+		const newNotifications: NotificationItem[] = [];
 		for (const userId of userIds) {
 			const result: QueryResult<NotificationItem> = await db.query(notificationQuery, [
 				title,
@@ -174,7 +174,7 @@ export const storeNotification = async (
 };
 
 export const getNotificationItem = async (notificationId: string) => {
-	const notificationQuery = `SELECT * FROM notification WHERE id = $1`;
+	const notificationQuery = "SELECT * FROM notification WHERE id = $1";
 
 	const notificationResult: QueryResult<NotificationItem> = await db.query(notificationQuery, [
 		notificationId

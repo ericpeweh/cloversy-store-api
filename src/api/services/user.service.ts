@@ -1,9 +1,6 @@
 // Data
 import { userRepo } from "../data";
 
-// Services
-import { userService } from ".";
-
 // Types
 import { User, UserStatus } from "../interfaces";
 

@@ -44,7 +44,7 @@ VALUES ($1, $2, $3, $4, $5)`;
 		}
 
 		// Change transaction review status
-		await client.query(`UPDATE transactions SET is_reviewed = true WHERE id = $1`, [transactionId]);
+		await client.query("UPDATE transactions SET is_reviewed = true WHERE id = $1", [transactionId]);
 
 		await client.query("COMMIT");
 	} catch (error) {

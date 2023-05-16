@@ -75,7 +75,7 @@ export const checkCartItemExist = async (
 };
 
 export const checkCartItemExistById = async (cartItemId: string) => {
-	const cartItemQuery = `SELECT id FROM cart WHERE id = $1`;
+	const cartItemQuery = "SELECT id FROM cart WHERE id = $1";
 
 	const cartItemResult = await db.query(cartItemQuery, [cartItemId]);
 
@@ -83,7 +83,7 @@ export const checkCartItemExistById = async (cartItemId: string) => {
 };
 
 export const checkCartItemAuthorized = async (cartItemId: string, userId: string) => {
-	const cartItemQuery = `SELECT id FROM cart WHERE id = $1 AND user_id = $2`;
+	const cartItemQuery = "SELECT id FROM cart WHERE id = $1 AND user_id = $2";
 
 	const cartItemResult = await db.query(cartItemQuery, [cartItemId, userId]);
 

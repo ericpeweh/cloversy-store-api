@@ -37,7 +37,7 @@ export const getCartItems = async (req: Request, res: Response, next: NextFuncti
 
 	try {
 		let cart: Partial<CartItem>[];
-		let sync: boolean = false;
+		let sync = false;
 
 		if (!userId) {
 			// Return session cart items

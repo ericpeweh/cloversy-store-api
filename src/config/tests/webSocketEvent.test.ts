@@ -26,7 +26,7 @@ const mockSocket = {
 };
 
 const mockIO: unknown = {
-	on: jest.fn((event: string, handler: Function) => {
+	on: jest.fn((event: string, handler: (socket: unknown) => void) => {
 		if (event === "connection") {
 			handler(mockSocket);
 		}
@@ -164,7 +164,7 @@ describe("webSocket onMessage", () => {
 		const handler = onNewMessageHandler(mockIOServer, mockUser as User, []);
 
 		await handler({ message: "Hello World", conversationId: 1 });
-		expect(mockIOServer.to).toHaveBeenCalledWith(`room-1`);
+		expect(mockIOServer.to).toHaveBeenCalledWith("room-1");
 		expect(mockIOServer.emit).toHaveBeenCalledWith("newMessageResponse", {
 			id: "UNIQUE_ID",
 			conversation_id: 1,
@@ -236,7 +236,7 @@ describe("webSocket userTyping", () => {
 		};
 
 		await handler({ conversationId, isTyping: isTyping });
-		expect(mockIOServer.to).toHaveBeenCalledWith(`room-1`);
+		expect(mockIOServer.to).toHaveBeenCalledWith("room-1");
 		expect(mockIOServer.emit).toHaveBeenCalledWith("userTypingResponse", userTyping);
 	});
 });

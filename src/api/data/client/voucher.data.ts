@@ -23,7 +23,7 @@ export const getUserVouchers = async (userId: string) => {
 };
 
 export const getSingleVoucher = async (voucherCode: string) => {
-	const voucherQuery = `SELECT * FROM voucher WHERE code = $1`;
+	const voucherQuery = "SELECT * FROM voucher WHERE code = $1";
 
 	const voucherResult: QueryResult<Voucher> = await db.query(voucherQuery, [voucherCode]);
 
@@ -49,7 +49,7 @@ export const getSingleVoucher = async (voucherCode: string) => {
 };
 
 export const getVoucherItem = async (voucherCode: string) => {
-	const voucherQuery = `SELECT * FROM voucher WHERE code = $1`;
+	const voucherQuery = "SELECT * FROM voucher WHERE code = $1";
 
 	const voucherResult: QueryResult<Voucher> = await db.query(voucherQuery, [voucherCode]);
 

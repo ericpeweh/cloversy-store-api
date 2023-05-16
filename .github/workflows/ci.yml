@@ -1,0 +1,49 @@
+name: Continuous Integration
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [14.x]
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: lint and test
+        run: |
+          echo "$GOOGLE_CLOUD_JSON" > src/config/google-cloud.json
+          echo "$FIREBASE_ADMIN_JSON" > src/config/firebase-admin.json
+          npm install
+          npx eslint .
+          npm run test
+        env:
+          CI: true
+          PORT: ${{ secrets.PORT }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          AUTHH0_CLIENTID: ${{ secrets.AUTHH0_CLIENTID }}
+          JWKS_URI: ${{ secrets.JWKS_URI }}
+          JWT_AUDIENCE: ${{ secrets.JWT_AUDIENCE }}
+          JWT_ISSUER: ${{ secrets.JWT_ISSUER }}
+          GOOGLE_CLOUD_KEY_PATH: ${{ secrets.GOOGLE_CLOUD_KEY_PATH }}
+          GOOGLE_CLOUD_PROJECT_ID: ${{ secrets.GOOGLE_CLOUD_PROJECT_ID }}
+          GOOGLE_CLOUD_BUCKET_NAME: ${{ secrets.GOOGLE_CLOUD_BUCKET_NAME }}
+          RAJA_ONGKIR_API_KEY: ${{ secrets.RAJA_ONGKIR_API_KEY }}
+          SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
+          MIDTRANS_SERVER_KEY: ${{ secrets.MIDTRANS_SERVER_KEY }}
+          MIDTRANS_CLIENT_KEY: ${{ secrets.MIDTRANS_CLIENT_KEY }}
+          MIDTRANS_MERCHANT_ID: ${{ secrets.MIDTRANS_MERCHANT_ID }}
+          FIREBASE_ADMIN_KEY_PATH: ${{ secrets.FIREBASE_ADMIN_KEY_PATH }}
+          SENDINBLUE_API_KEY: ${{ secrets.SENDINBLUE_API_KEY }}
+          GOOGLE_ANALYTICS_PROPERTY_ID: ${{ secrets.GOOGLE_ANALYTICS_PROPERTY_ID }}
+          GOOGLE_CLOUD_JSON: ${{ secrets.GOOGLE_CLOUD_JSON }}
+          FIREBASE_ADMIN_JSON: ${{ secrets.FIREBASE_ADMIN_JSON }}

@@ -146,7 +146,7 @@ export const handleNotifications = async (req: Request, res: Response, next: Nex
 			if (userTokens) {
 				const message: NotificationMessage = {
 					title: `Info transaksi #${order_id}`,
-					body: `Pembayaran transaksi berhasil diterima, pesanan akan segera diproses.`,
+					body: "Pembayaran transaksi berhasil diterima, pesanan akan segera diproses.",
 					actionTitle: "Detail transaksi",
 					actionLink: `https://cloversy.id/account/orders/${order_id}`,
 					deeplinkUrl: `id.cloversyid.cloversystoremobile://orders/${transaction.id}/details`
@@ -159,7 +159,7 @@ export const handleNotifications = async (req: Request, res: Response, next: Nex
 
 			const message: NotificationMessage = {
 				title: `Info transaksi #${order_id}`,
-				body: `Pembayaran transaksi berhasil, transaksi siap diproses.`,
+				body: "Pembayaran transaksi berhasil, transaksi siap diproses.",
 				actionTitle: "Detail transaksi",
 				actionLink: `https://admin.cloversy.id/orders/${order_id}`
 			};

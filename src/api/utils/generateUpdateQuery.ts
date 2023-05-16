@@ -26,7 +26,7 @@ const generateUpdateQuery = (
 
 	// Where part (ex: id)
 	if (identifier && Object.keys(identifier).length > 0) {
-		query += ` WHERE`;
+		query += " WHERE";
 		const identifierPairs = Object.entries(identifier);
 		identifierPairs.forEach(([key, value], index) => {
 			if (value !== undefined) {

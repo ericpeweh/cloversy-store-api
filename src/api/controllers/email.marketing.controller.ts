@@ -119,7 +119,7 @@ export const createEmailMarketing = async (req: Request, res: Response, next: Ne
 
 		// Handle direct and scheduled email marketing
 		let emailResult;
-		let directNotifSent: boolean = false;
+		let directNotifSent = false;
 
 		if (!scheduled) {
 			// Send email directly
@@ -127,7 +127,7 @@ export const createEmailMarketing = async (req: Request, res: Response, next: Ne
 
 			directNotifSent = true;
 
-			console.log(`Direct email marketing successfully sent.`);
+			console.log("Direct email marketing successfully sent.");
 		}
 
 		const newEmailMarketing = await marketingService.createEmailMarketing(

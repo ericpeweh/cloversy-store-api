@@ -2,12 +2,7 @@
 import { Response, Request, NextFunction } from "express";
 
 // Types
-import {
-	ReviewRequestItem,
-	ShippingManifestItem,
-	Voucher,
-	NotificationMessage
-} from "../../interfaces";
+import { ReviewRequestItem, ShippingManifestItem, NotificationMessage } from "../../interfaces";
 
 // Services
 import { notificationService, userService } from "../../services";

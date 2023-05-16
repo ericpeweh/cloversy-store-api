@@ -4,9 +4,6 @@ import { Request, Response, NextFunction } from "express";
 // Services
 import { productService } from "../../services/client";
 
-// Utils
-import { ErrorObj } from "../../utils";
-
 export const getAllProducts = async (req: Request, res: Response, next: NextFunction) => {
 	const {
 		brand: brandFilter = "",

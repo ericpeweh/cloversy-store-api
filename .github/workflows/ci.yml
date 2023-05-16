@@ -22,7 +22,7 @@ jobs:
       - name: lint and test
         run: |
           npm install
-          eslint .
+          npx eslint .
           npm run test
         env:
           CI: true

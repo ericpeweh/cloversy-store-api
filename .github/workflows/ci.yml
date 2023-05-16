@@ -21,6 +21,8 @@ jobs:
           node-version: ${{ matrix.node-version }}
       - name: lint and test
         run: |
+          echo "$GOOGLE_CLOUD_JSON" > src/config/google-cloud.json
+          echo "$FIREBASE_ADMIN_JSON" > src/config/firebase-admin.json
           npm install
           npx eslint .
           npm run test
@@ -43,3 +45,5 @@ jobs:
           FIREBASE_ADMIN_KEY_PATH: ${{ secrets.FIREBASE_ADMIN_KEY_PATH }}
           SENDINBLUE_API_KEY: ${{ secrets.SENDINBLUE_API_KEY }}
           GOOGLE_ANALYTICS_PROPERTY_ID: ${{ secrets.GOOGLE_ANALYTICS_PROPERTY_ID }}
+          GOOGLE_CLOUD_JSON: ${{ secrets.GOOGLE_CLOUD_JSON }}
+          FIREBASE_ADMIN_JSON: ${{ secrets.FIREBASE_ADMIN_JSON }}

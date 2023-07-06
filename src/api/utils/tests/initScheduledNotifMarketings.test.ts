@@ -105,7 +105,7 @@ describe("initScheduledNotifMarketings", () => {
 	});
 
 	it("should not schedule any task if no scheduled notification marketing found", async () => {
-		// Mock getEmailMarketings to return empty array
+		// Mock getNotificationMarketings to return empty array
 		(marketingService.getNotificationMarketings as jest.Mock).mockResolvedValueOnce({
 			notifMarketings: []
 		});
@@ -131,7 +131,7 @@ describe("initScheduledNotifMarketings", () => {
 		expect(console.log).toHaveBeenCalledWith("Scheduled 0 notification marketing job");
 	});
 
-	it("should schedule email marketing jobs correctly", async () => {
+	it("should schedule notification marketing jobs correctly", async () => {
 		// Call the init function
 		await initScheduledNotifMarketings();
 

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import express, { Request as ExpressRequest } from "express";
 
 export interface User {

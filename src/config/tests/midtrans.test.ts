@@ -17,7 +17,9 @@ describe("midtrans", () => {
 	});
 
 	it("should provided with required environment variables", () => {
-		expect(process.env.MIDTRANS_SERVER_KEY).toBeDefined();
-		expect(process.env.MIDTRANS_CLIENT_KEY).toBeDefined();
+		expect(process.env.MIDTRANS_SERVER_SANDBOX_KEY).toBeDefined();
+		expect(process.env.MIDTRANS_CLIENT_SANDBOX_KEY).toBeDefined();
+		expect(process.env.MIDTRANS_SERVER_PRODUCTION_KEY).toBeDefined();
+		expect(process.env.MIDTRANS_CLIENT_PRODUCTION_KEY).toBeDefined();
 	});
 });

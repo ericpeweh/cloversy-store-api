@@ -12,6 +12,7 @@
 		"start": "tsc && node ./dist/index.js",
 		"migrate": "node-pg-migrate --tsconfig ./tsconfig.json"
 	},
+	"typings": "src/api/types/*.d.ts",
 	"keywords": [],
 	"author": "",
 	"license": "ISC",

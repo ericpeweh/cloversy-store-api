@@ -31,7 +31,12 @@ export const handleNotifications = async (req: Request, res: Response, next: Nex
 			throw new ErrorObj.ClientError("Invalid request body!");
 		}
 
-		const key = sha512(order_id + status_code + gross_amount + process.env.MIDTRANS_SERVER_KEY);
+		const midtransServerKey =
+			process.env.NODE_ENV === "production"
+				? process.env.MIDTRANS_SERVER_PRODUCTION_KEY
+				: process.env.MIDTRANS_SERVER_SANDBOX_KEY;
+
+		const key = sha512(order_id + status_code + gross_amount + midtransServerKey);
 
 		if (key !== signature_key) throw new ErrorObj.ClientError("Invalid request signature!", 403);
 

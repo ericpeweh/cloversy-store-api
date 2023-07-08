@@ -13,7 +13,7 @@ const isAdmin = async (req: JWTRequest, res: Response, next: NextFunction) => {
 		if (req.auth === undefined) {
 			throw new ErrorObj.ClientError("Failed to check user authority, please try again.", 401);
 		}
-		const user = await userService.getUserDataBySub(req.auth.sub);
+		const user = await userService.getUserDataBySub(req.auth.sub || "");
 		const userRole = user.user_role;
 
 		if (userRole !== "admin") {

@@ -1,9 +1,8 @@
 {
-	// "exclude": ["jest.config.ts", "**/*.test.ts", "**/*.spec.ts"],
-	"exclude": ["jest.config.ts", "**/*.spec.ts"],
+	"exclude": ["jest.config.ts", "**/*.test.ts", "**/*.spec.ts"],
 	"compilerOptions": {
 		"target": "ES6",
-		"types": ["node", "jest"],
+		// "types": ["node", "jest"],
 		"module": "commonjs",
 		"typeRoots": ["./src/api/types", "./node_modules/@types"],
 		"outDir": "./dist",

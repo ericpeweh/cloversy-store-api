@@ -19,13 +19,16 @@ export const getAllVouchers = async (
 	const limit = itemsLimit ? +itemsLimit : 12;
 	const offset = parseInt(page) * limit - limit;
 
-	let voucherQuery = "SELECT * FROM voucher";
+	let voucherQuery = `SELECT 
+    v.voucher_code AS code, v.voucher_title AS title,
+    v.voucher_status AS status, v.*
+    FROM voucher v`;
 
-	let totalQuery = "SELECT COUNT(code) FROM voucher";
+	let totalQuery = "SELECT COUNT(voucher_code) FROM voucher";
 
 	if (voucherStatus) {
-		voucherQuery += ` WHERE status = $${paramsIndex + 1}`;
-		totalQuery += ` WHERE status = $${paramsIndex + 1}`;
+		voucherQuery += ` WHERE voucher_status = $${paramsIndex + 1}`;
+		totalQuery += ` WHERE voucher_status = $${paramsIndex + 1}`;
 		params.push(voucherStatus);
 		paramsIndex += 1;
 	}
@@ -55,7 +58,11 @@ export const getAllVouchers = async (
 };
 
 export const getSingleVoucher = async (voucherCode: string, analyticYear: string) => {
-	const voucherQuery = "SELECT * FROM voucher WHERE code = $1";
+	const voucherQuery = `SELECT
+    v.voucher_code AS code, v.voucher_title AS title,
+    v.voucher_status AS status, v.* 
+    FROM voucher v
+    WHERE v.voucher_code = $1`;
 
 	const voucherResult = await db.query(voucherQuery, [voucherCode]);
 
@@ -67,11 +74,12 @@ export const getSingleVoucher = async (voucherCode: string, analyticYear: string
 
 	let voucherDistResult = [];
 	if (isVoucherUserScoped) {
-		const voucherDistQuery = `SELECT u.id AS user_id, u.email AS email, 
+		const voucherDistQuery = `SELECT 
+      u.user_id AS user_id, u.email AS email, 
       u.full_name AS full_name, u.profile_picture AS profile_picture
       FROM voucher_dist v
       JOIN users u
-      ON v.user_id = u.id
+      ON v.user_id = u.user_id
       WHERE v.voucher_code = $1`;
 		const result = await db.query(voucherDistQuery, [voucherCode]);
 		voucherDistResult = result.rows;
@@ -85,7 +93,7 @@ export const getSingleVoucher = async (voucherCode: string, analyticYear: string
       '1 month'::interval
       )),
     t AS 
-      (SELECT id, discount_total, created_at, voucher_code
+      (SELECT transaction_id AS id, discount_total, created_at, voucher_code
         FROM transactions
         WHERE voucher_code = $2
         AND order_status NOT IN ('pending', 'cancel')
@@ -120,19 +128,22 @@ export const createVoucher = async (
 		await client.query("BEGIN");
 
 		const voucherQuery = `INSERT INTO voucher(
-      code,
-      title,
+      voucher_code,
+      voucher_title,
       expiry_date,
       discount,
       discount_type,
-      status,
+      voucher_status,
       usage_limit,
       voucher_scope,
       description
     ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *`;
 
-		const voucherResult: QueryResult<Voucher> = await client.query(voucherQuery, voucherData);
-		const newVoucherCode = voucherResult.rows[0].code;
+		const voucherResult: QueryResult<Voucher & { voucher_code: string }> = await client.query(
+			voucherQuery,
+			voucherData
+		);
+		const newVoucherCode = voucherResult.rows[0].voucher_code;
 
 		if (selectedUserIds.length > 0) {
 			const voucherDistQuery = `INSERT INTO voucher_dist(
@@ -167,15 +178,15 @@ export const updateVoucher = async (
 		await client.query("BEGIN");
 
 		const voucherQuery = `UPDATE voucher SET
-      title = $1,
+      voucher_title = $1,
       expiry_date = $2,
       discount = $3,
       discount_type = $4,
-      status = $5,
+      voucher_status = $5,
       usage_limit = $6,
       voucher_scope = $7,
       description = $8
-      WHERE code = $9 RETURNING *`;
+      WHERE voucher_code = $9 RETURNING *`;
 
 		const voucherResult = await client.query(voucherQuery, [...updatedVoucherData, code]);
 		const isVoucherGlobalScoped = voucherResult.rows[0].voucher_scope === "global";
@@ -218,7 +229,11 @@ export const updateVoucher = async (
 };
 
 export const getVoucherItem = async (voucherCode: string) => {
-	const voucherQuery = "SELECT * FROM voucher WHERE code = $1";
+	const voucherQuery = `SELECT
+    v.voucher_code AS code, v.voucher_title AS title,
+    v.voucher_status AS status, v.*
+    FROM voucher v
+    WHERE v.voucher_code = $1`;
 
 	const voucherResult: QueryResult<Voucher> = await db.query(voucherQuery, [voucherCode]);
 
@@ -226,9 +241,9 @@ export const getVoucherItem = async (voucherCode: string) => {
 };
 
 export const getActiveVoucherCount = async () => {
-	const reviewQuery = `SELECT COUNT(code) AS active_voucher_count 
+	const reviewQuery = `SELECT COUNT(voucher_code) AS active_voucher_count 
     FROM voucher
-  WHERE status = 'active'
+  WHERE voucher_status = 'active'
   AND current_usage < usage_limit
   AND expiry_date > NOW() 
   `;

@@ -72,7 +72,7 @@ export const updateUserData = async (req: Request, res: Response, next: NextFunc
 	try {
 		const updatedUserData = {
 			full_name,
-			contact,
+			user_contact: contact,
 			profile_picture,
 			user_status,
 			credits

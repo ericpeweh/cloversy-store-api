@@ -12,17 +12,17 @@ export const getPushSubscriptions = async (page: string, searchQuery: string) =>
 	const offset = parseInt(page) * limit - limit;
 
 	let query = `SELECT DISTINCT ON (ns.user_id)
-    ns.user_id as id,
-    ns.last_online as last_online, 
-    u.profile_picture as profile_picture,
-    u.full_name as full_name,
-    u.email as email
+    ns.user_id AS id,
+    ns.last_online AS last_online, 
+    u.profile_picture AS profile_picture,
+    u.full_name AS full_name,
+    u.email AS email
   FROM notification_subscription ns
-  JOIN users u ON ns.user_id = u.id
+  JOIN users u ON ns.user_id = u.user_id
   `;
 	let totalQuery = `SELECT COUNT(ns.id) 
     FROM notification_subscription ns
-  JOIN users u ON ns.user_id = u.id`;
+  JOIN users u ON ns.user_id = u.user_id`;
 
 	// Filter for user only (no admin)
 	query += " WHERE u.user_role = 'user'";
@@ -69,7 +69,7 @@ export const getNotifSubscriptionsByUserIds = async (userIds: string[] | number[
 export const getAllNotifSubscriptions = async () => {
 	const notificationQuery = `SELECT * 
       FROM notification_subscription ns
-    JOIN users u ON ns.user_id = u.id
+    JOIN users u ON ns.user_id = u.user_id
     WHERE u.user_role = 'user'
     `;
 

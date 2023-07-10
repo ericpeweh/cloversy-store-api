@@ -10,7 +10,7 @@ import { ErrorObj, getLocalTime } from "../utils";
 
 export const createNewConversation = async (title: string, userId: number) => {
 	const conversationsQuery = `INSERT INTO
-    conversations(title, created_by)
+    conversations(conversation_title, created_by)
     VALUES($1, $2) 
   ON CONFLICT DO NOTHING
   RETURNING id`;
@@ -31,7 +31,8 @@ export const addConversationParticipants = async (conversationId: number, userId
 };
 
 export const checkUserHaveCreatedConversation = async (userId: number) => {
-	const conversationsQuery = "SELECT id FROM conversations WHERE created_by = $1";
+	const conversationsQuery =
+		"SELECT conversation_id AS id FROM conversations WHERE created_by = $1";
 
 	const result = await db.query(conversationsQuery, [userId]);
 
@@ -41,16 +42,16 @@ export const checkUserHaveCreatedConversation = async (userId: number) => {
 export const getAllUserIdsWithoutConversation = async () => {
 	const usersQuery = `
   WITH mod_conversations AS (
-    SELECT id, title, created_by
+    SELECT c.conversation_id AS id, c.conversation_title AS title, created_by
 		FROM conversations c
-    WHERE c.title = 'private-message-user-admin'
+    WHERE c.conversation_title = 'private-message-user-admin'
   )
-  SELECT COALESCE(array_agg(u.id), '{}') AS user_ids
+  SELECT COALESCE(array_agg(u.user_id), '{}') AS user_ids
   FROM users u
     LEFT JOIN mod_conversations c
-    ON u.id = c.created_by
+    ON u.user_id = c.created_by
   WHERE u.user_role = 'user' 
-  AND c.id IS NULL`;
+  AND c.conversation_id IS NULL`;
 
 	const result = await db.query(usersQuery);
 
@@ -83,7 +84,7 @@ export const verifyConversationAccess = async (conversationId: number, userId: n
 
 export const createMessage = async (conversationId: number, body: string, senderId: number) => {
 	const messagesQuery = `INSERT INTO messages
-    (conversation_id, body, sender_id)
+    (conversation_id, message_body, sender_id)
     VALUES ($1, $2, $3)
   `;
 
@@ -91,9 +92,9 @@ export const createMessage = async (conversationId: number, body: string, sender
 };
 
 export const getConversationById = async (conversationId: string) => {
-	const query = `SELECT *
+	const query = `SELECT c.conversation_id AS id, c.conversation_title AS title, c.*
     FROM conversations c
-    WHERE c.id = $1`;
+    WHERE c.conversation_id = $1`;
 
 	const result = await db.query(query, [conversationId]);
 
@@ -109,8 +110,8 @@ export const getConversationMessages = async (conversationId: string, userCursor
 
 	// Get cursors (chat pagination)
 	const cursorQuery = `SELECT 
-      MAX(id) as max_cursor,
-      MIN(id) as min_cursor 
+      MAX(message_id) as max_cursor,
+      MIN(message_id) as min_cursor 
     FROM messages 
     WHERE conversation_id = $1`;
 	const cursorResult = await db.query(cursorQuery, [conversationId]);
@@ -120,11 +121,11 @@ export const getConversationMessages = async (conversationId: string, userCursor
 	const currentCursor = userCursor || maxCursor + 1;
 
 	// Get messages based on cursor
-	const query = `SELECT m.*, u.email
+	const query = `SELECT m.message_id AS id, m.message_body AS body, m.*, u.email
     FROM messages m
-    JOIN users u ON m.sender_id = u.id
+    JOIN users u ON m.sender_id = u.user_id
     WHERE m.conversation_id = $1
-    AND m.id < $2
+    AND m.message_id < $2
     ORDER BY m.created_at DESC
     LIMIT $3`;
 
@@ -161,18 +162,18 @@ export const getConversationList = async (page: string, userId: string) => {
 
 	let query = `WITH conversation_list AS 
     (
-      SELECT c.*, u.full_name, u.profile_picture, u.contact
+      SELECT c.conversation_id AS id, c.conversation_title AS title, c.*, u.full_name, u.profile_picture, u.user_contact AS contact
         FROM conversations c
       JOIN users u 
-        ON c.created_by = u.id
+        ON c.created_by = u.user_id
     )
     SELECT *,
       (
-        SELECT COUNT(m.id) 
+        SELECT COUNT(m.message_id) 
           FROM messages m
           LEFT JOIN conversations_users cu
             ON m.conversation_id = cu.conversation_id
-          WHERE m.conversation_id = c.id
+          WHERE m.conversation_id = c.conversation_id
           AND cu.user_id = $1
           AND m.sender_id != $1
           AND m.created_at > cu.read_at
@@ -180,23 +181,23 @@ export const getConversationList = async (page: string, userId: string) => {
       FROM conversation_list c
     LEFT JOIN LATERAL (
       SELECT json_build_object(
-        'id', m.id,
+        'id', m.message_id,
         'conversation_id', m.conversation_id,
-        'body', m.body,
+        'body', m.message_body,
         'sender_id', m.sender_id,
         'created_at', m.created_at,
         'email', u.email
       ) AS latest_message
       FROM messages m
       JOIN users u
-        ON m.sender_id = u.id
+        ON m.sender_id = u.user_id
       WHERE m.conversation_id = c.id
       ORDER BY m.created_at DESC
       LIMIT 1
     ) latest ON TRUE
     ORDER BY unread_message DESC
   `;
-	const totalQuery = "SELECT COUNT(id) FROM conversations";
+	const totalQuery = "SELECT COUNT(conversation_id) FROM conversations";
 
 	if (page) {
 		query += ` LIMIT ${limit} OFFSET ${offset}`;

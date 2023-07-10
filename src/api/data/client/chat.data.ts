@@ -9,10 +9,10 @@ import { Message } from "../../interfaces";
 import { QueryResult } from "pg";
 
 export const getUserConversation = async (userId: string) => {
-	const query = `SELECT *
+	const query = `SELECT c.conversation_id AS id, c.conversation_title AS title, c.*
     FROM conversations c
     WHERE c.created_by = $1
-    AND title = 'private-message-user-admin'`;
+    AND c.conversation_title = 'private-message-user-admin'`;
 
 	const result = await db.query(query, [userId]);
 
@@ -28,8 +28,8 @@ export const getConversationMessages = async (conversationId: string, userCursor
 
 	// Get cursors (chat pagination)
 	const cursorQuery = `SELECT 
-      MAX(id) as max_cursor,
-      MIN(id) as min_cursor 
+      MAX(message_id) as max_cursor,
+      MIN(message_id) as min_cursor 
     FROM messages 
     WHERE conversation_id = $1`;
 	const cursorResult = await db.query(cursorQuery, [conversationId]);
@@ -39,11 +39,11 @@ export const getConversationMessages = async (conversationId: string, userCursor
 	const currentCursor = userCursor || maxCursor + 1;
 
 	// Get messages based on cursor
-	const query = `SELECT m.*, u.email
+	const query = `SELECT m.message_id AS id, m.message_body AS body, m.*, u.email
     FROM messages m
-    JOIN users u ON m.sender_id = u.id
+    JOIN users u ON m.sender_id = u.user_id
     WHERE m.conversation_id = $1
-    AND m.id < $2
+    AND m.message_id < $2
     ORDER BY m.created_at DESC
     LIMIT $3`;
 

@@ -31,12 +31,13 @@ export const getTransactions = async (
 	const limit = itemsLimit ? +itemsLimit : 12;
 	const offset = parseInt(page) * limit - limit;
 
-	let transactionQuery = `SELECT t.*, ROUND(t.total) as total,
-      u.full_name as full_name, u.email as email
+	let transactionQuery = `SELECT 
+      t.transaction_id AS id, t.*, ROUND(t.total) AS total,
+      u.full_name AS full_name, u.email AS email
     FROM transactions t
-    JOIN users u ON t.user_id = u.id`;
+    JOIN users u ON t.user_id = u.user_id`;
 
-	let totalQuery = "SELECT COUNT(id) FROM transactions t";
+	let totalQuery = "SELECT COUNT(transaction_id) FROM transactions t";
 
 	if (transactionStatus) {
 		transactionQuery += ` WHERE t.order_status = $${paramsIndex + 1}`;
@@ -54,7 +55,9 @@ export const getTransactions = async (
 	}
 
 	if (searchQuery) {
-		const search = ` ${paramsIndex === 0 ? "WHERE" : "AND"} t.id iLIKE $${paramsIndex + 1}`;
+		const search = ` ${paramsIndex === 0 ? "WHERE" : "AND"} t.transaction_id iLIKE $${
+			paramsIndex + 1
+		}`;
 		transactionQuery += search;
 		totalQuery += search;
 		params.push(`%${searchQuery}%`);
@@ -62,7 +65,12 @@ export const getTransactions = async (
 	}
 
 	if (sortBy) {
-		const sorter = sortBy === "low-to-high" || sortBy === "high-to-low" ? "total" : sortBy;
+		const sorter =
+			sortBy === "low-to-high" || sortBy === "high-to-low"
+				? "total"
+				: sortBy === "id"
+				? "transaction_id"
+				: sortBy;
 		const sortType = sortBy === "low-to-high" ? "ASC" : "DESC";
 
 		transactionQuery += ` ORDER BY t.${sorter} ${sortType} NULLS LAST`;
@@ -85,7 +93,8 @@ export const getTransactions = async (
 };
 
 export const getTransactionItem = async (transactionId: string) => {
-	const transactionQuery = "SELECT * FROM transactions WHERE id = $1";
+	const transactionQuery =
+		"SELECT t.transaction_id AS id, t.* FROM transactions t WHERE t.trannsaction_id = $1";
 
 	const transactionResult: QueryResult<Transaction> = await db.query(transactionQuery, [
 		transactionId
@@ -96,23 +105,24 @@ export const getTransactionItem = async (transactionId: string) => {
 
 export const getSingleTransaction = async (transactionId: string) => {
 	const transactionQuery = `SELECT 
-    t.id as id, t.user_id as user_id, t.order_status as order_status, 
-    t.gift_note as gift_note, t.voucher_code as voucher_code, 
-    t.customer_note as customer_note, t.order_note as order_note, t.created_at as created_at,
-    t.is_reviewed as is_reviewed, t.order_status_modified as order_status_modified, 
+    t.transaction_id AS id, t.user_id AS user_id, 
+    t.order_status AS order_status, 
+    t.gift_note AS gift_note, t.voucher_code AS voucher_code, 
+    t.customer_note AS customer_note, t.order_note AS order_note, t.created_at AS created_at,
+    t.is_reviewed AS is_reviewed, t.order_status_modified AS order_status_modified, 
     ROUND(t.subtotal) AS subtotal, 
     ROUND(t.discount_total) AS discount_total,
     ROUND(t.total) AS total,
     to_json(ts) AS shipping_details,
     tt.timeline_object as timeline,
-    u.full_name as full_name, u.email as email, u.contact as contact,
-    v.title as voucher_title, v.discount_type as voucher_discount_type, v.discount as voucher_discount
+    u.full_name AS full_name, u.email AS email, u.user_contact AS contact,
+    v.voucher_title AS voucher_title, v.discount_type AS voucher_discount_type, v.discount AS voucher_discount
   FROM transactions t
-    JOIN transactions_shipping ts ON t.id = ts.transaction_id
-    JOIN transactions_timeline tt ON t.id = tt.transaction_id
-    JOIN users u ON t.user_id = u.id
-    LEFT JOIN voucher v ON t.voucher_code = v.code
-  WHERE t.id = $1
+    JOIN transactions_shipping ts ON t.transaction_id = ts.transaction_id
+    JOIN transactions_timeline tt ON t.transaction_id = tt.transaction_id
+    JOIN users u ON t.user_id = u.user_id
+    LEFT JOIN voucher v ON t.voucher_code = v.voucher_code
+  WHERE t.transaction_id = $1
     `;
 
 	const transactionResult: QueryResult<
@@ -138,12 +148,15 @@ export const getSingleTransaction = async (transactionId: string) => {
 		[transactionId]
 	);
 
-	const transactionItemsQuery = `SELECT ti.*, products.*, ROUND(ti.price) AS price FROM transactions_item ti
+	const transactionItemsQuery = `SELECT 
+    ti.transaction_item_id AS id, ti.*, 
+    products.*, ROUND(ti.price) AS price 
+  FROM transactions_item ti
   JOIN (
-    SELECT p.id as product_id, p.title as title, p.slug as slug,
+    SELECT p.product_id AS product_id, p.product_title AS title, p.product_slug AS slug,
     (SELECT array_agg("url") AS images 
       FROM product_image pi 
-      WHERE pi.product_id = p.id
+      WHERE pi.product_id = p.product_id
     )
     FROM product p
   ) AS products 
@@ -174,11 +187,11 @@ export const updateTransaction = async (updateTransactionData: UpdateTransaction
 		const { query: transactionQuery, params: transactionParams } = generateUpdateQuery(
 			"transactions",
 			updatedTransactionData,
-			{ id: transactionId },
+			{ transaction_id: transactionId },
 			"",
 			undefined,
 			[
-				"id",
+				"transaction_id",
 				"user_id",
 				"order_status",
 				"order_status_modified",
@@ -233,7 +246,7 @@ export const changeTransactionStatus = async (
 		// Update transaction status
 		const transactionQuery = `UPDATE transactions
       SET order_status = $1, order_status_modified = $2 
-    WHERE id = $3`;
+    WHERE transaction_id = $3`;
 
 		await client.query(transactionQuery, [orderStatus, getLocalTime(), transactionId]);
 
@@ -272,7 +285,7 @@ export const changeTransactionStatus = async (
 		if (transaction && voucher && voucher?.voucher_scope === "global") {
 			voucherQuery = `UPDATE voucher 
         SET current_usage = current_usage - 1
-      WHERE code = $1`;
+      WHERE voucher_code = $1`;
 			voucherParams = [voucher.code];
 		}
 
@@ -302,7 +315,7 @@ export const getSalesTotal = async () => {
 };
 
 export const getTransactionCount = async () => {
-	const transactionQuery = "SELECT COUNT(id) AS transaction_count FROM transactions";
+	const transactionQuery = "SELECT COUNT(transaction_id) AS transaction_count FROM transactions";
 
 	const transactionResult = await db.query(transactionQuery);
 
@@ -318,7 +331,7 @@ export const getMonthlySalesCountAnalytics = async (analyticYear: string) => {
         '1 month'::interval
       )),
     t AS 
-      (SELECT id, created_at, order_status
+      (SELECT transaction_id AS id, created_at, order_status
         FROM transactions
         WHERE order_status NOT IN ('pending', 'cancel')
         AND date_trunc('year', created_at) = date_trunc('year', $1::timestamp)

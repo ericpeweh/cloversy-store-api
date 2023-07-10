@@ -14,8 +14,12 @@ export const getAllCustomers = async (page: string, searchQuery: string, statusQ
 	const limit = 12;
 	const offset = parseInt(page) * limit - limit;
 
-	let query = "SELECT * FROM users WHERE user_role = $1";
-	let totalQuery = "SELECT COUNT(id) FROM users WHERE user_role = $1";
+	let query = `SELECT 
+    u.user_id AS id, u.user_contact AS contact,
+    u.user_status AS status, u.*
+    FROM users u 
+    WHERE user_role = $1`;
+	let totalQuery = "SELECT COUNT(user_id) FROM users WHERE user_role = $1";
 
 	if (searchQuery) {
 		const searchPart = ` AND (email iLIKE $${paramsIndex + 1} OR full_name iLIKE $${
@@ -36,7 +40,7 @@ export const getAllCustomers = async (page: string, searchQuery: string, statusQ
 		params.push(statusQuery);
 	}
 
-	query += " ORDER BY id DESC";
+	query += " ORDER BY user_id DESC";
 	query += ` LIMIT ${limit} OFFSET ${offset}`;
 
 	const customers = await db.query(query, params);
@@ -53,39 +57,50 @@ export const getAllCustomers = async (page: string, searchQuery: string, statusQ
 };
 
 export const getUserDataBySub = async (userSub: string) => {
-	const userQuery = "SELECT * FROM users WHERE sub = $1";
+	const userQuery = `SELECT 
+    u.user_id AS id, u.user_contact AS contact,
+    u.user_status AS status, u.* 
+  FROM users u WHERE u.sub = $1`;
 	const userResult = await db.query(userQuery, [userSub]);
 
 	return userResult.rows[0];
 };
 
 export const getUserDataByEmail = async (userEmail: string) => {
-	const userQuery = "SELECT * FROM users WHERE email = $1";
+	const userQuery = `SELECT 
+    u.user_id AS id, u.user_contact AS contact,
+    u.user_status AS status, u.* 
+  FROM users u WHERE u.email = $1`;
 	const userResult = await db.query(userQuery, [userEmail]);
 
 	return userResult.rows[0];
 };
 
 export const getUserDataById = async (userId: string) => {
-	const userQuery = "SELECT * FROM users WHERE id = $1";
+	const userQuery = `SELECT 
+    u.user_id AS id, u.user_contact AS contact,
+    u.user_status AS status, u.* 
+  FROM users WHERE user_id = $1`;
 	const userResult = await db.query(userQuery, [userId]);
 
-	const addressQuery = `SELECT * FROM address 
+	const addressQuery = `SELECT 
+    address_id AS id, address_contact AS contact, address.*
+    FROM address 
     WHERE user_id = $1
-  ORDER BY is_default DESC, id ASC`;
+  ORDER BY is_default DESC, address_id ASC`;
 	const addressResult = await db.query(addressQuery, [userId]);
 
 	const productSeenQuery = `SELECT pls.*,
-    p.title as title,
-    ROUND(p.price) as price,
-    p.slug as slug,
+    p.product_title AS title,
+    ROUND(p.price) AS price,
+    p.product_slug AS slug,
     (SELECT array_agg("url") AS images 
         FROM product_image pi 
-        WHERE pi.product_id = p.id
+        WHERE pi.product_id = p.product_id
     )
   FROM product_last_seen pls
-  JOIN product p ON pls.product_id = p.id
-  WHERE user_id = $1 AND p.status = 'active'
+  JOIN product p ON pls.product_id = p.product_id
+  WHERE user_id = $1 AND p.product_status = 'active'
   ORDER BY seen_date DESC
   LIMIT 4`;
 
@@ -94,20 +109,24 @@ export const getUserDataById = async (userId: string) => {
 	]);
 
 	const wishlistQuery = `SELECT 
-    w.*, p.title as title,
+    w.wishlist_id AS id, w.*, 
+    p.product_title AS title,
     (SELECT array_agg("url") AS images 
       FROM product_image pi 
-      WHERE pi.product_id = p.id
+      WHERE pi.product_id = p.product_id
     )
   FROM wishlist w 
-  JOIN product p ON w.product_id = p.id
+  JOIN product p ON w.product_id = p.product_id
   WHERE user_id = $1
   ORDER BY w.created_at DESC`;
 	const wishlistResult = await db.query(wishlistQuery, [userId]);
 
-	const vouchersQuery = `SELECT v.* FROM voucher_dist vd 
+	const vouchersQuery = `SELECT 
+    v.voucher_code AS code, v.voucher_title AS title,
+    v.voucher_status AS status, v.* 
+    FROM voucher_dist vd 
     JOIN voucher v
-    ON vd.voucher_code = v.code
+    ON vd.voucher_code = v.voucher_code
     WHERE vd.user_id = $1
   `;
 	const vouchersResult = await db.query(vouchersQuery, [userId]);
@@ -132,7 +151,7 @@ export const updateUser = async (updatedUserData: Partial<User>, userId: string)
 	const { query, params } = generateUpdateQuery(
 		"users",
 		updatedUserData,
-		{ id: userId },
+		{ user_id: userId },
 		" RETURNING *"
 	);
 
@@ -143,7 +162,7 @@ export const updateUser = async (updatedUserData: Partial<User>, userId: string)
 
 export const getAllAdminUserIds = async () => {
 	const userQuery = `SELECT 
-    array_agg("id") AS user_ids
+    array_agg("user_id") AS user_ids
   FROM users
   WHERE users.user_role = 'admin'`;
 
@@ -155,7 +174,7 @@ export const getAllAdminUserIds = async () => {
 export const getUserEmailAndNameByIds = async (userIds: string[] | number[]) => {
 	const userQuery = `SELECT email, full_name
     FROM users
-  WHERE id = ANY ($1) AND user_role = 'user'`;
+  WHERE user_id = ANY ($1) AND user_role = 'user'`;
 
 	const userResult: QueryResult<{ email: string; full_name: string }> = await db.query(userQuery, [
 		userIds
@@ -165,7 +184,7 @@ export const getUserEmailAndNameByIds = async (userIds: string[] | number[]) => 
 };
 
 export const getCustomerCount = async () => {
-	const userQuery = `SELECT COUNT(id) AS customer_count 
+	const userQuery = `SELECT COUNT(user_id) AS customer_count 
     FROM users
   WHERE user_role = 'user'`;
 

@@ -116,7 +116,7 @@ export const updateNotificationMarketing = async (
 		const { query: notificationQuery, params: notificationParams } = generateUpdateQuery(
 			"notification_marketing",
 			updatedNotifMarketingData,
-			{ id: notifMarketingId },
+			{ notification_marketing_id: notifMarketingId },
 			" RETURNING *"
 		);
 
@@ -200,14 +200,14 @@ export const getNotificationMarketings = async (
 	const limit = itemsLimit ? +itemsLimit : 10;
 	const offset = parseInt(page) * limit - limit;
 
-	let notifMarketingQuery = `SELECT nm.*,
+	let notifMarketingQuery = `SELECT nm.notification_marketing_id AS id, nm.*,
     (SELECT COUNT(id) AS target_count
       FROM notification_marketing_target nmt
-      WHERE nmt.notification_marketing_id = nm.id
+      WHERE nmt.notification_marketing_id = nm.notification_marketing_id
     )
   FROM notification_marketing nm
   `;
-	let totalQuery = "SELECT COUNT(id) FROM notification_marketing nm";
+	let totalQuery = "SELECT COUNT(notification_marketing_id) FROM notification_marketing nm";
 
 	if (searchQuery) {
 		const searchPart = ` WHERE (
@@ -238,7 +238,7 @@ export const getNotificationMarketings = async (
 	}
 
 	// Sort by id (last created first)
-	notifMarketingQuery += " ORDER BY nm.id DESC";
+	notifMarketingQuery += " ORDER BY nm.notification_marketing_id DESC";
 
 	if (page) {
 		notifMarketingQuery += ` LIMIT ${limit} OFFSET ${offset}`;
@@ -263,10 +263,10 @@ export const getNotificationMarketingDetail = async (notifMarketingId: string | 
 	const notifMarketingQuery = `SELECT nm.*,
     (SELECT COUNT(id) AS target_count
       FROM notification_marketing_target nmt
-      WHERE nmt.notification_marketing_id = nm.id
+      WHERE nmt.notification_marketing_id = nm.notification_marketing_id
     )
   FROM notification_marketing nm
-  WHERE nm.id = $1`;
+  WHERE nm.notification_marketing_id = $1`;
 
 	const notifMarketingResult: QueryResult<NotifMarketingItem> = await db.query(
 		notifMarketingQuery,
@@ -280,11 +280,11 @@ export const getNotificationMarketingDetail = async (notifMarketingId: string | 
 		);
 
 	const notifMarketingTargetQuery = `SELECT DISTINCT ON (nmt.user_id)
-      u.id AS user_id, u.email AS email,
+      u.user_id AS user_id, u.email AS email,
       u.full_name AS full_name, 
       u.profile_picture AS profile_picture
     FROM notification_marketing_target nmt
-    JOIN users u ON nmt.user_id = u.id
+    JOIN users u ON nmt.user_id = u.user_id
     WHERE nmt.notification_marketing_id = $1
     `;
 
@@ -319,14 +319,14 @@ export const getEmailMarketings = async (
 	const limit = itemsLimit ? +itemsLimit : 10;
 	const offset = parseInt(page) * limit - limit;
 
-	let emailMarketingQuery = `SELECT em.*,
+	let emailMarketingQuery = `SELECT em.email_marketing_id AS id, em.*,
     (SELECT COUNT(id) AS target_count
       FROM email_marketing_target emt
-      WHERE emt.email_marketing_id = em.id
+      WHERE emt.email_marketing_id = em.email_marketing_id
     )
   FROM email_marketing em
   `;
-	let totalQuery = "SELECT COUNT(id) FROM email_marketing em";
+	let totalQuery = "SELECT COUNT(email_marketing_id) FROM email_marketing em";
 
 	if (searchQuery) {
 		const searchPart = ` WHERE (
@@ -357,7 +357,7 @@ export const getEmailMarketings = async (
 	}
 
 	// Sort by id (last created first)
-	emailMarketingQuery += " ORDER BY em.id DESC";
+	emailMarketingQuery += " ORDER BY em.email_marketing_id DESC";
 
 	if (page) {
 		emailMarketingQuery += ` LIMIT ${limit} OFFSET ${offset}`;
@@ -379,14 +379,14 @@ export const getEmailMarketings = async (
 };
 
 export const getEmailMarketingDetail = async (emailMarketingId: string | number) => {
-	const emailMarketingQuery = `SELECT em.*, 
+	const emailMarketingQuery = `SELECT em.email_marketing_id AS id, em.*, 
     to_json(em.params) as params,
     (SELECT COUNT(id) AS target_count
       FROM email_marketing_target emt
-      WHERE emt.email_marketing_id = em.id
+      WHERE emt.email_marketing_id = em.email_marketing_id
     )
   FROM email_marketing em
-  WHERE em.id = $1`;
+  WHERE em.email_marketing_id = $1`;
 
 	const emailMarketingResult: QueryResult<EmailMarketingItem> = await db.query(
 		emailMarketingQuery,
@@ -397,11 +397,11 @@ export const getEmailMarketingDetail = async (emailMarketingId: string | number)
 		throw new ErrorObj.ClientError(`Email marketing with id of ${emailMarketingId} not found`, 404);
 
 	const emailMarketingTargetQuery = `SELECT DISTINCT ON (emt.user_id)
-      u.id AS user_id, u.email AS email,
+      u.user_id AS user_id, u.email AS email,
       u.full_name AS full_name, 
       u.profile_picture AS profile_picture
     FROM email_marketing_target emt
-    JOIN users u ON emt.user_id = u.id
+    JOIN users u ON emt.user_id = u.user_id
     WHERE emt.email_marketing_id = $1
     `;
 
@@ -482,7 +482,8 @@ export const createEmailMarketing = async (
 };
 
 export const getSingleEmailMarketing = async (emailMarketingId: number | string) => {
-	const emailQuery = "SELECT * FROM email_marketing WHERE id = $1";
+	const emailQuery =
+		"SELECT em.email_marketing_id AS id, em.* FROM email_marketing em WHERE em.email_marketing_id = $1";
 
 	const emailResult: QueryResult<EmailMarketingItem> = await db.query(emailQuery, [
 		emailMarketingId
@@ -505,7 +506,7 @@ export const updateEmailMarketing = async (
 		const { query: emailQuery, params: emailParams } = generateUpdateQuery(
 			"email_marketing",
 			updatedEmailMarketingData,
-			{ id: emailMarketingId },
+			{ email_marketing_id: emailMarketingId },
 			" RETURNING *"
 		);
 
@@ -577,11 +578,11 @@ export const getSelectedBirthdayUsers = async () => {
       GROUP BY t.user_id
       HAVING SUM(total) >= $1
     ) t
-      ON u.id = t.user_id
+      ON u.user_id = t.user_id
     WHERE NOT EXISTS (
       SELECT 1
       FROM offers o
-      WHERE o.user_id = u.id
+      WHERE o.user_id = u.user_id
         AND o.offer_name = 'birthday_offer'
         AND DATE_PART('year', o.created_at) = DATE_PART('year', CURRENT_DATE)
     )

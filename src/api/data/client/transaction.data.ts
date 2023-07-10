@@ -46,22 +46,25 @@ export const createTransaction = async (
 
 		// Create transaction record
 		const transactionQuery = `INSERT INTO transactions(
-      id, user_id, order_status, customer_note, gift_note, voucher_code, discount_total, subtotal, total
-    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id
+      transaction_id, user_id, order_status, customer_note, gift_note, voucher_code, discount_total, subtotal, total
+    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING transaction_id
     `;
 
-		const transactionResult: QueryResult<{ id: number }> = await client.query(transactionQuery, [
-			chargeResponse.order_id,
-			user.id,
-			"pending",
-			customer_note,
-			gift_note,
-			selectedVoucher?.code || null,
-			discount,
-			subtotal,
-			total
-		]);
-		const transactionId = transactionResult.rows[0].id;
+		const transactionResult: QueryResult<{ transaction_id: number }> = await client.query(
+			transactionQuery,
+			[
+				chargeResponse.order_id,
+				user.id,
+				"pending",
+				customer_note,
+				gift_note,
+				selectedVoucher?.code || null,
+				discount,
+				subtotal,
+				total
+			]
+		);
+		const transactionId = transactionResult.rows[0].transaction_id;
 
 		// Create transaction item list records
 		const transactionItemQuery = `INSERT INTO transactions_item(
@@ -90,7 +93,9 @@ export const createTransaction = async (
 
 		// Create transaction shipping record
 		const transactionShippingQuery = `INSERT INTO transactions_shipping(
-      transaction_id, shipping_cost, shipping_courier, shipping_service, recipient_name, contact, address, province, province_id, city, city_id, subdistrict, subdistrict_id, postal_code, label, shipping_note, shipping_etd
+      transaction_id, shipping_cost, shipping_courier, shipping_service, recipient_name, 
+      shipping_contact, shipping_address, province, province_id, city, city_id, 
+      subdistrict, subdistrict_id, postal_code, label, shipping_note, shipping_etd
     ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)
     `;
 		const { courier, service, etd } = selectedShipping;
@@ -143,7 +148,7 @@ export const createTransaction = async (
 					description: "Pesanan telah dibuat"
 				},
 				{
-					timeline_date: getLocalTime(1000),
+					timeline_date: getLocalTime(2000),
 					description: "Menunggu pembayaran"
 				}
 			])
@@ -154,7 +159,7 @@ export const createTransaction = async (
 			// Incremment voucher usage linit by 1 (+1)
 			const voucherUsageQuery = `UPDATE voucher 
         SET current_usage = current_usage + 1 
-      WHERE code = $1`;
+      WHERE voucher_code = $1`;
 
 			await client.query(voucherUsageQuery, [selectedVoucher.code]);
 		}
@@ -182,19 +187,19 @@ export const createTransaction = async (
 
 export const getSingleTransaction = async (userId: string, transactionId: string) => {
 	const transactionQuery = `SELECT 
-    t.id as id, t.user_id as user_id, t.order_status as order_status, 
-    t.gift_note as gift_note, t.voucher_code as voucher_code, 
-    t.customer_note as customer_note, t.created_at as created_at,
-    t.is_reviewed as is_reviewed,
+    t.transaction_id AS id, t.user_id AS user_id, t.order_status AS order_status, 
+    t.gift_note AS gift_note, t.voucher_code AS voucher_code, 
+    t.customer_note AS customer_note, t.created_at AS created_at,
+    t.is_reviewed AS is_reviewed,
     ROUND(t.subtotal) AS subtotal, 
     ROUND(t.discount_total) AS discount_total,
     ROUND(t.total) AS total,
     to_json(ts) AS shipping_details,
     tt.timeline_object as timeline
   FROM transactions t
-    JOIN transactions_shipping ts ON t.id = ts.transaction_id
-    JOIN transactions_timeline tt ON t.id = tt.transaction_id
-  WHERE user_id = $1 AND id = $2
+    JOIN transactions_shipping ts ON t.transaction_id = ts.transaction_id
+    JOIN transactions_timeline tt ON t.transaction_id = tt.transaction_id
+  WHERE user_id = $1 AND transaction_id = $2
     `;
 
 	const transactionResult: QueryResult<
@@ -214,12 +219,16 @@ export const getSingleTransaction = async (userId: string, transactionId: string
 		[transactionId]
 	);
 
-	const transactionItemsQuery = `SELECT ti.*, products.*, ROUND(ti.price) AS price FROM transactions_item ti
+	const transactionItemsQuery = `SELECT 
+    ti.transaction_item_id AS id, ti.*, 
+    p.product_title AS title, p.product_status AS status, 
+    p.product_description AS description, p.product_slug AS slug, p.*, ROUND(ti.price) AS price 
+  FROM transactions_item ti
   JOIN (
-    SELECT p.id as product_id, p.title as title, p.slug as slug,
+    SELECT p.product_id AS product_id, p.product_title AS title, p.product_slug AS slug,
     (SELECT array_agg("url") AS images 
       FROM product_image pi 
-      WHERE pi.product_id = p.id
+      WHERE pi.product_id = p.product_id
     )
     FROM product p
   ) AS products 
@@ -240,7 +249,8 @@ export const getSingleTransaction = async (userId: string, transactionId: string
 };
 
 export const getTransactionItem = async (transactionId: string) => {
-	const transactionQuery = "SELECT * FROM transactions WHERE id = $1";
+	const transactionQuery =
+		"SELECT t.transaction_id AS id, t.* FROM transactions t WHERE t.transaction_id = $1";
 
 	const transactionResult: QueryResult<Transaction> = await db.query(transactionQuery, [
 		transactionId
@@ -252,8 +262,8 @@ export const getTransactionItem = async (transactionId: string) => {
 export const getUserTransactions = async (userId: string) => {
 	const transactionsQuery = `
     SELECT 
-    t.id as id, t.user_id as user_id, t.order_status as order_status, t.is_reviewed as is_reviewed,
-    t.created_at as created_at, ROUND(t.total) AS total, 
+    t.transaction_id AS id, t.user_id AS user_id, t.order_status AS order_status, t.is_reviewed AS is_reviewed,
+    t.created_at AS created_at, ROUND(t.total) AS total, 
     (
       SELECT json_agg(json_build_object(
           'product_id', ti.product_id,
@@ -266,17 +276,17 @@ export const getUserTransactions = async (userId: string) => {
       ))
       FROM transactions_item ti
       JOIN (
-        SELECT p.id as product_id, p.title as title, p.slug as slug,
+        SELECT p.id AS product_id, p.product_title AS title, p.product_slug AS slug,
           (
             SELECT array_agg("url") AS images 
             FROM product_image pi 
-            WHERE pi.product_id = p.id
+            WHERE pi.product_id = p.product_id
           )
           FROM product p
       ) AS products 
       ON products.product_id = ti.product_id
       WHERE products.product_id = ti.product_id
-      AND ti.transaction_id = t.id
+      AND ti.transaction_id = t.transaction_id
     ) as item_details
     FROM transactions t
     WHERE t.user_id = $1
@@ -310,7 +320,7 @@ export const updateTransaction = async (
 		// Update transactions
 		const transactionsQuery = `UPDATE transactions
       SET order_status = $1, order_status_modified = $2
-    WHERE id = $3
+    WHERE transaction_id = $3
     `;
 
 		await client.query(transactionsQuery, [orderStatus, getLocalTime(), orderId]);
@@ -341,7 +351,7 @@ export const updateTransaction = async (
 			// Decrement voucher usage count
 			const voucherQuery = `UPDATE voucher 
           SET current_usage = current_usage - 1
-        WHERE code = $1`;
+        WHERE voucher_code = $1`;
 			const voucherParams = [voucher.code];
 
 			await client.query(voucherQuery, voucherParams);
@@ -368,7 +378,7 @@ export const updateTransaction = async (
 
 export const checkTransactionOwnByUser = async (userId: string, transactionId: string) => {
 	const transactionQuery = `SELECT id FROM transactions
-    WHERE id = $1 AND user_id = $2`;
+    WHERE transaction_id = $1 AND user_id = $2`;
 
 	const transactionResult = await db.query(transactionQuery, [transactionId, userId]);
 

@@ -11,7 +11,7 @@ import { getLocalTime } from "../../utils";
 export const subscribeToEmail = async (email: string) => {
 	// Reset id sequence to current biggest id
 	await db.query(
-		"SELECT setval(pg_get_serial_sequence('email_subscription', 'id'), MAX(id)) FROM email_subscription"
+		"SELECT setval(pg_get_serial_sequence('email_subscription', 'email_subscription_id'), MAX(email_subscription_id)) FROM email_subscription"
 	);
 
 	const emailQuery = `INSERT INTO email_subscription 

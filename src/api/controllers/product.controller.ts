@@ -122,14 +122,14 @@ export const updateProduct = async (req: Request, res: Response, next: NextFunct
 		const images = req.files as Express.Multer.File[];
 
 		const updatedProductData = {
-			title,
+			product_title: title,
 			sku,
 			price,
-			status,
+			product_status: status,
 			category_id,
 			brand_id,
-			description,
-			slug
+			product_description: description,
+			product_slug: slug
 		};
 
 		const result = await productService.updateProduct(
@@ -162,7 +162,7 @@ export const deleteProduct = async (req: Request, res: Response, next: NextFunct
 
 		res.status(200).json({
 			status: "success",
-			data: { deletedProductId: result.rows[0].id }
+			data: { deletedProductId: result.rows[0].product_id }
 		});
 	} catch (error: unknown) {
 		return next(error);

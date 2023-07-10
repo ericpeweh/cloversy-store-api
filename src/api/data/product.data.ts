@@ -20,27 +20,30 @@ export const getAllProducts = async (
 	const limit = 12;
 	const offset = parseInt(page) * limit - limit;
 
-	let query = `SELECT p.*, b.name AS brand, 
+	let query = `SELECT 
+    p.product_id AS id, p.product_title AS title, p.product_status AS status, 
+    p.product_description AS description, p.product_slug AS slug, p.*, 
+    b.brand_name AS brand, 
     (SELECT url FROM product_image pi 
-      WHERE pi.product_id = p.id 
+      WHERE pi.product_id = p.product_id 
       LIMIT 1
     ) AS image,
     (SELECT ROUND(AVG(rating) / 2, 2) AS rating
       FROM review r
-      WHERE r.product_id = p.id AND r.status = 'active'
+      WHERE r.product_id = p.product_id AND r.review_status = 'active'
     ),
     (SELECT COALESCE(SUM(ti.quantity), 0) AS popularity
       FROM transactions_item ti
-      WHERE ti.product_id = p.id
+      WHERE ti.product_id = p.product_id
     )
     FROM product p JOIN brand b
-    ON p.brand_id = b.id`;
+    ON p.brand_id = b.brand_id`;
 
-	let totalQuery = "SELECT COUNT(id) FROM product";
+	let totalQuery = "SELECT COUNT(product_id) FROM product";
 
 	if (productStatus) {
-		query += ` WHERE status = $${paramsIndex + 1}`;
-		totalQuery += ` WHERE status = $${paramsIndex + 1}`;
+		query += ` WHERE product_status = $${paramsIndex + 1}`;
+		totalQuery += ` WHERE product_status = $${paramsIndex + 1}`;
 		params.push(productStatus);
 		paramsIndex += 1;
 	}
@@ -54,7 +57,9 @@ export const getAllProducts = async (
 	}
 
 	if (searchQuery) {
-		const search = ` ${paramsIndex === 0 ? "WHERE" : "AND"} title iLIKE $${paramsIndex + 1}`;
+		const search = ` ${paramsIndex === 0 ? "WHERE" : "AND"} product_title iLIKE $${
+			paramsIndex + 1
+		}`;
 		query += search;
 		totalQuery += search;
 		params.push(`%${searchQuery}%`);
@@ -62,7 +67,12 @@ export const getAllProducts = async (
 	}
 
 	if (sortBy) {
-		const sorter = sortBy === "low-to-high" || sortBy === "high-to-low" ? "price" : sortBy;
+		const sorter =
+			sortBy === "low-to-high" || sortBy === "high-to-low"
+				? "price"
+				: sortBy === "id"
+				? "product_id"
+				: sortBy;
 		const sortType = sortBy === "low-to-high" ? "ASC" : "DESC";
 
 		query += ` ORDER BY ${sorter} ${sortType} NULLS LAST`;
@@ -87,31 +97,34 @@ export const getAllProducts = async (
 };
 
 export const getSingleProductById = async (productId: string, analyticYear: string) => {
-	const productQuery = `SELECT p.*, ROUND(p.price) AS price , b.name AS brand, c.name AS category,
+	const productQuery = `SELECT 
+  p.product_id AS id, p.product_title AS title, p.product_status AS status, 
+  p.product_description AS description, p.product_slug AS slug, p.*, ROUND(p.price) AS price, 
+  b.brand_name AS brand, c.category_name AS category,
   (SELECT array_agg("url") AS images 
     FROM product_image pi 
-    WHERE pi.product_id = p.id
+    WHERE pi.product_id = p.product_id
   ),
   (SELECT array_agg("size" ORDER BY size ASC) AS sizes
     FROM product_size ps
-    WHERE ps.product_id = p.id
+    WHERE ps.product_id = p.product_id
   ),
   (SELECT array_agg("tag") AS tags
     FROM product_tag pt
-    WHERE pt.product_id = p.id
+    WHERE pt.product_id = p.product_id
   ),
   (SELECT ROUND(AVG(rating) / 2, 2) AS rating
 		FROM review r
-		WHERE r.product_id = p.id AND r.status = 'active'
+		WHERE r.product_id = p.product_id AND r.review_status = 'active'
 	),
-	(SELECT COUNT(r.id) AS review_count
+	(SELECT COUNT(r.review_id) AS review_count
 		FROM review r
-		WHERE r.product_id = p.id AND r.status = 'active'
+		WHERE r.product_id = p.product_id AND r.review_status = 'active'
 	)
   FROM product p
-  JOIN brand b ON p.brand_id = b.id 
-  JOIN category c ON p.category_id = c.id 
-  WHERE p.id = $1 
+  JOIN brand b ON p.brand_id = b.brand_id 
+  JOIN category c ON p.category_id = c.category_id 
+  WHERE p.product_id = $1 
 `;
 	const productResult = await db.query(productQuery, [productId]);
 
@@ -132,7 +145,7 @@ export const getSingleProductById = async (productId: string, analyticYear: stri
     ti AS
       (SELECT quantity, created_at, order_status
         FROM transactions_item ti
-        JOIN transactions t ON ti.transaction_id = t.id
+        JOIN transactions t ON ti.transaction_id = t.transaction_id
         WHERE ti.product_id = $2
         AND order_status NOT IN ('pending', 'cancel')
         AND date_trunc('year', created_at) = date_trunc('year', $1::timestamp)
@@ -160,14 +173,14 @@ export const createProduct = async (productData: Array<any>, tags: string[], siz
 		await client.query("BEGIN");
 
 		const productQuery = `INSERT INTO product(
-      title,
+      product_title,
       sku,
       price,
-      status,
+      product_status,
       category_id,
       brand_id,
-      description,
-      slug
+      product_description,
+      product_slug
     ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *`;
 
 		const productResult = await client.query(productQuery, productData);
@@ -257,7 +270,7 @@ export const updateProduct = async (updateProductData: UpdateProductDataArgs) =>
 		const { query: productQuery, params: productParams } = generateUpdateQuery(
 			"product",
 			updatedProductData,
-			{ id: productId },
+			{ product_id: productId },
 			" RETURNING *"
 		);
 
@@ -329,7 +342,7 @@ export const deleteProduct = async (productId: string) => {
 		const sizeQuery = "DELETE FROM product_size WHERE product_id = $1";
 		await client.query(sizeQuery, [productId]);
 
-		const productQuery = "DELETE FROM product WHERE id = $1 RETURNING id";
+		const productQuery = "DELETE FROM product WHERE product_id = $1 RETURNING product_id";
 		const productResult = await client.query(productQuery, [productId]);
 
 		await client.query("COMMIT");
@@ -343,7 +356,7 @@ export const deleteProduct = async (productId: string) => {
 };
 
 export const getProductCount = async () => {
-	const productQuery = "SELECT COUNT(id) AS product_count FROM product";
+	const productQuery = "SELECT COUNT(product_id) AS product_count FROM product";
 
 	const productResult = await db.query(productQuery);
 

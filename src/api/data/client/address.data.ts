@@ -9,9 +9,10 @@ import { Address, UpdateAddressDataArgs } from "../../interfaces";
 import { generateUpdateQuery } from "../../utils";
 
 export const getAllUserAddress = async (userId: string) => {
-	const addressQuery = `SELECT * FROM address
+	const addressQuery = `SELECT address_id AS id, address_contact AS contact, address.* 
+    FROM address
     WHERE user_id = $1
-    ORDER BY is_default DESC, id ASC
+    ORDER BY is_default DESC, address_id ASC
   `;
 
 	const addressResult = await db.query(addressQuery, [userId]);
@@ -19,9 +20,10 @@ export const getAllUserAddress = async (userId: string) => {
 };
 
 export const getSingleUserAddress = async (addressId: string) => {
-	const addressQuery = `SELECT * FROM address
-    WHERE id = $1
-    ORDER BY is_default DESC, id ASC
+	const addressQuery = `SELECT address_id AS id, address_contact AS contact, address.* 
+    FROM address
+    WHERE address_id = $1
+    ORDER BY is_default DESC, address_id ASC
   `;
 
 	const addressResult: QueryResult<Address> = await db.query(addressQuery, [addressId]);
@@ -42,7 +44,7 @@ export const createAddress = async (
 	const query = `INSERT INTO address(
     user_id,
     recipient_name,
-    contact,
+    address_contact,
     address,
     is_default,
     province,
@@ -76,7 +78,7 @@ export const updateAddress = async (
 	const { query: addressQuery, params: productParams } = generateUpdateQuery(
 		"address",
 		updatedAddressData,
-		{ id: addressId, user_id: userId },
+		{ address_id: addressId, user_id: userId },
 		" RETURNING *"
 	);
 
@@ -86,7 +88,7 @@ export const updateAddress = async (
 };
 export const deleteAddress = async (addressId: string, userId: number) => {
 	const query = `DELETE FROM address
-    WHERE id = $1 AND user_id = $2 RETURNING *`;
+    WHERE address_id = $1 AND user_id = $2 RETURNING *`;
 
 	const result = await db.query(query, [addressId, userId]);
 
@@ -94,7 +96,8 @@ export const deleteAddress = async (addressId: string, userId: number) => {
 };
 
 export const getAddressById = async (addressId: string) => {
-	const addressQuery = "SELECT * FROM address WHERE id = $1";
+	const addressQuery =
+		"SELECT address_id AS id, address_contact AS contact, address.* FROM address WHERE address_id = $1";
 
 	const addressResult = await db.query(addressQuery, [addressId]);
 

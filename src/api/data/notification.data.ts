@@ -18,28 +18,29 @@ export const getAllNotifications = async (
 	const offset = parseInt(page) * limit - limit;
 
 	let notificationQuery = `SELECT 
-    n.*, nc.name as category_name, nr.is_read as is_read
+    n.notification_id AS id, n.notification_title AS title, n.notification_description AS description, 
+    n.notification_category_id AS category_id, n.*, nc.notification_category_name AS category_name, nr.is_read AS is_read
   FROM notification n
-  JOIN notification_category nc ON nc.id = n.category_id
-  LEFT JOIN notification_read nr ON nr.notification_id = n.id
+  JOIN notification_category nc ON nc.notification_category_id = n.notification_category_id
+  LEFT JOIN notification_read nr ON nr.notification_id = n.notification_id
   WHERE nr.user_id = $1
   `;
 
-	let totalQuery = `SELECT COUNT(n.id) as count, 
+	let totalQuery = `SELECT COUNT(n.notification_id) as count, 
   (
-    SELECT COUNT(n.id) AS not_read
+    SELECT COUNT(n.notification_id) AS not_read
     FROM notification n
-    LEFT JOIN notification_read nr ON nr.notification_id = n.id
+    LEFT JOIN notification_read nr ON nr.notification_id = n.notification_id
     WHERE nr.user_id = $1 AND nr.is_read = FALSE
   )
   FROM notification n
-  JOIN notification_category nc ON nc.id = n.category_id
-  LEFT JOIN notification_read nr ON nr.notification_id = n.id
+  JOIN notification_category nc ON nc.notification_category_id = n.notification_category_id
+  LEFT JOIN notification_read nr ON nr.notification_id = n.notification_id
   WHERE nr.user_id = $1
   `;
 
 	if (typeFilter) {
-		const filterPart = ` AND nc.name = $${paramsIndex + 1}`;
+		const filterPart = ` AND nc.notification_category_name = $${paramsIndex + 1}`;
 		notificationQuery += filterPart;
 		totalQuery += filterPart;
 
@@ -75,7 +76,9 @@ export const removeNotificationTokens = async (tokens: string[]) => {
 };
 
 export const getSingleNotificationMarketing = async (notifMarketingId: number | string) => {
-	const notificationQuery = "SELECT * FROM notification_marketing WHERE id = $1";
+	const notificationQuery = `SELECT nm.notification_marketing_id AS id, nm.* 
+      FROM notification_marketing nm 
+      WHERE nm.notification_marketing_id = $1`;
 
 	const notificationResult: QueryResult<NotifMarketingItem> = await db.query(notificationQuery, [
 		notifMarketingId
@@ -89,7 +92,7 @@ export const getNotificationTokens = async (userIds: string[] | number[]) => {
     COALESCE(array_agg("token"), '{}') 
     AS tokens
     FROM notification_subscription ns
-    JOIN users u ON ns.user_id = u.id
+    JOIN users u ON ns.user_id = u.user_id
   WHERE user_id = ANY ($1)`;
 
 	const notificationResult: QueryResult<{ tokens: string[] }> = await db.query(notificationQuery, [
@@ -104,7 +107,7 @@ export const getUserNotificationTokens = async (userIds: string[] | number[]) =>
     COALESCE(array_agg("token"), '{}') 
     AS tokens
     FROM notification_subscription ns
-    JOIN users u ON ns.user_id = u.id
+    JOIN users u ON ns.user_id = u.user_id
   WHERE user_id = ANY ($1) AND u.user_role = 'user'`;
 
 	const notificationResult: QueryResult<{ tokens: string[] }> = await db.query(notificationQuery, [
@@ -119,7 +122,7 @@ export const getAdminNotificationTokens = async () => {
     COALESCE(array_agg("token"), '{}')
     AS tokens
     FROM notification_subscription ns
-    JOIN users u ON ns.user_id = u.id
+    JOIN users u ON ns.user_id = u.user_id
   WHERE u.user_role = 'admin'`;
 
 	const notificationResult: QueryResult<{ tokens: string[] }> = await db.query(notificationQuery);
@@ -132,7 +135,7 @@ export const getAllUserNotificationTokens = async () => {
     COALESCE(array_agg("token"), '{}')
     AS tokens
     FROM notification_subscription ns
-    JOIN users u ON ns.user_id = u.id
+    JOIN users u ON ns.user_id = u.user_id
   WHERE u.user_role = 'user'`;
 
 	const notificationResult: QueryResult<{ tokens: string[] }> = await db.query(notificationQuery);
@@ -147,7 +150,7 @@ export const storeNotification = async (
 	if (userIds.length > 0) {
 		const { title, description, category_id, action_link } = notificationData;
 		const notificationQuery = `INSERT INTO notification(
-      title, description, user_id, category_id, action_link
+      notification_title, notification_description, user_id, notification_category_id, action_link
     ) VALUES ($1, $2, $3, $4, $5) RETURNING *`;
 
 		const newNotifications: NotificationItem[] = [];
@@ -174,7 +177,10 @@ export const storeNotification = async (
 };
 
 export const getNotificationItem = async (notificationId: string) => {
-	const notificationQuery = "SELECT * FROM notification WHERE id = $1";
+	const notificationQuery = `SELECT 
+    n.notification_id AS id, n.notification_title AS title, 
+    n.notification_description AS description, n.notification_category_id AS category_id, n.* 
+    FROM notification n WHERE n.notification_id = $1`;
 
 	const notificationResult: QueryResult<NotificationItem> = await db.query(notificationQuery, [
 		notificationId
@@ -196,9 +202,9 @@ export const readNotification = async (notificationId: string, userId: string) =
 
 	const notificationResult = await db.query(notificationQuery, [notificationId, userId]);
 
-	const notReadQuery = `SELECT COUNT(n.id) AS not_read
+	const notReadQuery = `SELECT COUNT(n.notification_id) AS not_read
   FROM notification n
-  LEFT JOIN notification_read nr ON nr.notification_id = n.id
+  LEFT JOIN notification_read nr ON nr.notification_id = n.notification_id
   WHERE nr.user_id = $1 AND nr.is_read = FALSE`;
 
 	const notReadResult = await db.query(notReadQuery, [userId]);

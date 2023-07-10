@@ -10,20 +10,21 @@ export const getAllBrands = async (page: string, searchQuery: string, sortBy: st
 	let query = `SELECT *,
     (SELECT 
       COUNT(*) FROM product p
-      WHERE p.brand_id = b.id
+      WHERE p.brand_id = b.brand_id
     ) AS product_amount  
     FROM brand b`;
-	let totalQuery = "SELECT COUNT(id) FROM brand";
+	let totalQuery = "SELECT COUNT(brand_id) FROM brand";
 
 	if (searchQuery) {
-		query += ` WHERE name iLIKE $${paramsIndex + 1}`;
-		totalQuery += " WHERE name iLIKE $1";
+		query += ` WHERE brand_name iLIKE $${paramsIndex + 1}`;
+		totalQuery += " WHERE brand_name iLIKE $1";
 		paramsIndex += 1;
 		params.push(`%${searchQuery}%`);
 	}
 
 	if (sortBy) {
-		const sorter = sortBy === "a-z" || sortBy === "z-a" ? "name" : sortBy;
+		const sorter =
+			sortBy === "a-z" || sortBy === "z-a" ? "name" : sortBy === "id" ? "brand_id" : sortBy;
 		const sortType = sortBy === "a-z" ? "ASC" : "DESC";
 
 		query += ` ORDER BY ${sorter} ${sortType}`;
@@ -48,8 +49,8 @@ export const getAllBrands = async (page: string, searchQuery: string, sortBy: st
 
 export const createBrand = async (brandData: Array<any>) => {
 	const query = `INSERT INTO brand(
-    name,
-    identifier
+    brand_name,
+    brand_identifier
   ) VALUES ($1, $2) RETURNING *`;
 
 	const result = await db.query(query, brandData);
@@ -59,9 +60,9 @@ export const createBrand = async (brandData: Array<any>) => {
 
 export const updateBrand = async (updatedBrand: Array<string>, brandId: string) => {
 	const query = `UPDATE brand
-    SET name = $1,  
-    identifier = $2
-    WHERE id = $3 RETURNING *`;
+    SET brand_name = $1,  
+    brand_identifier = $2
+    WHERE brand_id = $3 RETURNING *`;
 
 	const result = await db.query(query, [...updatedBrand, brandId]);
 
@@ -70,7 +71,7 @@ export const updateBrand = async (updatedBrand: Array<string>, brandId: string) 
 
 export const deleteBrand = async (brandId: string) => {
 	const query = `DELETE FROM brand
-    WHERE id = $1 RETURNING *`;
+    WHERE brand_id = $1 RETURNING *`;
 
 	const result = await db.query(query, [brandId]);
 

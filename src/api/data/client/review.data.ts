@@ -6,12 +6,13 @@ import { ProductReviewItem, ReviewRequestItem } from "../../interfaces";
 import { QueryResult } from "pg";
 
 export const getProductReviews = async (productId: string) => {
-	const reviewsQuery = `SELECT r.id as id,
-    ROUND(ROUND(r.rating, 2) / 2, 2) AS rating, r.description as description, r.created_at as created_at, u.profile_picture as profile_picture, u.full_name as full_name
+	const reviewsQuery = `SELECT r.review_id AS id,
+    ROUND(ROUND(r.rating, 2) / 2, 2) AS rating, r.review_description AS description, 
+    r.created_at AS created_at, u.profile_picture AS profile_picture, u.full_name AS full_name
   FROM review r
-  JOIN users u ON r.user_id = u.id
+  JOIN users u ON r.user_id = u.user_id
   WHERE r.product_id = $1
-  AND r.status = 'active'`;
+  AND r.review_status = 'active'`;
 
 	const reviewsResult: QueryResult<ProductReviewItem> = await db.query(reviewsQuery, [productId]);
 
@@ -26,8 +27,8 @@ export const createReviews = async (
 	const client = await db.pool.connect();
 
 	const reviewsQuery = `INSERT INTO review
-  (product_id, user_id, transaction_id, rating, description)
-VALUES ($1, $2, $3, $4, $5)`;
+    (product_id, user_id, transaction_id, rating, review_description)
+  VALUES ($1, $2, $3, $4, $5)`;
 
 	try {
 		await client.query("BEGIN");

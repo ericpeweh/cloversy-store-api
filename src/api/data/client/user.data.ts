@@ -9,7 +9,7 @@ export const updateUserAccountDetails = async (
 	userSub: string
 ) => {
 	const userQuery = `UPDATE users 
-    SET full_name = $1, contact = $2, birth_date = $3
+    SET full_name = $1, user_contact = $2, birth_date = $3
     WHERE sub = $4
     RETURNING *
   `;

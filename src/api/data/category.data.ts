@@ -10,20 +10,21 @@ export const getAllCategories = async (page: string, searchQuery: string, sortBy
 	let query = `SELECT *,
     (SELECT 
       COUNT(*) FROM product p 
-      WHERE p.category_id = c.id
+      WHERE p.category_id = c.category_id
     ) AS product_amount 
     FROM category c`;
-	let totalQuery = "SELECT COUNT(id) FROM category";
+	let totalQuery = "SELECT COUNT(category_id) FROM category";
 
 	if (searchQuery) {
-		query += ` WHERE name iLIKE $${paramsIndex + 1}`;
-		totalQuery += " WHERE name iLIKE $1";
+		query += ` WHERE category_name iLIKE $${paramsIndex + 1}`;
+		totalQuery += " WHERE category_name iLIKE $1";
 		paramsIndex += 1;
 		params.push(`%${searchQuery}%`);
 	}
 
 	if (sortBy) {
-		const sorter = sortBy === "a-z" || sortBy === "z-a" ? "name" : sortBy;
+		const sorter =
+			sortBy === "a-z" || sortBy === "z-a" ? "name" : sortBy === "id" ? "category_id" : sortBy;
 		const sortType = sortBy === "a-z" ? "ASC" : "DESC";
 
 		query += ` ORDER BY ${sorter} ${sortType}`;
@@ -48,9 +49,9 @@ export const getAllCategories = async (page: string, searchQuery: string, sortBy
 
 export const createCategory = async (categoryData: Array<any>) => {
 	const query = `INSERT INTO category(
-    name,
-    description,
-    identifier
+    category_name,
+    category_description,
+    category_identifier
   ) VALUES ($1, $2, $3) RETURNING *`;
 
 	const result = await db.query(query, categoryData);
@@ -60,10 +61,10 @@ export const createCategory = async (categoryData: Array<any>) => {
 
 export const updateCategory = async (updatedCategory: Array<string>, categoryId: string) => {
 	const query = `UPDATE category
-    SET name = $1,  
-    description = $2,
-    identifier = $3
-    WHERE id = $4 RETURNING *`;
+    SET category_name = $1,  
+    category_description = $2,
+    category_identifier = $3
+    WHERE category_id = $4 RETURNING *`;
 
 	const result = await db.query(query, [...updatedCategory, categoryId]);
 
@@ -72,7 +73,7 @@ export const updateCategory = async (updatedCategory: Array<string>, categoryId:
 
 export const deleteCategory = async (categoryId: string) => {
 	const query = `DELETE FROM category
-    WHERE id = $1 RETURNING *`;
+    WHERE category_id = $1 RETURNING *`;
 
 	const result = await db.query(query, [categoryId]);
 

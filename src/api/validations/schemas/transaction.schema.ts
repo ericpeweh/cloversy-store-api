@@ -63,7 +63,7 @@ export const updateTransactionBodySchema = Joi.object({
 	customerNote: Joi.string().allow("").optional(),
 	giftNote: Joi.string().allow("").optional(),
 	shippingTrackingCode: Joi.string().allow("").optional(),
-	timelineObj: Joi.string().required()
+	timelineObj: Joi.string().optional()
 });
 
 export const patchChangeTransactionStatusParamsSchema = Joi.object({

@@ -24,9 +24,9 @@ export const getSingleVoucher = async (voucherCode: string, analyticYear: string
 };
 
 export const createVoucher = async (voucherData: any[], selectedUserIds: string[] | number[]) => {
-	const newVoucher = await voucherRepo.createVoucher(voucherData, selectedUserIds);
+	const result = await voucherRepo.createVoucher(voucherData, selectedUserIds);
 
-	return newVoucher;
+	return result.rows[0];
 };
 
 export const updateVoucher = async (
@@ -42,7 +42,7 @@ export const updateVoucher = async (
 		code
 	);
 
-	return updatedVoucher;
+	return updatedVoucher.rows[0];
 };
 
 export const getVoucherItem = async (voucherCode: string) => {

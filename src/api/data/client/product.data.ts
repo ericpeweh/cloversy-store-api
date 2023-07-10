@@ -41,7 +41,7 @@ export const getAllProducts = async (
 			FROM review r
 			WHERE r.product_id = p.product_id AND r.review_status = 'active'
 		),
-		(SELECT COUNT(r.id) AS review_count
+		(SELECT COUNT(r.review_id) AS review_count
 			FROM review r
 			WHERE r.product_id = p.product_id AND r.review_status = 'active'
 		),

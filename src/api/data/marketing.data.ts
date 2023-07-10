@@ -68,10 +68,9 @@ export const createNotificationMarketing = async (
 			send_to
 		];
 
-		const notifMarketingResult: QueryResult<NotifMarketingItem> = await client.query(
-			notifMarketingQuery,
-			notifMarketingParams
-		);
+		const notifMarketingResult: QueryResult<
+			NotifMarketingItem & { notification_marketing_id: number }
+		> = await client.query(notifMarketingQuery, notifMarketingParams);
 
 		// Create notification marketing target records
 		if (notifSubscriptions.length > 0) {
@@ -83,7 +82,7 @@ export const createNotificationMarketing = async (
 
 			notifSubscriptions.forEach(async sub => {
 				await client.query(notifMarketingTargetQuery, [
-					notifMarketingResult.rows[0].id,
+					notifMarketingResult.rows[0].notification_marketing_id,
 					sub.user_id,
 					sub.token
 				]);
@@ -91,7 +90,10 @@ export const createNotificationMarketing = async (
 		}
 
 		await client.query("COMMIT");
-		return notifMarketingResult.rows[0];
+		return {
+			...notifMarketingResult.rows[0],
+			id: notifMarketingResult.rows[0].notification_marketing_id
+		};
 	} catch (error) {
 		await client.query("ROLLBACK");
 		throw error;
@@ -120,10 +122,8 @@ export const updateNotificationMarketing = async (
 			" RETURNING *"
 		);
 
-		const result: QueryResult<NotifMarketingItem> = await client.query(
-			notificationQuery,
-			notificationParams
-		);
+		const result: QueryResult<NotifMarketingItem & { notification_marketing_id: number }> =
+			await client.query(notificationQuery, notificationParams);
 		const updatedNotifMarketing = result.rows[0];
 
 		// Handle send_to field changed or send_to still 'all'
@@ -178,7 +178,7 @@ export const updateNotificationMarketing = async (
 		}
 
 		await client.query("COMMIT");
-		return updatedNotifMarketing;
+		return { ...updatedNotifMarketing, id: updatedNotifMarketing.notification_marketing_id };
 	} catch (error) {
 		await client.query("ROLLBACK");
 		console.log(error);
@@ -245,6 +245,7 @@ export const getNotificationMarketings = async (
 	}
 
 	const totalNotifMarketings = (await db.query(totalQuery, params)).rows[0].count;
+
 	const notifMarketings: QueryResult<ScheduledNotifMarketingItem> = await db.query(
 		notifMarketingQuery,
 		params
@@ -260,7 +261,7 @@ export const getNotificationMarketings = async (
 };
 
 export const getNotificationMarketingDetail = async (notifMarketingId: string | number) => {
-	const notifMarketingQuery = `SELECT nm.*,
+	const notifMarketingQuery = `SELECT nm.*, nm.notification_marketing_id AS id,
     (SELECT COUNT(id) AS target_count
       FROM notification_marketing_target nmt
       WHERE nmt.notification_marketing_id = nm.notification_marketing_id
@@ -454,10 +455,8 @@ export const createEmailMarketing = async (
 			JSON.stringify(emailResult?.failedEmails + "")
 		];
 
-		const emailMarketingResult: QueryResult<EmailMarketingItem> = await client.query(
-			emailMarketingQuery,
-			emailMarketingParams
-		);
+		const emailMarketingResult: QueryResult<EmailMarketingItem & { email_marketing_id: number }> =
+			await client.query(emailMarketingQuery, emailMarketingParams);
 
 		// Create email marketing target records
 		if (selectedUserIds.length > 0) {
@@ -467,12 +466,15 @@ export const createEmailMarketing = async (
       ) VALUES ($1, $2)`;
 
 			selectedUserIds.forEach(async userId => {
-				await client.query(emailMarketingTargetQuery, [emailMarketingResult.rows[0].id, userId]);
+				await client.query(emailMarketingTargetQuery, [
+					emailMarketingResult.rows[0].email_marketing_id,
+					userId
+				]);
 			});
 		}
 
 		await client.query("COMMIT");
-		return emailMarketingResult.rows[0];
+		return { ...emailMarketingResult.rows[0], id: emailMarketingResult.rows[0].email_marketing_id };
 	} catch (error) {
 		await client.query("ROLLBACK");
 		throw error;
@@ -510,7 +512,8 @@ export const updateEmailMarketing = async (
 			" RETURNING *"
 		);
 
-		const result: QueryResult<EmailMarketingItem> = await client.query(emailQuery, emailParams);
+		const result: QueryResult<EmailMarketingItem & { email_marketing_id: number }> =
+			await client.query(emailQuery, emailParams);
 		const updatedEmailMarketing = result.rows[0];
 
 		if (selectedUserIds && selectedUserIds?.length > 0) {
@@ -535,7 +538,7 @@ export const updateEmailMarketing = async (
 		}
 
 		await client.query("COMMIT");
-		return updatedEmailMarketing;
+		return { ...updatedEmailMarketing, id: updatedEmailMarketing.email_marketing_id };
 	} catch (error) {
 		await client.query("ROLLBACK");
 		console.log(error);

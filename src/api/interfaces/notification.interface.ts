@@ -16,6 +16,7 @@ export interface SendNotificationResult {
 
 export interface NotificationItem {
 	id: number;
+	notification_id?: number;
 	title: string;
 	description: string;
 	user_id: number | null;

@@ -93,7 +93,7 @@ export const getNotificationTokens = async (userIds: string[] | number[]) => {
     AS tokens
     FROM notification_subscription ns
     JOIN users u ON ns.user_id = u.user_id
-  WHERE user_id = ANY ($1)`;
+  WHERE ns.user_id = ANY ($1)`;
 
 	const notificationResult: QueryResult<{ tokens: string[] }> = await db.query(notificationQuery, [
 		userIds
@@ -108,7 +108,7 @@ export const getUserNotificationTokens = async (userIds: string[] | number[]) =>
     AS tokens
     FROM notification_subscription ns
     JOIN users u ON ns.user_id = u.user_id
-  WHERE user_id = ANY ($1) AND u.user_role = 'user'`;
+  WHERE ns.user_id = ANY ($1) AND u.user_role = 'user'`;
 
 	const notificationResult: QueryResult<{ tokens: string[] }> = await db.query(notificationQuery, [
 		userIds
@@ -170,8 +170,8 @@ export const storeNotification = async (
       user_id, notification_id
     ) VALUES ($1, $2)`;
 
-		for (const { user_id, id } of newNotifications) {
-			await db.query(notificationReadQuery, [user_id, id]);
+		for (const { user_id, notification_id } of newNotifications) {
+			await db.query(notificationReadQuery, [user_id, notification_id]);
 		}
 	}
 };

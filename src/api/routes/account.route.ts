@@ -19,12 +19,14 @@ router.patch(
 	validate(accountSchema.updateUserAccountDetailsSchema, "body"),
 	userController.updateUserAccountDetails
 );
+
 router.put(
 	"/details/picture",
 	upload.single("image"),
 	validate(accountSchema.putUserProfilePictureSchema, ""),
 	userController.changeUserProfilePicture
 );
+
 router.delete("/details/picture", userController.deleteUserProfilePicture);
 
 export default router;

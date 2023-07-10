@@ -72,7 +72,7 @@ export const createProduct = async (
 		tags,
 		sizes
 	);
-	const newProductId = productResult.rows[0].id;
+	const newProductId = productResult.rows[0].product_id;
 
 	// Upload images to google cloud storage
 	const imagePromises: Promise<UploadResponse>[] = [];
@@ -97,7 +97,7 @@ export const createProduct = async (
 
 	images.forEach(storedImage => fs.unlink(storedImage.path, () => {}));
 
-	return newProduct;
+	return { ...newProduct, id: newProductId };
 };
 
 export const updateProduct = async (
@@ -106,7 +106,7 @@ export const updateProduct = async (
 ) => {
 	const { productResult, filteredUpdatedTags, filteredUpdatedSizes } =
 		await productRepo.updateProduct(updatedProductData);
-	const updatedProductId = productResult.rows[0].id;
+	const updatedProductId = productResult.rows[0].product_id;
 
 	// Upload images to google cloud storage
 	const imagePromises: Promise<UploadResponse>[] = [];
@@ -140,6 +140,7 @@ export const updateProduct = async (
 
 	const updatedProduct = {
 		...productResult.rows[0],
+		id: updatedProductId,
 		tags: filteredUpdatedTags,
 		sizes: filteredUpdatedSizes,
 		images: imagesResult.rows.map(url => url)

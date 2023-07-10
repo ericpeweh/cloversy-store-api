@@ -51,7 +51,7 @@ export const getAllUserIdsWithoutConversation = async () => {
     LEFT JOIN mod_conversations c
     ON u.user_id = c.created_by
   WHERE u.user_role = 'user' 
-  AND c.conversation_id IS NULL`;
+  AND c.id IS NULL`;
 
 	const result = await db.query(usersQuery);
 

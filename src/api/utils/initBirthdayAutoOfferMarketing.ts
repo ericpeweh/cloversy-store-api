@@ -64,8 +64,7 @@ export const birthdayAutoOfferMarketingFn = async () => {
 		description
 	];
 
-	const newVoucher = (await voucherService.createVoucher(voucherQueryData, selectedUserIds))
-		.rows[0];
+	const newVoucher = await voucherService.createVoucher(voucherQueryData, selectedUserIds);
 
 	// Send offer email to users
 	const targets = await userService.getUserEmailAndNameByIds(selectedUserIds);

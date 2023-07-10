@@ -84,7 +84,7 @@ export const createVoucher = async (req: Request, res: Response, next: NextFunct
 
 		res.status(200).json({
 			status: "success",
-			data: { newVoucher: result.rows[0] }
+			data: { newVoucher: { ...result, code: result.voucher_code } }
 		});
 	} catch (error: unknown) {
 		return next(error);
@@ -128,7 +128,7 @@ export const updateVoucher = async (req: Request, res: Response, next: NextFunct
 
 		res.status(200).json({
 			status: "success",
-			data: { updatedVoucher: result.rows[0] }
+			data: { updatedVoucher: { ...result, code: result.voucher_code } }
 		});
 	} catch (error: unknown) {
 		return next(error);

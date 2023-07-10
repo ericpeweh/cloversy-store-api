@@ -20,7 +20,7 @@ export const putUserProfilePictureSchema = Joi.object({
 }).unknown();
 
 // Address routes
-const modifyAddressBodySchema = {
+const modifyAddressBodyBaseSchema = {
 	recipient_name: Joi.string().max(100).required(),
 	contact: Joi.string()
 		.phoneNumber({ defaultCountry: "ID", strict: true })
@@ -44,7 +44,7 @@ const modifyAddressBodySchema = {
 	shipping_note: Joi.string().allow("").optional()
 };
 
-export const createAddressBodySchema = Joi.object({ ...modifyAddressBodySchema });
+export const createAddressBodySchema = Joi.object({ ...modifyAddressBodyBaseSchema });
 
 export const updateAddressParamsSchema = Joi.object({
 	addressId: Joi.string().pattern(/^\d+$/).required().messages({
@@ -52,9 +52,14 @@ export const updateAddressParamsSchema = Joi.object({
 	})
 });
 
-export const updateAddressBodySchema = Joi.object({
-	...modifyAddressBodySchema
-});
+export const updateAddressBodySchema = Joi.alternatives().try(
+	Joi.object({
+		is_default: Joi.boolean().required()
+	}),
+	Joi.object({
+		...modifyAddressBodyBaseSchema
+	})
+);
 
 export const deleteAddressParamsSchema = Joi.object({
 	addressId: Joi.string().pattern(/^\d+$/).required().messages({

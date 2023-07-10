@@ -13,7 +13,7 @@ export const getUserVouchers = async (userId: string) => {
     FROM voucher_dist vd
     JOIN voucher v
     ON v.voucher_code = vd.voucher_code
-  WHERE v.user_id = $1
+  WHERE vd.user_id = $1
   AND v.voucher_status = 'active'
   ORDER BY v.created_at DESC
   `;

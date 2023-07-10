@@ -9,12 +9,12 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
 
 	pgm.addConstraint(
 		"product_size",
-		"fk_product_size.product_id_and_product.id",
-		"FOREIGN KEY(product_id) REFERENCES product(id)"
+		"fk_product_size.product_id_and_product.product_id",
+		"FOREIGN KEY(product_id) REFERENCES product(product_id)"
 	);
 }
 
 export async function down(pgm: MigrationBuilder): Promise<void> {
 	pgm.dropConstraint("product_size", "unique_product_size.product_id_and_product_size.size");
-	pgm.dropConstraint("product_size", "fk_product_size.product_id_and_product.id");
+	pgm.dropConstraint("product_size", "fk_product_size.product_id_and_product.product_id");
 }

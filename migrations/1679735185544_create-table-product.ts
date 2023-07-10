@@ -3,10 +3,10 @@ import { MigrationBuilder } from "node-pg-migrate";
 export async function up(pgm: MigrationBuilder): Promise<void> {
 	pgm.createTable("product", {
 		product_id: {
-			type: "SERIAL",
+			type: "SMALLSERIAL",
 			primaryKey: true
 		},
-		title: {
+		product_title: {
 			type: "VARCHAR(100)",
 			notNull: true
 		},
@@ -18,22 +18,22 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
 			type: "DECIMAL(10,2)",
 			notNull: true
 		},
-		status: {
+		product_status: {
 			type: "VARCHAR(10)",
 			notNull: true
 		},
 		category_id: {
-			type: "INTEGER",
+			type: "SMALLINT",
 			notNull: true
 		},
 		brand_id: {
-			type: "INTEGER",
+			type: "SMALLINT",
 			notNull: true
 		},
-		description: {
+		product_description: {
 			type: "TEXT"
 		},
-		slug: {
+		product_slug: {
 			type: "VARCHAR(100)",
 			unique: true,
 			notNull: true

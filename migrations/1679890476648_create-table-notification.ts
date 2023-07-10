@@ -2,23 +2,23 @@ import { MigrationBuilder } from "node-pg-migrate";
 
 export async function up(pgm: MigrationBuilder): Promise<void> {
 	pgm.createTable("notification", {
-		id: {
+		notification_id: {
 			type: "SERIAL",
 			primaryKey: true
 		},
-		title: {
-			type: "VARCHAR(255)",
+		notification_title: {
+			type: "VARCHAR(120)",
 			notNull: true
 		},
-		description: {
+		notification_description: {
 			type: "TEXT",
 			notNull: true
 		},
 		user_id: {
-			type: "INTEGER"
+			type: "SMALLINT"
 		},
-		category_id: {
-			type: "INTEGER",
+		notification_category_id: {
+			type: "SMALLINT",
 			notNull: true
 		},
 		action_link: {

@@ -2,12 +2,12 @@ import { MigrationBuilder } from "node-pg-migrate";
 
 export async function up(pgm: MigrationBuilder): Promise<void> {
 	pgm.createTable("email_subscription", {
-		id: {
+		email_subscription_id: {
 			type: "SERIAL",
 			primaryKey: true
 		},
 		email: {
-			type: "VARCHAR(255)",
+			type: "VARCHAR(254)",
 			notNull: true,
 			unique: true
 		},

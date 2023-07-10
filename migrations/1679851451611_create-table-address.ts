@@ -2,19 +2,19 @@ import { MigrationBuilder } from "node-pg-migrate";
 
 export async function up(pgm: MigrationBuilder): Promise<void> {
 	pgm.createTable("address", {
-		id: {
-			type: "SERIAL",
+		address_id: {
+			type: "SMALLSERIAL",
 			primaryKey: true
 		},
 		user_id: {
-			type: "INTEGER",
+			type: "SMALLINT",
 			notNull: true
 		},
 		recipient_name: {
 			type: "VARCHAR(100)",
 			notNull: true
 		},
-		contact: {
+		address_contact: {
 			type: "VARCHAR(20)",
 			notNull: true
 		},
@@ -32,7 +32,7 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
 			notNull: true
 		},
 		province_id: {
-			type: "INTEGER",
+			type: "SMALLINT",
 			notNull: true
 		},
 		city: {
@@ -40,7 +40,7 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
 			notNull: true
 		},
 		city_id: {
-			type: "INTEGER",
+			type: "SMALLINT",
 			notNull: true
 		},
 		subdistrict: {
@@ -48,7 +48,7 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
 			notNull: true
 		},
 		subdistrict_id: {
-			type: "INTEGER",
+			type: "SMALLINT",
 			notNull: true
 		},
 		postal_code: {

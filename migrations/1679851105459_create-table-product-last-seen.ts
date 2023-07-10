@@ -7,11 +7,11 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
 			primaryKey: true
 		},
 		user_id: {
-			type: "INTEGER",
+			type: "SMALLINT",
 			notNull: true
 		},
 		product_id: {
-			type: "INTEGER",
+			type: "SMALLINT",
 			notNull: true
 		},
 		seen_date: {

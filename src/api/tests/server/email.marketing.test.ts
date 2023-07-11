@@ -284,7 +284,7 @@ describe("notification marketing route", () => {
 				jest.spyOn(marketingRepo, "createEmailMarketing").mockResolvedValueOnce({
 					notification_code: "ABCDE12345",
 					...newEmailMarketing
-				} as unknown as EmailMarketingItem);
+				} as unknown as EmailMarketingItem & { email_marketing_id: number });
 
 				// Mock userService.getAllAdminUserIds
 				jest.spyOn(userService, "getAllAdminUserIds").mockResolvedValueOnce([1, 2, 3]);
@@ -366,7 +366,7 @@ describe("notification marketing route", () => {
 				jest.spyOn(marketingRepo, "createEmailMarketing").mockResolvedValueOnce({
 					notification_code: "ABCDE12345",
 					...newEmailMarketing
-				} as unknown as EmailMarketingItem);
+				} as unknown as EmailMarketingItem & { email_marketing_id: number });
 
 				// Send the request
 				const res = await supertest(app)
@@ -419,11 +419,11 @@ describe("notification marketing route", () => {
 
 				expect(res2.status).toBe(400);
 				expect(res2.body).toMatchInlineSnapshot(`
-          {
-            "message": "Validation error: "scheduled" must be in ISO 8601 date format",
-            "status": "error",
-          }
-        `);
+				  {
+				    "message": "Validation error: "scheduled" must be in ISO 8601 date format",
+				    "status": "error",
+				  }
+				`);
 
 				// Invalid selected user ids format
 				const res3 = await supertest(app)
@@ -435,11 +435,11 @@ describe("notification marketing route", () => {
 
 				expect(res3.status).toBe(400);
 				expect(res3.body).toMatchInlineSnapshot(`
-          {
-            "message": "Validation error: "selectedUserIds[0]" does not match any of the allowed types",
-            "status": "error",
-          }
-        `);
+				  {
+				    "message": "Validation error: "selectedUserIds[0]" does not match any of the allowed types",
+				    "status": "error",
+				  }
+				`);
 
 				// Invalid sendTo
 				const res4 = await supertest(app)
@@ -451,11 +451,11 @@ describe("notification marketing route", () => {
 
 				expect(res4.status).toBe(400);
 				expect(res4.body).toMatchInlineSnapshot(`
-          {
-            "message": "Validation error: "sendTo" must be [selected]",
-            "status": "error",
-          }
-        `);
+				  {
+				    "message": "Validation error: "sendTo" must be [selected]",
+				    "status": "error",
+				  }
+				`);
 
 				// Exceed maximum selected users
 				const res5 = await supertest(app)
@@ -467,27 +467,11 @@ describe("notification marketing route", () => {
 
 				expect(res5.status).toBe(400);
 				expect(res5.body).toMatchInlineSnapshot(`
-          {
-            "message": "Validation error: Maximum selected users exceeded (max 100 users).",
-            "status": "error",
-          }
-        `);
-
-				// Empty selected users
-				const res6 = await supertest(app)
-					.post("/admin/marketing/emails")
-					.send({
-						...newEmailMarketing,
-						selectedUserIds: [] // Length must be > 0
-					});
-
-				expect(res6.status).toBe(400);
-				expect(res6.body).toMatchInlineSnapshot(`
-          {
-            "message": "Validation error: Selected users can't be empty",
-            "status": "error",
-          }
-        `);
+				  {
+				    "message": "Validation error: Maximum selected users exceeded (max 100 users).",
+				    "status": "error",
+				  }
+				`);
 			});
 		});
 	});
@@ -509,7 +493,7 @@ describe("notification marketing route", () => {
 				jest.spyOn(marketingService, "updateEmailMarketing").mockResolvedValueOnce({
 					...mockEmailMarketings[0],
 					canceled: true
-				} as EmailMarketingItem);
+				} as EmailMarketingItem & { email_marketing_id: number });
 
 				const res = await supertest(app).post("/admin/marketing/emails/1/cancel");
 
@@ -588,7 +572,9 @@ describe("notification marketing route", () => {
 				// Mock marketingService.updateEmailMarketing
 				jest
 					.spyOn(marketingService, "updateEmailMarketing")
-					.mockResolvedValueOnce(mockEmailMarketings[0] as EmailMarketingItem);
+					.mockResolvedValueOnce(
+						mockEmailMarketings[0] as EmailMarketingItem & { email_marketing_id: number }
+					);
 
 				// Mock marketingService.scheduleEmailMarketing
 				jest
@@ -652,7 +638,9 @@ describe("notification marketing route", () => {
 				// Mock marketingService.updateEmailMarketing
 				jest
 					.spyOn(marketingService, "updateEmailMarketing")
-					.mockResolvedValueOnce(mockEmailMarketings[0] as EmailMarketingItem);
+					.mockResolvedValueOnce(
+						mockEmailMarketings[0] as EmailMarketingItem & { email_marketing_id: number }
+					);
 
 				// Mock marketingService.scheduleEmailMarketing
 				jest

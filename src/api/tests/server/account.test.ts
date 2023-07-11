@@ -100,7 +100,8 @@ describe("admin account route", () => {
 
 				const mockUpdatedUserDetails = {
 					...mockUser,
-					...mockReqBody
+					...mockReqBody,
+					user_contact: mockReqBody.contact
 				};
 
 				// Mock updateUserAccountDetails to return user details

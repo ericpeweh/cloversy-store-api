@@ -2,12 +2,12 @@ import { MigrationBuilder } from "node-pg-migrate";
 
 export async function up(pgm: MigrationBuilder): Promise<void> {
 	pgm.createTable("transactions", {
-		id: {
+		transaction_id: {
 			type: "VARCHAR(10)",
 			primaryKey: true
 		},
 		user_id: {
-			type: "INTEGER",
+			type: "SMALLINT",
 			notNull: true
 		},
 		order_status: {

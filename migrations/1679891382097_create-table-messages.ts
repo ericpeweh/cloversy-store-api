@@ -2,7 +2,7 @@ import { MigrationBuilder } from "node-pg-migrate";
 
 export async function up(pgm: MigrationBuilder): Promise<void> {
 	pgm.createTable("messages", {
-		id: {
+		message_id: {
 			type: "SERIAL",
 			primaryKey: true
 		},
@@ -10,12 +10,12 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
 			type: "INTEGER",
 			notNull: true
 		},
-		body: {
+		message_body: {
 			type: "TEXT",
 			notNull: true
 		},
 		sender_id: {
-			type: "INTEGER",
+			type: "SMALLINT",
 			notNull: true
 		},
 		created_at: {

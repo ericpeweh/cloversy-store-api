@@ -17,7 +17,7 @@ const initScheduledEmailMarketings = async () => {
 		const triggerAt = new Date(scheduled);
 
 		// Get notification targets
-		const selectedUserIds = await marketingService.getNotifMarketingTargetUserIds(
+		const selectedUserIds = await marketingService.getEmailMarketingTargetUserIds(
 			emailMarketing.id.toString()
 		);
 

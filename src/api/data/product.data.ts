@@ -39,7 +39,7 @@ export const getAllProducts = async (
     FROM product p JOIN brand b
     ON p.brand_id = b.brand_id`;
 
-	let totalQuery = "SELECT COUNT(product_id) FROM product";
+	let totalQuery = "SELECT COUNT(product_id) FROM product p";
 
 	if (productStatus) {
 		query += ` WHERE product_status = $${paramsIndex + 1}`;
@@ -49,7 +49,7 @@ export const getAllProducts = async (
 	}
 
 	if (brandFilter) {
-		const filter = ` ${paramsIndex === 0 ? "WHERE" : "AND"} brand_id = $${paramsIndex + 1}`;
+		const filter = ` ${paramsIndex === 0 ? "WHERE" : "AND"} p.brand_id = $${paramsIndex + 1}`;
 		query += filter;
 		totalQuery += filter;
 		params.push(brandFilter);
@@ -57,7 +57,7 @@ export const getAllProducts = async (
 	}
 
 	if (searchQuery) {
-		const search = ` ${paramsIndex === 0 ? "WHERE" : "AND"} product_title iLIKE $${
+		const search = ` ${paramsIndex === 0 ? "WHERE" : "AND"} p.product_title iLIKE $${
 			paramsIndex + 1
 		}`;
 		query += search;
@@ -184,7 +184,7 @@ export const createProduct = async (productData: Array<any>, tags: string[], siz
     ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *`;
 
 		const productResult = await client.query(productQuery, productData);
-		const productId = productResult.rows[0].id;
+		const productId = productResult.rows[0].product_id;
 
 		const tagResult: string[] = [];
 		const productTagQuery = `INSERT INTO product_tag(

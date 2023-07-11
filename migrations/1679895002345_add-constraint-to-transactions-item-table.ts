@@ -3,14 +3,14 @@ import { MigrationBuilder } from "node-pg-migrate";
 export async function up(pgm: MigrationBuilder): Promise<void> {
 	pgm.addConstraint(
 		"transactions_item",
-		"fk_transactions_item.transaction_id_and_transactions.id",
-		"FOREIGN KEY(transaction_id) REFERENCES transactions(id)"
+		"fk_transactions_item.transaction_id_and_transactions.transaction_id",
+		"FOREIGN KEY(transaction_id) REFERENCES transactions(transaction_id)"
 	);
 
 	pgm.addConstraint(
 		"transactions_item",
-		"fk_transactions_item.product_id_and_product.id",
-		"FOREIGN KEY(product_id) REFERENCES product(id)"
+		"fk_transactions_item.product_id_and_product.product_id",
+		"FOREIGN KEY(product_id) REFERENCES product(product_id)"
 	);
 
 	pgm.addConstraint(
@@ -23,10 +23,10 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
 export async function down(pgm: MigrationBuilder): Promise<void> {
 	pgm.dropConstraint(
 		"transactions_item",
-		"fk_transactions_item.transaction_id_and_transactions.id"
+		"fk_transactions_item.transaction_id_and_transactions.transaction_id"
 	);
 
-	pgm.dropConstraint("transactions_item", "fk_transactions_item.product_id_and_product.id");
+	pgm.dropConstraint("transactions_item", "fk_transactions_item.product_id_and_product.product_id");
 
 	pgm.dropConstraint(
 		"transactions_item",

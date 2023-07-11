@@ -2,16 +2,16 @@ import { MigrationBuilder } from "node-pg-migrate";
 
 export async function up(pgm: MigrationBuilder): Promise<void> {
 	pgm.createTable("review", {
-		id: {
+		review_id: {
 			type: "SERIAL",
 			primaryKey: true
 		},
 		product_id: {
-			type: "INTEGER",
+			type: "SMALLINT",
 			notNull: true
 		},
 		user_id: {
-			type: "INTEGER",
+			type: "SMALLINT",
 			notNull: true
 		},
 		transaction_id: {
@@ -23,11 +23,11 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
 			notNull: true,
 			check: "(rating BETWEEN 1 AND 10)"
 		},
-		description: {
+		review_description: {
 			type: "TEXT",
 			notNull: true
 		},
-		status: {
+		review_status: {
 			type: "VARCHAR(10)",
 			notNull: true,
 			default: "active"

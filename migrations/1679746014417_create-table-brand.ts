@@ -2,15 +2,15 @@ import { MigrationBuilder } from "node-pg-migrate";
 
 export async function up(pgm: MigrationBuilder): Promise<void> {
 	pgm.createTable("brand", {
-		id: {
-			type: "SERIAL",
+		brand_id: {
+			type: "SMALLSERIAL",
 			primaryKey: true
 		},
-		name: {
+		brand_name: {
 			type: "VARCHAR(50)",
 			notNull: true
 		},
-		identifier: {
+		brand_identifier: {
 			type: "VARCHAR(50)",
 			notNull: true,
 			unique: true

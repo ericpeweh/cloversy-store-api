@@ -7,7 +7,9 @@ export const getAllBrands = async (page: string, searchQuery: string, sortBy: st
 	const limit = 10;
 	const offset = parseInt(page) * limit - limit;
 
-	let query = `SELECT *,
+	let query = `SELECT 
+    b.brand_id AS id, b.brand_name as name, 
+    b.brand_identifier as identifier, b.*,
     (SELECT 
       COUNT(*) FROM product p
       WHERE p.brand_id = b.brand_id

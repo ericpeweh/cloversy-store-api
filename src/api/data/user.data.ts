@@ -19,7 +19,7 @@ export const getAllCustomers = async (page: string, searchQuery: string, statusQ
     u.user_status AS status, u.*
     FROM users u 
     WHERE user_role = $1`;
-	let totalQuery = "SELECT COUNT(user_id) FROM users WHERE user_role = $1";
+	let totalQuery = "SELECT COUNT(user_id) FROM users u WHERE user_role = $1";
 
 	if (searchQuery) {
 		const searchPart = ` AND (email iLIKE $${paramsIndex + 1} OR full_name iLIKE $${
@@ -80,7 +80,7 @@ export const getUserDataById = async (userId: string) => {
 	const userQuery = `SELECT 
     u.user_id AS id, u.user_contact AS contact,
     u.user_status AS status, u.* 
-  FROM users WHERE user_id = $1`;
+  FROM users u WHERE user_id = $1`;
 	const userResult = await db.query(userQuery, [userId]);
 
 	const addressQuery = `SELECT 
@@ -90,10 +90,11 @@ export const getUserDataById = async (userId: string) => {
   ORDER BY is_default DESC, address_id ASC`;
 	const addressResult = await db.query(addressQuery, [userId]);
 
-	const productSeenQuery = `SELECT pls.*,
+	const productSeenQuery = `SELECT 
+    pls.*, pls.product_id AS id,
     p.product_title AS title,
     ROUND(p.price) AS price,
-    p.product_slug AS slug,
+    p.product_slug AS slug,   
     (SELECT array_agg("url") AS images 
         FROM product_image pi 
         WHERE pi.product_id = p.product_id
@@ -157,7 +158,7 @@ export const updateUser = async (updatedUserData: Partial<User>, userId: string)
 
 	const userResult = await db.query(query, params);
 
-	return userResult;
+	return userResult.rows[0];
 };
 
 export const getAllAdminUserIds = async () => {

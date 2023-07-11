@@ -13,7 +13,7 @@ export const updateUserAccountDetails = async (
 ) => {
 	const userData = await userRepo.updateUserAccountDetails(updatedUserAccountDetailsData, userSub);
 
-	return userData;
+	return { ...userData, contact: userData.user_contact };
 };
 
 export const changeUserProfilePicture = async (

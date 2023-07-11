@@ -94,7 +94,7 @@ export const getTransactions = async (
 
 export const getTransactionItem = async (transactionId: string) => {
 	const transactionQuery =
-		"SELECT t.transaction_id AS id, t.* FROM transactions t WHERE t.trannsaction_id = $1";
+		"SELECT t.transaction_id AS id, t.* FROM transactions t WHERE t.transaction_id = $1";
 
 	const transactionResult: QueryResult<Transaction> = await db.query(transactionQuery, [
 		transactionId

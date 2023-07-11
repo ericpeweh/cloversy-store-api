@@ -24,7 +24,7 @@ jest.mock("../../services", () => ({
 			})
 		),
 		sendEmails: jest.fn().mockReturnValue({ successCount: 3 }),
-		getNotifMarketingTargetUserIds: jest.fn(() => Promise.resolve([1, 2, 3])),
+		getEmailMarketingTargetUserIds: jest.fn(() => Promise.resolve([1, 2, 3])),
 		updateEmailMarketing: jest.fn(() => Promise.resolve())
 	},
 	userService: {
@@ -87,7 +87,7 @@ describe("initScheduledEmailMarketings", () => {
 		await initScheduledEmailMarketings();
 
 		// Assert no scheduling activity is made
-		expect(marketingService.getNotifMarketingTargetUserIds).not.toHaveBeenCalled();
+		expect(marketingService.getEmailMarketingTargetUserIds).not.toHaveBeenCalled();
 		expect(marketingService.sendEmails).not.toHaveBeenCalled();
 		expect(userService.getUserEmailAndNameByIds).not.toHaveBeenCalled();
 		expect(userService.getAllAdminUserIds).not.toHaveBeenCalled();
@@ -110,10 +110,10 @@ describe("initScheduledEmailMarketings", () => {
 		await scheduledJob1();
 		await scheduledJob2();
 
-		// Assert getNotifMarketingTargetUserIds getUserEmailAndNameByIds were called twice each
-		expect(marketingService.getNotifMarketingTargetUserIds).toHaveBeenCalledTimes(2);
-		expect(marketingService.getNotifMarketingTargetUserIds).toHaveBeenCalledWith("1");
-		expect(marketingService.getNotifMarketingTargetUserIds).toHaveBeenCalledWith("2");
+		// Assert getEmailMarketingTargetUserIds getUserEmailAndNameByIds were called twice each
+		expect(marketingService.getEmailMarketingTargetUserIds).toHaveBeenCalledTimes(2);
+		expect(marketingService.getEmailMarketingTargetUserIds).toHaveBeenCalledWith("1");
+		expect(marketingService.getEmailMarketingTargetUserIds).toHaveBeenCalledWith("2");
 
 		expect(userService.getUserEmailAndNameByIds).toHaveBeenCalledTimes(2);
 		expect(userService.getUserEmailAndNameByIds).toHaveBeenCalledWith([1, 2, 3]);

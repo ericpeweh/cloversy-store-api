@@ -11,7 +11,7 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
 			notNull: true
 		},
 		user_id: {
-			type: "INTEGER",
+			type: "SMALLINT",
 			notNull: true
 		},
 		read_at: {

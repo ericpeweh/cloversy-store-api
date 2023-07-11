@@ -64,15 +64,15 @@ export const birthdayAutoOfferMarketingFn = async () => {
 		description
 	];
 
-	const newVoucher = (await voucherService.createVoucher(voucherQueryData, selectedUserIds))
-		.rows[0];
+	const newVoucher = await voucherService.createVoucher(voucherQueryData, selectedUserIds);
 
 	// Send offer email to users
 	const targets = await userService.getUserEmailAndNameByIds(selectedUserIds);
 
 	const emailSubject = "Happy Birthday Clovers! Voucher diskon untuk kamu yang berulang tahun :)";
+
 	const emailParams = {
-		voucher_code: newVoucher.code,
+		voucher_code: newVoucher.voucher_code,
 		discount_value: "Rp. 100.000,-",
 		email_subject: emailSubject
 	};

@@ -2,8 +2,8 @@ import { MigrationBuilder } from "node-pg-migrate";
 
 export async function up(pgm: MigrationBuilder): Promise<void> {
 	pgm.createTable("email_marketing", {
-		id: {
-			type: "SERIAL",
+		email_marketing_id: {
+			type: "SMALLSERIAL",
 			primaryKey: true
 		},
 		notification_code: {
@@ -12,7 +12,7 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
 			unique: true
 		},
 		title: {
-			type: "VARCHAR(255)",
+			type: "VARCHAR(100)",
 			notNull: true
 		},
 		sent_at: {
@@ -25,7 +25,7 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
 			type: "TEXT"
 		},
 		email_subject: {
-			type: "VARCHAR(255)",
+			type: "VARCHAR(120)",
 			notNull: true
 		},
 		send_to: {
@@ -41,13 +41,13 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
 			type: "JSONB"
 		},
 		success_count: {
-			type: "INTEGER"
+			type: "SMALLINT"
 		},
 		failure_count: {
-			type: "INTEGER"
+			type: "SMALLINT"
 		},
 		template_id: {
-			type: "INTEGER",
+			type: "SMALLINT",
 			notNull: true
 		},
 		failed_emails: {

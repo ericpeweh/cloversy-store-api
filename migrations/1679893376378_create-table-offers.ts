@@ -7,11 +7,11 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
 			primaryKey: true
 		},
 		user_id: {
-			type: "INTEGER",
+			type: "SMALLINT",
 			notNull: true
 		},
 		offer_name: {
-			type: "VARCHAR(255)",
+			type: "VARCHAR(100)",
 			notNull: true
 		},
 		created_at: {

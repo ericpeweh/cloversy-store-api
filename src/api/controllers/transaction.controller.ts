@@ -114,7 +114,7 @@ export const updateTransaction = async (req: Request, res: Response, next: NextF
 		customerNote = "",
 		giftNote = "",
 		shippingTrackingCode = "",
-		timelineObj
+		timelineObj = ""
 	} = req.body;
 
 	try {

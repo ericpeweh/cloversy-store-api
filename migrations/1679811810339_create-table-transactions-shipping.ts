@@ -19,7 +19,7 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
 			notNull: true
 		},
 		shipping_tracking_code: {
-			type: "VARCHAR(255)"
+			type: "VARCHAR(100)"
 		},
 		shipping_etd: {
 			type: "VARCHAR(10)",
@@ -29,11 +29,11 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
 			type: "VARCHAR(100)",
 			notNull: true
 		},
-		contact: {
+		shipping_contact: {
 			type: "VARCHAR(20)",
 			notNull: true
 		},
-		address: {
+		shipping_address: {
 			type: "TEXT",
 			notNull: true
 		},
@@ -42,7 +42,7 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
 			notNull: true
 		},
 		province_id: {
-			type: "INTEGER",
+			type: "SMALLINT",
 			notNull: true
 		},
 		city: {
@@ -50,7 +50,7 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
 			notNull: true
 		},
 		city_id: {
-			type: "INTEGER",
+			type: "SMALLINT",
 			notNull: true
 		},
 		subdistrict: {
@@ -58,7 +58,7 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
 			notNull: true
 		},
 		subdistrict_id: {
-			type: "INTEGER",
+			type: "SMALLINT",
 			notNull: true
 		},
 		postal_code: {

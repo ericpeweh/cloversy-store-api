@@ -59,7 +59,7 @@ export const updateUser = async (
 
 	const userResult = await userRepo.updateUser(updatedUserData, userId);
 
-	return userResult.rows[0];
+	return { ...userResult, contact: userResult.user_contact };
 };
 
 export const getAllAdminUserIds = async () => {

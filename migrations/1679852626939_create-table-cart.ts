@@ -2,16 +2,16 @@ import { MigrationBuilder } from "node-pg-migrate";
 
 export async function up(pgm: MigrationBuilder): Promise<void> {
 	pgm.createTable("cart", {
-		id: {
+		cart_item_id: {
 			type: "SERIAL",
 			primaryKey: true
 		},
 		user_id: {
-			type: "INTEGER",
+			type: "SMALLINT",
 			notNull: true
 		},
 		product_id: {
-			type: "INTEGER",
+			type: "SMALLINT",
 			notNull: true
 		},
 		size: {
@@ -19,7 +19,7 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
 			notNull: true
 		},
 		quantity: {
-			type: "INTEGER",
+			type: "SMALLINT",
 			notNull: true
 		}
 	});

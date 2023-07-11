@@ -7,7 +7,10 @@ export const getAllCategories = async (page: string, searchQuery: string, sortBy
 	const limit = 10;
 	const offset = parseInt(page) * limit - limit;
 
-	let query = `SELECT *,
+	let query = `SELECT 
+    c.category_id AS id, c.category_name AS name, 
+    c.category_identifier AS identifier, 
+    c.category_description AS description, c.*,
     (SELECT 
       COUNT(*) FROM product p 
       WHERE p.category_id = c.category_id

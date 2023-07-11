@@ -47,7 +47,7 @@ export const handleNotifications = async (req: Request, res: Response, next: Nex
 		if (fraud_status == "challenge") {
 			// Notify admin there is challenge transaction
 			const message: NotificationMessage = {
-				title: "Pembayaran trannsaksi bermasalah",
+				title: "Pembayaran transaksi bermasalah",
 				body: `Pesanan #${order_id} mengalami masalah saat melakukan pembayaran, menunggu konfirmasi admin.`,
 				actionTitle: "Detail transaksi",
 				actionLink: `https://admin.cloversy.id/orders/${order_id}`

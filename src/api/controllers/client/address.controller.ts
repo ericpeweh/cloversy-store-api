@@ -106,9 +106,9 @@ export const updateAddress = async (req: Request, res: Response, next: NextFunct
 			shipping_note
 		} = req.body;
 
-		const updatedAddressData: Partial<Address> = {
+		const updatedAddressData: Partial<Address & { address_contact: string }> = {
 			recipient_name,
-			contact,
+			address_contact: contact,
 			address,
 			is_default,
 			province,

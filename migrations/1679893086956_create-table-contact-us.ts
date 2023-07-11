@@ -7,19 +7,19 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
 			primaryKey: true
 		},
 		sender_name: {
-			type: "VARCHAR(255)",
+			type: "VARCHAR(200)",
 			notNull: true
 		},
 		email: {
-			type: "VARCHAR(255)",
+			type: "VARCHAR(254)",
 			notNull: true
 		},
 		objective: {
 			type: "VARCHAR(30)",
 			notNull: true
 		},
-		title: {
-			type: "VARCHAR(255)",
+		message_title: {
+			type: "VARCHAR(200)",
 			notNull: true
 		},
 		message: {

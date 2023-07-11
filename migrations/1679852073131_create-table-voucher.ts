@@ -2,12 +2,12 @@ import { MigrationBuilder } from "node-pg-migrate";
 
 export async function up(pgm: MigrationBuilder): Promise<void> {
 	pgm.createTable("voucher", {
-		code: {
+		voucher_code: {
 			type: "VARCHAR(10)",
 			primaryKey: true
 		},
-		title: {
-			type: "VARCHAR(255)",
+		voucher_title: {
+			type: "VARCHAR(80)",
 			notNull: true
 		},
 		expiry_date: {
@@ -26,11 +26,11 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
 			notNull: true
 		},
 		usage_limit: {
-			type: "INTEGER",
+			type: "SMALLINT",
 			default: 10
 		},
 		current_usage: {
-			type: "INTEGER",
+			type: "SMALLINT",
 			default: 0
 		},
 		voucher_scope: {

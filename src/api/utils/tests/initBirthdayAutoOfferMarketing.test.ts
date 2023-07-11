@@ -17,19 +17,15 @@ jest.mock("../../services", () => ({
 	},
 	voucherService: {
 		createVoucher: jest.fn().mockReturnValue({
-			rows: [
-				{
-					code: "VOUCHERCODE",
-					title: "Happy Birthday Clovers",
-					expiryDate: new Date().toISOString(),
-					discount: 100000,
-					discountType: "value",
-					status: "active",
-					usageLimit: 3,
-					voucherScope: "user",
-					description: "Birthday offer given by auto-offer system 2023-03-09"
-				}
-			]
+			voucher_code: "VOUCHERCODE",
+			title: "Happy Birthday Clovers",
+			expiryDate: new Date().toISOString(),
+			discount: 100000,
+			discountType: "value",
+			status: "active",
+			usageLimit: 3,
+			voucherScope: "user",
+			description: "Birthday offer given by auto-offer system 2023-03-09"
 		})
 	},
 	notificationService: {

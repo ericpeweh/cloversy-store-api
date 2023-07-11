@@ -199,7 +199,7 @@ export const getSingleTransaction = async (userId: string, transactionId: string
   FROM transactions t
     JOIN transactions_shipping ts ON t.transaction_id = ts.transaction_id
     JOIN transactions_timeline tt ON t.transaction_id = tt.transaction_id
-  WHERE user_id = $1 AND transaction_id = $2
+  WHERE t.user_id = $1 AND t.transaction_id = $2
     `;
 
 	const transactionResult: QueryResult<
@@ -221,8 +221,8 @@ export const getSingleTransaction = async (userId: string, transactionId: string
 
 	const transactionItemsQuery = `SELECT 
     ti.transaction_item_id AS id, ti.*, 
-    p.product_title AS title, p.product_status AS status, 
-    p.product_description AS description, p.product_slug AS slug, p.*, ROUND(ti.price) AS price 
+    products.title AS title, products.slug AS slug, 
+    products.*, ROUND(ti.price) AS price 
   FROM transactions_item ti
   JOIN (
     SELECT p.product_id AS product_id, p.product_title AS title, p.product_slug AS slug,
@@ -231,7 +231,7 @@ export const getSingleTransaction = async (userId: string, transactionId: string
       WHERE pi.product_id = p.product_id
     )
     FROM product p
-  ) AS products 
+  ) AS products
   ON products.product_id = ti.product_id
   WHERE products.product_id = ti.product_id
   AND ti.transaction_id = $1`;
@@ -276,7 +276,7 @@ export const getUserTransactions = async (userId: string) => {
       ))
       FROM transactions_item ti
       JOIN (
-        SELECT p.id AS product_id, p.product_title AS title, p.product_slug AS slug,
+        SELECT p.product_id AS product_id, p.product_title AS title, p.product_slug AS slug,
           (
             SELECT array_agg("url") AS images 
             FROM product_image pi 
@@ -377,7 +377,7 @@ export const updateTransaction = async (
 };
 
 export const checkTransactionOwnByUser = async (userId: string, transactionId: string) => {
-	const transactionQuery = `SELECT id FROM transactions
+	const transactionQuery = `SELECT transaction_id FROM transactions
     WHERE transaction_id = $1 AND user_id = $2`;
 
 	const transactionResult = await db.query(transactionQuery, [transactionId, userId]);

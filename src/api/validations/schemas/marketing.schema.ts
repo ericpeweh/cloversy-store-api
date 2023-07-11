@@ -66,13 +66,14 @@ const basePostEmailMarketingBodySchema = {
 	title: Joi.string().required(),
 	description: Joi.string().allow("").optional(),
 	scheduled: Joi.date().iso().allow(null).optional(),
-	selectedUserIds: Joi.array().items(Joi.string(), Joi.number()).max(100).min(1).messages({
+	selectedUserIds: Joi.array().items(Joi.string(), Joi.number()).max(100).min(0).messages({
 		"array.min": "Selected users can't be empty",
 		"array.max": "Maximum selected users exceeded (max 100 users)."
 	}),
 	email_subject: Joi.string().required(),
 	params: Joi.object().required(),
-	templateId: Joi.number().required()
+	templateId: Joi.number().required(),
+	sendTo: Joi.string().valid("selected")
 };
 
 export const createEmailMarketingBodySchema = Joi.object({

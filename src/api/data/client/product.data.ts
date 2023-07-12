@@ -176,13 +176,17 @@ export const getProductRecommendations = async (productTags: string[], productId
       (SELECT ROUND(AVG(rating) / 2, 2) AS rating
         FROM review r
         WHERE r.product_id = p.product_id AND r.review_status = 'active'
-		  )
+		  ),
+      (SELECT COALESCE(SUM(ti.quantity), 0) AS popularity
+        FROM transactions_item ti
+        WHERE ti.product_id = p.product_id
+      )
       FROM product p
       JOIN brand b ON p.brand_id = b.brand_id 
       JOIN category c ON p.category_id = c.category_id 
     ) AS filtered
   WHERE filtered.tags && ($1) AND filtered.id != $2
-  ORDER BY rating DESC NULLS LAST
+  ORDER BY popularity DESC, rating DESC NULLS LAST
   LIMIT 4
   `;
 	const recommendationsResult = await db.query(recommendationsQuery, [productTags, productId]);

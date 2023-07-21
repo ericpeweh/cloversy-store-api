@@ -13,7 +13,7 @@ export const postAddProductToCartBodySchema = Joi.object({
 });
 
 const baseCartItemIdSchema = {
-	id: Joi.number()
+	id: Joi.alternatives().try(Joi.number(), Joi.string())
 };
 
 export const patchUpdateCartItemBodySchema = Joi.object({

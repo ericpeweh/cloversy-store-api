@@ -56,7 +56,7 @@ export const getAllProducts = async (
 	let totalQuery = "SELECT COUNT(product_id) FROM product WHERE product_status = 'active'";
 
 	if (brandFilter) {
-		const filter = ` AND brand_id = $${paramsIndex + 1}`;
+		const filter = ` AND p.brand_id = $${paramsIndex + 1}`;
 		query += filter;
 		totalQuery += filter;
 		params.push(brandFilter);

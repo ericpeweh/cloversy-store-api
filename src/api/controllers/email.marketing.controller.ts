@@ -9,6 +9,7 @@ import { marketingService, notificationService, userService } from "../services"
 
 // Utils
 import { ErrorObj, getEmailTemplateParams, scheduler } from "../utils";
+import { scheduledJobs } from "../utils/scheduler";
 
 export const getEmailsTemplate = async (_: Request, res: Response, next: NextFunction) => {
 	try {
@@ -289,6 +290,14 @@ export const cancelEmailMarketing = async (req: Request, res: Response, next: Ne
 			updatedEmailMarketingData: { canceled: true },
 			emailMarketingId
 		});
+
+		// Cancel email marketing scheduled task
+		if (updatedEmailMarketing.notification_code) {
+			const job = scheduledJobs ? scheduledJobs[updatedEmailMarketing.notification_code] : null;
+			if (job) {
+				job.cancel();
+			}
+		}
 
 		res.status(200).json({
 			status: "success",

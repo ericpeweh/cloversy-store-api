@@ -13,6 +13,7 @@ import { marketingService, notificationService, userService } from "../services"
 
 // Utils
 import { ErrorObj, scheduler } from "../utils";
+import { scheduledJobs } from "../utils/scheduler";
 
 export const createNotificationMarketing = async (
 	req: Request,
@@ -297,6 +298,14 @@ export const cancelNotificationMarketing = async (
 			updatedNotifMarketingData: { canceled: true },
 			notifMarketingId
 		});
+
+		// Cancel notification marketing scheduled task
+		if (updatedNotifMarketing.notification_code) {
+			const job = scheduledJobs ? scheduledJobs[updatedNotifMarketing.notification_code] : null;
+			if (job) {
+				job.cancel();
+			}
+		}
 
 		res.status(200).json({
 			status: "success",

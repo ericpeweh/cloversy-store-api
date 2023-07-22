@@ -50,7 +50,7 @@ app.use(
 		secret: process.env.SESSION_SECRET!,
 		cookie: {
 			maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
-			sameSite: "none",
+			sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", // to ennable session in localhost
 			secure: process.env.NODE_ENV === "production"
 		},
 		store: new (sessionStore(session))({

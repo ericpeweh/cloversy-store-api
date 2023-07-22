@@ -105,6 +105,7 @@ app.use("/admin/notifications", isAdmin, getUserData, router.notificationRouter)
 app.use("/admin/chat", isAdmin, getUserData, router.chatRouter);
 app.use("/admin/account", isAdmin, getUserData, router.accountRouter);
 app.use("/admin/auth", isAuth, isAdmin, getUserData, router.authRouter);
+app.use("/admin/reports", isAuth, isAdmin, router.reportRouter);
 
 // Error handling middleware
 app.use(errorHandler);

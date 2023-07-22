@@ -16,6 +16,7 @@ import * as activitySchema from "./activity.schema";
 import * as cartSchema from "./cart.schema";
 import * as contactSchema from "./contact.schema";
 import * as dataSchema from "./data.schema";
+import * as reportSchema from "./report.schema";
 
 export {
 	accountSchema,
@@ -34,5 +35,6 @@ export {
 	activitySchema,
 	cartSchema,
 	contactSchema,
-	dataSchema
+	dataSchema,
+	reportSchema
 };

@@ -13,6 +13,7 @@ import notificationRouter from "./notification.route";
 import dashboardRouter from "./dashboard.route";
 import chatRouter from "./chat.route";
 import accountRouter from "./account.route";
+import reportRouter from "./report.route";
 
 export default {
 	productRouter,
@@ -28,5 +29,6 @@ export default {
 	notificationRouter,
 	dashboardRouter,
 	chatRouter,
-	accountRouter
+	accountRouter,
+	reportRouter
 };

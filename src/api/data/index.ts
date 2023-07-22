@@ -10,6 +10,7 @@ import * as notificationRepo from "./notification.data";
 import * as subscriptionRepo from "./subscription.data";
 import * as marketingRepo from "./marketing.data";
 import * as chatRepo from "./chat.data";
+import * as reportRepo from "./report.data";
 
 export {
 	productRepo,
@@ -22,5 +23,6 @@ export {
 	notificationRepo,
 	subscriptionRepo,
 	marketingRepo,
-	chatRepo
+	chatRepo,
+	reportRepo
 };

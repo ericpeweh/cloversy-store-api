@@ -50,7 +50,7 @@ app.use(
 		secret: process.env.SESSION_SECRET!,
 		cookie: {
 			maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
-			sameSite: "none",
+			sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", // to ennable session in localhost
 			secure: process.env.NODE_ENV === "production"
 		},
 		store: new (sessionStore(session))({
@@ -105,6 +105,7 @@ app.use("/admin/notifications", isAdmin, getUserData, router.notificationRouter)
 app.use("/admin/chat", isAdmin, getUserData, router.chatRouter);
 app.use("/admin/account", isAdmin, getUserData, router.accountRouter);
 app.use("/admin/auth", isAuth, isAdmin, getUserData, router.authRouter);
+app.use("/admin/reports", isAuth, isAdmin, router.reportRouter);
 
 // Error handling middleware
 app.use(errorHandler);

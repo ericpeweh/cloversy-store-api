@@ -13,6 +13,7 @@ import * as notifMarketingController from "./notif.marketing.controller";
 import * as notificationController from "./notification.controller";
 import * as dashboardController from "./dashboard.controller";
 import * as chatController from "./chat.controller";
+import * as reportController from "./report.controller";
 
 // Combine splited marketing controllers
 const marketingController = { ...emailMarketingController, ...notifMarketingController };
@@ -30,5 +31,6 @@ export {
 	marketingController,
 	notificationController,
 	dashboardController,
-	chatController
+	chatController,
+	reportController
 };

@@ -9,3 +9,4 @@ export { default as initNotificationSubscriptionsCleanup } from "./initNotificat
 export { default as getEmailTemplateParams } from "./getEmailTemplateParams";
 export { default as initScheduledEmailMarketings } from "./initScheduledEmailMarketings";
 export { default as initBirthdayAutoOfferMarketing } from "./initBirthdayAutoOfferMarketing";
+export { default as validateReportDate } from "./validateReportDate";

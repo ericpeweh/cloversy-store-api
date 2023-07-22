@@ -24,7 +24,8 @@ export const changeUserProfilePicture = async (
 	if (!userCurrentPicture.includes("s.gravatar.com") && userCurrentPicture) {
 		await bucket
 			.file(userCurrentPicture.replace("https://storage.googleapis.com/cloversy-store/", ""))
-			.delete();
+			.delete()
+			.catch(); // prevent throw remove image (fallback if image is already deleted)
 	}
 
 	const cloudImageResponse = await bucket.upload(image.path, {

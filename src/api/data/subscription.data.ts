@@ -29,7 +29,7 @@ export const getPushSubscriptions = async (page: string, searchQuery: string) =>
 	totalQuery += " WHERE u.user_role = 'user'";
 
 	if (searchQuery) {
-		const searchPart = ` WHERE (u.email iLIKE $${paramsIndex} OR u.full_name iLIKE $${paramsIndex})`;
+		const searchPart = ` AND (u.email iLIKE $${paramsIndex} OR u.full_name iLIKE $${paramsIndex})`;
 		query += searchPart;
 		totalQuery += searchPart;
 

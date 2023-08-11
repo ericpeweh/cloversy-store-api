@@ -9,7 +9,9 @@ import { QueryResult } from "pg";
 import { ErrorObj } from "../../utils";
 
 export const getUserVouchers = async (userId: string) => {
-	const voucherQuery = `SELECT v.voucher_code AS code, v.voucher_title AS title, v.discount, v.discount_type, v.expiry_date
+	const voucherQuery = `SELECT 
+  v.voucher_code AS code, v.voucher_title AS title, 
+  v.discount, v.discount_type, v.expiry_date
     FROM voucher_dist vd
     JOIN voucher v
     ON v.voucher_code = vd.voucher_code
@@ -23,7 +25,9 @@ export const getUserVouchers = async (userId: string) => {
 };
 
 export const getSingleVoucher = async (voucherCode: string) => {
-	const voucherQuery = "SELECT * FROM voucher WHERE voucher_code = $1";
+	const voucherQuery = `SELECT 
+    v.voucher_code AS code, v.voucher_title AS title, v.voucher_status AS status, v.*
+  FROM voucher v WHERE v.voucher_code = $1`;
 
 	const voucherResult: QueryResult<Voucher> = await db.query(voucherQuery, [voucherCode]);
 
@@ -49,7 +53,9 @@ export const getSingleVoucher = async (voucherCode: string) => {
 };
 
 export const getVoucherItem = async (voucherCode: string) => {
-	const voucherQuery = "SELECT * FROM voucher WHERE voucher_code = $1";
+	const voucherQuery = `SELECT
+    v.voucher_code AS code, v.voucher_title AS title, v.voucher_status AS status, v.*  
+  FROM voucher v WHERE v.voucher_code = $1`;
 
 	const voucherResult: QueryResult<Voucher> = await db.query(voucherQuery, [voucherCode]);
 
